@@ -19,27 +19,6 @@ def normalise_api_base_url(raw: str) -> str:
     return stripped
 
 
-def resolved_api_base_url() -> str:
-    """
-    API host for compliance scoring. Set API_BASE_URL in Render / Streamlit
-    Cloud Secrets to the deployed FastAPI public URL (e.g. HTTPS on Render).
-    """
-
-    fallback = (
-        os.environ.get("STREAMLIT_API_BASE_URL", "").strip()
-    )
-
-    if fallback:
-
-        return normalise_api_base_url(fallback)
-
-    return normalise_api_base_url(
-        os.environ.get(
-            "API_BASE_URL",
-            "http://localhost:8000",
-        )
-    )
-
 import numpy as np
 import pandas as pd
 import requests
@@ -107,18 +86,54 @@ export_service = ExportService()
 # API CONFIGURATION
 # =============================================================================
 
-API_BASE_URL = resolved_api_base_url()
-
 MAX_DISPLAY_ROWS = 1000
 MAX_CHART_ROWS = 5000
 
-HEALTH_ENDPOINT = (
-    f"{API_BASE_URL}/health/"
-)
 
-SCREENING_ENDPOINT = (
-    f"{API_BASE_URL}/scoring/run"
-)
+def get_api_base_url() -> str:
+    """
+    FastAPI public base URL (no trailing slash).
+
+    Resolution order:
+    1. Environment ``STREAMLIT_API_BASE_URL`` or ``API_BASE_URL`` (Render, Docker, local).
+    2. Streamlit Cloud **Secrets** keys ``STREAMLIT_API_BASE_URL`` or ``API_BASE_URL``.
+    3. Local default ``http://localhost:8000``.
+
+    **You do not set RENDER_EXTERNAL_URL yourself** — Render injects that on the API
+    service only. For Streamlit Cloud, copy your API’s HTTPS URL from the Render
+    dashboard into Secrets as ``API_BASE_URL``.
+    """
+
+    for env_key in (
+        "STREAMLIT_API_BASE_URL",
+        "API_BASE_URL",
+    ):
+
+        val = os.environ.get(env_key, "").strip()
+
+        if val:
+
+            return normalise_api_base_url(val)
+
+    try:
+
+        sec = st.secrets
+
+        for key in (
+            "STREAMLIT_API_BASE_URL",
+            "API_BASE_URL",
+        ):
+
+            if key in sec:
+
+                return normalise_api_base_url(str(sec[key]))
+
+    except Exception:
+
+        pass
+
+    return normalise_api_base_url("http://localhost:8000")
+
 
 # =============================================================================
 # API HELPERS
@@ -132,7 +147,7 @@ def check_backend_health() -> bool:
     try:
 
         response = requests.get(
-            HEALTH_ENDPOINT,
+            f"{get_api_base_url()}/health/",
             timeout=5,
         )
 
@@ -191,7 +206,7 @@ def run_screening_via_api(
     )
 
     response = requests.post(
-        SCREENING_ENDPOINT,
+        f"{get_api_base_url()}/scoring/run",
         json={"records": payload},
         timeout=300,
     )
