@@ -17,6 +17,4 @@ build/
 .env.*
 !.env.example
 
-.python-version
-
 streamlit/logs/
