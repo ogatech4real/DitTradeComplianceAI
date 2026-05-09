@@ -255,6 +255,114 @@ def sanitise_dataframe(
     return out
 
 
+def get_scoring_request_timeout_sec() -> float:
+    """
+    HTTP client timeout for /scoring/run (large uploads can exceed 5 minutes).
+
+    Streamlit Cloud: set secret or env ``STREAMLIT_SCORING_TIMEOUT_SEC`` (seconds).
+    """
+
+    for env_key in (
+        "STREAMLIT_SCORING_TIMEOUT_SEC",
+        "SCORING_REQUEST_TIMEOUT_SEC",
+    ):
+
+        raw = os.environ.get(
+            env_key,
+            "",
+        ).strip()
+
+        if raw:
+
+            try:
+
+                return max(
+                    30.0,
+                    float(raw),
+                )
+
+            except ValueError:
+
+                pass
+
+    try:
+
+        sec = st.secrets.get(
+            "STREAMLIT_SCORING_TIMEOUT_SEC",
+        )
+
+        if sec is not None:
+
+            return max(
+                30.0,
+                float(sec),
+            )
+
+    except Exception:
+
+        pass
+
+    return 600.0
+
+
+def format_scoring_http_error(
+    response: requests.Response,
+) -> str:
+
+    code = response.status_code
+
+    if code in (
+        502,
+        503,
+        504,
+    ):
+
+        return (
+            f"HTTP {code}: API gateway could not reach the scoring service "
+            f"or it timed out ({get_api_base_url()}). Typical causes: "
+            "instance memory/CPU limits, Render proxy timeout, or cold start. "
+            "Check API logs on Render; consider a larger plan or "
+            "``STREAMLIT_SCORING_TIMEOUT_SEC`` if the client gave up early."
+        )
+
+    text = (
+        response.text
+        or ""
+    )
+
+    snippet = text.strip()[:200]
+
+    if snippet.lower().startswith(
+        "<!doctype",
+    ) or "<html" in snippet.lower():
+
+        return (
+            f"HTTP {code}: received an HTML error page from the host "
+            "(often 502 Bad Gateway) instead of JSON. "
+            "Inspect the API service logs on Render for crashes or OOM."
+        )
+
+    try:
+
+        parsed = response.json()
+
+        detail = parsed.get("detail")
+
+        if detail is not None:
+
+            return str(detail)
+
+    except Exception:
+
+        pass
+
+    if len(text) > 1200:
+
+        return f"{text[:1200]}…"
+
+    return text or f"HTTP {code} with empty body"
+
+
 def run_screening_via_api(
     dataframe: pd.DataFrame,
 ) -> Dict[str, Any]:
@@ -270,24 +378,19 @@ def run_screening_via_api(
         orient="records"
     )
 
+    timeout_sec = get_scoring_request_timeout_sec()
+
     response = requests.post(
         f"{get_api_base_url()}/scoring/run",
         json={"records": payload},
-        timeout=300,
+        timeout=timeout_sec,
     )
 
     if response.status_code != 200:
 
-        try:
-
-            error_detail = (
-                response.json()
-                .get("detail")
-            )
-
-        except Exception:
-
-            error_detail = response.text
+        error_detail = format_scoring_http_error(
+            response,
+        )
 
         raise RuntimeError(
             f"Backend scoring failed: "
@@ -628,8 +731,21 @@ elif selected_page == "Upload & Screening":
 
 elif selected_page == "Results Dashboard":
 
-    st.subheader(
-        "Compliance Screening Results"
+    st.markdown(
+        """
+<div style="
+padding:12px 14px;
+border-radius:8px;
+background:#ECEFF1;
+color:#263238;
+font-weight:700;
+font-size:24px;
+border:1px solid #CFD8DC;
+">
+Compliance Screening Results
+</div>
+""",
+        unsafe_allow_html=True,
     )
 
     results_df = SessionManager.get(
@@ -695,18 +811,21 @@ elif selected_page == "Results Dashboard":
             col1, col2, col3 = st.columns(3)
 
             with col1:
+                execution_seconds = float(
+                    processing_metadata.get(
+                        "processing_duration_seconds",
+                        0,
+                    )
+                )
                 st.metric(
                     "Execution Time",
-                    f"{processing_metadata.get('processing_duration_seconds', 0)} sec",
+                    f"{execution_seconds:.2f} sec",
                 )
 
             with col2:
                 st.metric(
                     "Model Version",
-                    processing_metadata.get(
-                        "model_version",
-                        "N/A",
-                    ),
+                    "DTCAI_V1.0",
                 )
 
             with col3:
