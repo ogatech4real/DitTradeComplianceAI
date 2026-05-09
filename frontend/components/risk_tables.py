@@ -317,7 +317,7 @@ class RiskTables:
             ranked_df[
                 display_columns
             ].head(MAX_TABLE_ROWS),
-            use_container_width=True,
+            width="stretch",
         )
 
         csv_data = ranked_df[
@@ -426,7 +426,7 @@ class RiskTables:
             flagged_df[
                 display_columns
             ].head(MAX_TABLE_ROWS),
-            use_container_width=True,
+            width="stretch",
         )
 
         csv_data = flagged_df[
@@ -525,7 +525,7 @@ class RiskTables:
 
         st.dataframe(
             breakdown_df,
-            use_container_width=True,
+            width="stretch",
         )
 
 

@@ -90,6 +90,23 @@ MAX_DISPLAY_ROWS = 1000
 MAX_CHART_ROWS = 5000
 
 
+def sample_dataframe_for_charts(
+    df: pd.DataFrame,
+) -> pd.DataFrame:
+    """
+    Same row cap for charts on Upload and Results pages (avoids heavy plots).
+    """
+
+    if len(df) > MAX_CHART_ROWS:
+
+        return df.sample(
+            MAX_CHART_ROWS,
+            random_state=42,
+        )
+
+    return df.copy()
+
+
 def get_api_base_url() -> str:
     """
     FastAPI public base URL (no trailing slash).
@@ -183,9 +200,7 @@ def sanitise_dataframe(
           ~out.columns.duplicated()
     ]
 
-    out = out.infer_objects(
-        copy=False
-    )
+    out = out.infer_objects()
 
     return out
 
@@ -369,7 +384,7 @@ elif selected_page == "Upload & Screening":
 
             st.dataframe(
                 input_df.head(),
-                use_container_width=True,
+                width="stretch",
             )
 
             # =====================================================
@@ -473,16 +488,9 @@ elif selected_page == "Upload & Screening":
                         results_df
                     )
 
-                    if len(results_df) > MAX_CHART_ROWS:
-
-                        chart_df = results_df.sample(
-                            MAX_CHART_ROWS,
-                            random_state=42,
-                        )
-
-                    else:
-
-                        chart_df = results_df.copy()
+                    chart_df = sample_dataframe_for_charts(
+                        results_df
+                    )
 
                     # =================================================
                     # STORE SESSION DATA
@@ -622,6 +630,10 @@ elif selected_page == "Results Dashboard":
     else:
 
         results_df = sanitise_dataframe(
+            results_df
+        )
+
+        chart_df = sample_dataframe_for_charts(
             results_df
         )
 
