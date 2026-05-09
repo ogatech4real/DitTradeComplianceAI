@@ -27,18 +27,21 @@ class BatchAnalysisEngine:
         df: pd.DataFrame,
     ) -> pd.Series:
 
+        # Avoid record_id as a duplicate key because it is often unique-by-design
+        # and suppresses true duplicate cluster detection.
         duplicate_keys = [
             col for col in [
-                "record_id",
                 "shipment_value_usd",
                 "shipment_quantity",
                 "declared_origin_country",
                 "product_family",
+                "destination_market",
             ]
             if col in df.columns
         ]
 
-        if not duplicate_keys:
+        # Require a minimum key-set to avoid noisy broad matches.
+        if len(duplicate_keys) < 3:
 
             return pd.Series(
                 [0] * len(df),
@@ -64,30 +67,66 @@ class BatchAnalysisEngine:
         df: pd.DataFrame,
         threshold: float = 0.30,
     ) -> pd.Series:
+        supplier_dimension = None
+        for col in [
+            "supplier_name",
+            "exporter_id",
+            "importer_id",
+        ]:
+            if col in df.columns:
+                supplier_dimension = col
+                break
 
-        if (
-            "supplier_name"
-            not in df.columns
-        ):
+        if supplier_dimension is None:
 
             return pd.Series(
                 [0] * len(df),
                 index=df.index,
             )
 
-        supplier_share = (
-            df["supplier_name"]
+        supplier_series = (
+            df[supplier_dimension]
             .astype(str)
+            .str.strip()
+        )
+
+        invalid_tokens = {
+            "",
+            "none",
+            "null",
+            "nan",
+            "n/a",
+            "na",
+        }
+
+        valid_mask = ~supplier_series.str.lower().isin(
+            invalid_tokens
+        )
+
+        if valid_mask.sum() < 10:
+            return pd.Series(
+                [0] * len(df),
+                index=df.index,
+            )
+
+        supplier_share = (
+            supplier_series[valid_mask]
             .value_counts(normalize=True)
         )
+
+        # Suppress noisy concentration alerts for low-cardinality identifiers.
+        if supplier_share.size < 2:
+            return pd.Series(
+                [0] * len(df),
+                index=df.index,
+            )
 
         flagged_suppliers = supplier_share[
             supplier_share >= threshold
         ].index
 
         return (
-            df["supplier_name"]
-            .astype(str)
+            supplier_series
             .isin(flagged_suppliers)
             .astype(int)
         )
@@ -104,8 +143,6 @@ class BatchAnalysisEngine:
         if (
             "destination_market"
             not in df.columns
-            or "hybrid_score"
-            not in df.columns
         ):
 
             return pd.Series(
@@ -113,10 +150,46 @@ class BatchAnalysisEngine:
                 index=df.index,
             )
 
+        # This batch stage executes before hybrid_score creation in workflow_engine.
+        # Use hybrid_score when available, otherwise a conservative proxy.
+        if "hybrid_score" in df.columns:
+            risk_signal = pd.to_numeric(
+                df["hybrid_score"],
+                errors="coerce",
+            ).fillna(0)
+        else:
+            proxy_components = []
+            for col in [
+                "rule_score",
+                "if_score",
+                "rf_probability",
+            ]:
+                if col in df.columns:
+                    proxy_components.append(
+                        pd.to_numeric(
+                            df[col],
+                            errors="coerce",
+                        ).fillna(0)
+                    )
+
+            if not proxy_components:
+                return pd.Series(
+                    [0] * len(df),
+                    index=df.index,
+                )
+
+            risk_signal = pd.concat(
+                proxy_components,
+                axis=1,
+            ).mean(axis=1)
+
+        temp_df = df.copy()
+        temp_df["_market_risk_signal"] = risk_signal
+
         grouped = (
-            df.groupby(
+            temp_df.groupby(
                 "destination_market"
-            )["hybrid_score"]
+            )["_market_risk_signal"]
             .mean()
         )
 
@@ -132,12 +205,19 @@ class BatchAnalysisEngine:
             + grouped.std(ddof=0)
         )
 
+        # In very homogeneous batches, avoid auto-flagging all markets.
+        if pd.isna(threshold) or np.isclose(grouped.std(ddof=0), 0):
+            return pd.Series(
+                [0] * len(df),
+                index=df.index,
+            )
+
         high_risk_markets = grouped[
             grouped >= threshold
         ].index
 
         return (
-            df["destination_market"]
+            temp_df["destination_market"]
             .isin(high_risk_markets)
             .astype(int)
         )

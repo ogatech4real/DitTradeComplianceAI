@@ -1,8 +1,9 @@
 from __future__ import annotations
 
+import asyncio
+import logging
 from pathlib import Path
 from typing import Dict, Any
-import logging
 
 import numpy as np
 import pandas as pd
@@ -133,11 +134,12 @@ async def run_scoring(
         # RUN PIPELINE
         # =================================================
 
-        pipeline_results = (
-            pipeline_manager.run_pipeline(
-                input_data=input_df,
-                return_intermediate=False,
-            )
+        # Run synchronous pipeline in a thread pool so the ASGI worker
+        # stays responsive (e.g. /health during long scores on Render).
+        pipeline_results = await asyncio.to_thread(
+            pipeline_manager.run_pipeline,
+            input_df,
+            False,
         )
 
         records = pipeline_results.get(
