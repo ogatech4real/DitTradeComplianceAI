@@ -1,8 +1,12 @@
-# Render Blueprint: deploy API + Streamlit as two Python web services.
+# Render Blueprint: deploy API + optional Streamlit web services.
 # Docs: https://render.com/docs/blueprint-spec
 #
-# After deploy: open the Streamlit service URL for the UI. The UI calls the API via
-# API_BASE_URL (wired from the API service public URL).
+# If you created the service manually and logs show:
+#   Running 'gunicorn your_application.wsgi'  ->  gunicorn: command not found
+# fix it in the Dashboard: Settings -> Start Command MUST be the uvicorn/streamlit
+# line below (Render’s Python default is a Django placeholder — not this repo).
+#
+# After deploy: Streamlit Cloud should set API_BASE_URL to your API’s HTTPS URL.
 
 version: "1"
 
@@ -14,6 +18,8 @@ services:
     startCommand: uvicorn backend.api.main:app --host 0.0.0.0 --port $PORT
     healthCheckPath: /health/
     envVars:
+      - key: PYTHON_VERSION
+        value: "3.11.9"
       - key: MPLBACKEND
         value: Agg
 
@@ -23,6 +29,8 @@ services:
     buildCommand: pip install --upgrade pip && pip install -r requirements.txt
     startCommand: streamlit run frontend/app.py --server.port=$PORT --server.address=0.0.0.0 --server.headless=true
     envVars:
+      - key: PYTHON_VERSION
+        value: "3.11.9"
       - key: MPLBACKEND
         value: Agg
       - key: API_BASE_URL
