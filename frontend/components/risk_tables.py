@@ -107,6 +107,100 @@ class RiskTables:
         # Return original text when structured parsing fails.
         return {"raw_icc_payload": text}
 
+    @staticmethod
+    def build_operator_risk_drivers(
+        row: pd.Series,
+    ) -> list[str]:
+        """
+        Build concise, operator-facing risk drivers for a record.
+        """
+        drivers: list[str] = []
+
+        rule_hits = int(
+            pd.to_numeric(
+                row.get(
+                    "rule_flag_count",
+                    0,
+                ),
+                errors="coerce",
+            )
+            if pd.notna(
+                row.get(
+                    "rule_flag_count",
+                    0,
+                )
+            )
+            else 0
+        )
+        if rule_hits > 0:
+            drivers.append(
+                f"{rule_hits} compliance rule hit(s) detected."
+            )
+
+        fraud_score = float(
+            pd.to_numeric(
+                row.get(
+                    "fraud_score",
+                    0.0,
+                ),
+                errors="coerce",
+            )
+            if pd.notna(
+                row.get(
+                    "fraud_score",
+                    0.0,
+                )
+            )
+            else 0.0
+        )
+        if fraud_score >= 0.5:
+            drivers.append(
+                "Elevated fraud pattern signal."
+            )
+
+        batch_score = float(
+            pd.to_numeric(
+                row.get(
+                    "batch_risk_score",
+                    0.0,
+                ),
+                errors="coerce",
+            )
+            if pd.notna(
+                row.get(
+                    "batch_risk_score",
+                    0.0,
+                )
+            )
+            else 0.0
+        )
+        if batch_score >= 0.33:
+            drivers.append(
+                "Part of a higher-risk batch cluster."
+            )
+
+        anomaly_class = str(
+            row.get(
+                "anomaly_class",
+                "",
+            )
+        ).strip().lower()
+        if anomaly_class and anomaly_class not in {
+            "none",
+            "normal",
+            "unknown",
+        }:
+            drivers.append(
+                f"Anomaly pattern observed ({anomaly_class})."
+            )
+
+        if not drivers:
+            drivers.append(
+                "No strong risk drivers surfaced; record appears lower-priority."
+            )
+
+        return drivers
+
     # =====================================================
     # MAIN RENDER
     # =====================================================
@@ -219,6 +313,10 @@ class RiskTables:
             top_k
         )
 
+        st.caption(
+            "Queue is ranked by hybrid risk score; records shown are for operational triage."
+        )
+
         # -------------------------------------------------
         # VISUAL RISK INDICATOR
         # -------------------------------------------------
@@ -297,15 +395,89 @@ class RiskTables:
             ranked_df
         )
 
+        selected_idx = 0
+        selector_options = list(
+            range(len(ranked_df))
+        )
+        selected_idx = st.selectbox(
+            "Inspect record for operator explanation",
+            options=selector_options,
+            format_func=lambda idx: (
+                f"{ranked_df.iloc[idx].get('record_id', f'row_{idx + 1}')} "
+                f"| risk={float(pd.to_numeric(ranked_df.iloc[idx].get('hybrid_score', 0), errors='coerce') or 0):.3f}"
+            ),
+            index=0,
+        )
+
+        focus_row = ranked_df.iloc[
+            selected_idx
+        ]
+
+        requires_review = str(
+            focus_row.get(
+                "severity_level",
+                "",
+            )
+        ).lower() in {
+            "critical",
+            "high",
+            "medium",
+        }
+
+        severity_label = str(
+            focus_row.get(
+                "severity_level",
+                "unknown",
+            )
+        ).title()
+        recommended_action = str(
+            focus_row.get(
+                "recommended_action",
+                "Manual review recommended.",
+            )
+        )
+
+        st.markdown(
+            "### Operator Decision Snapshot"
+        )
+        snapshot_col1, snapshot_col2, snapshot_col3 = st.columns(3)
+        with snapshot_col1:
+            st.metric(
+                "Requires Review",
+                "Yes" if requires_review else "No",
+            )
+        with snapshot_col2:
+            st.metric(
+                "Severity",
+                severity_label,
+            )
+        with snapshot_col3:
+            st.metric(
+                "Hybrid Risk Score",
+                f"{float(pd.to_numeric(focus_row.get('hybrid_score', 0), errors='coerce') or 0):.3f}",
+            )
+
+        st.info(
+            f"Recommended action: {recommended_action}"
+        )
+
+        st.markdown(
+            "**Why this record is in the queue**"
+        )
+        for driver in RiskTables.build_operator_risk_drivers(
+            focus_row
+        ):
+            st.write(f"- {driver}")
+
         if "icc" in ranked_df.columns:
 
             with st.expander(
-                "View ICC-normalised payload sample"
+                "View technical ICC-normalised payload"
             ):
                 sample_icc_payload = (
                     ranked_df[
                         "icc"
-                    ].iloc[0]
+                    ].iloc[selected_idx]
                 )
                 st.json(
                     RiskTables.parse_icc_payload(
@@ -313,12 +485,12 @@ class RiskTables:
                     )
                 )
 
-        col1, col2, col3 = st.columns(3)
+        col1, col2, col3, col4 = st.columns(4)
 
         with col1:
 
             st.metric(
-                "Priority Records",
+                "Displayed Queue Records",
                 len(ranked_df),
             )
 
@@ -342,6 +514,21 @@ class RiskTables:
             )
 
         with col3:
+            medium_count = (
+                ranked_df[
+                    "hybrid_risk_label"
+                ]
+                .astype(str)
+                .str.lower()
+                .eq("medium")
+                .sum()
+            )
+            st.metric(
+                "Medium",
+                int(medium_count),
+            )
+
+        with col4:
 
             avg_score = round(
                 pd.to_numeric(
