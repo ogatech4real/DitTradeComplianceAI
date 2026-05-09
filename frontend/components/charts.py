@@ -251,6 +251,60 @@ class Charts:
     # =====================================================
 
     @staticmethod
+    def derive_violation_count(
+        df: pd.DataFrame,
+    ) -> pd.Series | None:
+        """
+        Return per-record violation count with schema-tolerant fallbacks.
+        """
+        if "rule_flag_count" in df.columns:
+            return (
+                pd.to_numeric(
+                    df["rule_flag_count"],
+                    errors="coerce",
+                )
+                .fillna(0)
+                .clip(lower=0)
+                .astype(int)
+            )
+
+        # Fallback: sum binary-like rule indicator fields if explicit count is absent.
+        candidate_cols = [
+            col for col in df.columns
+            if (
+                col.endswith("_flag")
+                or col.endswith("_violation")
+                or col.startswith("rule_")
+            )
+            and col != "hybrid_flag"
+        ]
+
+        if not candidate_cols:
+            return None
+
+        if len(candidate_cols) > 25:
+            # Guardrail for very wide schemas; keep only most likely rule indicators.
+            candidate_cols = [
+                col for col in candidate_cols
+                if "rule" in col
+            ][:25]
+
+        if not candidate_cols:
+            return None
+
+        flags_df = (
+            df[candidate_cols]
+            .apply(
+                pd.to_numeric,
+                errors="coerce",
+            )
+            .fillna(0)
+        )
+
+        # Treat any positive value in a rule indicator as one violation.
+        return (flags_df > 0).sum(axis=1).astype(int)
+
+    @staticmethod
     def render_rule_flag_distribution(
         df: pd.DataFrame,
     ) -> None:
@@ -267,50 +321,133 @@ class Charts:
 
             return
 
-        if (
-            "rule_flag_count"
-            not in df.columns
-        ):
+        violation_count = Charts.derive_violation_count(
+            df
+        )
+
+        if violation_count is None:
 
             st.warning(
-                "rule_flag_count column missing."
+                "No compatible violation-count field found for this upload schema."
             )
 
             return
 
-        counts = (
-            pd.to_numeric(
-                df[
-                    "rule_flag_count"
-                ],
-                errors="coerce",
-            )
-            .fillna(0)
-            .astype(int)
-            .value_counts()
-            .sort_index()
+        total_shipments = int(
+            len(violation_count)
         )
+
+        bins = pd.cut(
+            violation_count,
+            bins=[-1, 0, 1, 2, 3, np.inf],
+            labels=[
+                "0",
+                "1",
+                "2",
+                "3",
+                "4+",
+            ],
+        )
+
+        counts = (
+            bins.value_counts()
+            .reindex(
+                [
+                    "0",
+                    "1",
+                    "2",
+                    "3",
+                    "4+",
+                ],
+                fill_value=0,
+            )
+        )
+
+        colour_map = {
+            "0": "#00C853",
+            "1": "#FFD600",
+            "2": "#FFAB00",
+            "3": "#FF6D00",
+            "4+": "#D50000",
+        }
+        bar_colours = [
+            colour_map.get(
+                str(label),
+                "#2979FF",
+            )
+            for label in counts.index
+        ]
+
+        no_violation_count = int(
+            counts.get(
+                "0",
+                0,
+            )
+        )
+        any_violation_count = total_shipments - no_violation_count
+        high_violation_count = int(
+            counts.get(
+                "4+",
+                0,
+            )
+        )
+        avg_violations = float(
+            violation_count.mean()
+        )
+
+        m1, m2, m3, m4 = st.columns(4)
+        with m1:
+            st.metric(
+                "No Violations",
+                f"{(no_violation_count / max(total_shipments, 1)) * 100:.1f}%",
+            )
+        with m2:
+            st.metric(
+                "At Least One Violation",
+                f"{(any_violation_count / max(total_shipments, 1)) * 100:.1f}%",
+            )
+        with m3:
+            st.metric(
+                "High-Violation Shipments (4+)",
+                f"{high_violation_count:,}",
+            )
+        with m4:
+            st.metric(
+                "Avg Violations / Shipment",
+                f"{avg_violations:.2f}",
+            )
 
         fig, ax = plt.subplots(
             figsize=(7, 4)
         )
 
-        colour_map = cm.viridis(
-            np.linspace(
-                0.2,
-                0.9,
-                len(counts),
-            )
-        )
-
-        ax.bar(
+        bars = ax.bar(
             counts.index.astype(str),
             counts.values,
-            color=colour_map,
+            color=bar_colours,
         )
 
+        for bar, value in zip(
+            bars,
+            counts.values,
+        ):
+            pct = (
+                (value / max(total_shipments, 1))
+                * 100
+            )
+            ax.text(
+                bar.get_x()
+                + bar.get_width() / 2,
+                bar.get_height()
+                + max(1, 0.01 * total_shipments),
+                f"{int(value):,}\n({pct:.1f}%)",
+                ha="center",
+                va="bottom",
+                fontsize=8,
+            )
+
         ax.set_xlabel(
-            "Number of Violations"
+            "Compliance Rule Violations per Shipment"
         )
 
         ax.set_ylabel(
@@ -318,12 +455,15 @@ class Charts:
         )
 
         ax.set_title(
-            "Rule Violation Distribution"
+            "Rule Violation Distribution (Operator View)"
         )
 
         apply_chart_style(ax)
 
         st.pyplot(fig)
+        st.caption(
+            f"n = {total_shipments:,} shipments. Buckets are fixed: 0, 1, 2, 3, 4+."
+        )
 
     # =====================================================
     # REVIEW PRIORITY ANALYSIS
