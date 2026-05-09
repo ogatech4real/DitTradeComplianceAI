@@ -45,7 +45,8 @@ class OperatorReportService:
 
         operational_metrics = (
             self.generate_operational_metrics(
-                scored_df
+                scored_df,
+                processing_metadata=processing_metadata,
             )
         )
 
@@ -313,22 +314,36 @@ class OperatorReportService:
     @staticmethod
     def generate_operational_metrics(
         scored_df: pd.DataFrame,
+        processing_metadata: Dict[str, Any] | None = None,
     ) -> Dict[str, Any]:
 
         metrics = {}
+
+        if processing_metadata is None:
+            processing_metadata = {}
 
         total_records = len(
             scored_df
         )
 
-        flagged_records = 0
+        records_requiring_review = 0
 
         if (
-            "hybrid_pred"
+            "requires_review"
             in scored_df.columns
         ):
 
-            flagged_records = int(
+            records_requiring_review = int(
+                (
+                    scored_df[
+                        "requires_review"
+                    ]
+                    .fillna(False)
+                    .astype(bool)
+                ).sum()
+            )
+        elif "hybrid_pred" in scored_df.columns:
+            records_requiring_review = int(
                 (
                     scored_df[
                         "hybrid_pred"
@@ -342,7 +357,7 @@ class OperatorReportService:
                 "review_rate_percent"
             ] = round(
                 (
-                    flagged_records
+                    records_requiring_review
                     / total_records
                 ) * 100,
                 2,
@@ -385,7 +400,7 @@ class OperatorReportService:
                     .isin(
                         [
                             "critical",
-                            "priority",
+                            "high",
                         ]
                     )
                 ).sum()
@@ -402,6 +417,87 @@ class OperatorReportService:
                 ) * 100,
                 2,
             )
+
+        if "fraud_score" in scored_df.columns:
+            metrics["fraud_alerts"] = int(
+                (
+                    pd.to_numeric(
+                        scored_df["fraud_score"],
+                        errors="coerce",
+                    )
+                    .fillna(0)
+                    >= 0.5
+                ).sum()
+            )
+        else:
+            metrics["fraud_alerts"] = 0
+
+        if "if_pred" in scored_df.columns:
+            metrics["anomaly_records"] = int(
+                (
+                    pd.to_numeric(
+                        scored_df["if_pred"],
+                        errors="coerce",
+                    )
+                    .fillna(0)
+                    == 1
+                ).sum()
+            )
+        else:
+            metrics["anomaly_records"] = 0
+
+        if "batch_risk_score" in scored_df.columns:
+            metrics["batch_risk_score"] = round(
+                float(
+                    pd.to_numeric(
+                        scored_df["batch_risk_score"],
+                        errors="coerce",
+                    )
+                    .fillna(0)
+                    .mean()
+                ),
+                4,
+            )
+        else:
+            metrics["batch_risk_score"] = 0.0
+
+        intelligence_quality = processing_metadata.get(
+            "intelligence_quality",
+            {},
+        )
+
+        if "mapping_confidence" in scored_df.columns:
+            metrics["mapping_confidence"] = round(
+                float(
+                    pd.to_numeric(
+                        scored_df["mapping_confidence"],
+                        errors="coerce",
+                    )
+                    .fillna(0)
+                    .mean()
+                ),
+                4,
+            )
+        else:
+            metrics["mapping_confidence"] = float(
+                intelligence_quality.get(
+                    "mapping_confidence",
+                    processing_metadata.get(
+                        "mapping_confidence",
+                        0.0,
+                    ),
+                )
+            )
+
+        metrics["data_quality_score"] = float(
+            intelligence_quality.get(
+                "data_quality_score",
+                processing_metadata.get(
+                    "data_quality_score",
+                    0.0,
+                ),
+            )
+        )
 
         return metrics
 

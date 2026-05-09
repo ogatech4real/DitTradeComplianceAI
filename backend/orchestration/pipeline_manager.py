@@ -7,9 +7,13 @@ from datetime import datetime
 
 import joblib
 import pandas as pd
+import numpy as np
 
 from src.data.io import load_tabular_file
 from src.data.mapping import canonicalise_dataframe
+from src.data.mapping import infer_mapping
+from src.domain.schema import REQUIRED_SCREENING_FIELDS
+from src.data.data_quality import DataQualityProfiler
 from src.features.preprocessing import enrich_from_icc, ALL_FEATURES
 from src.rules.rule_engine import run_rule_engine
 from backend.orchestration.workflow_engine import WorkflowEngine
@@ -152,6 +156,64 @@ class PipelineManager:
             },
         }
 
+    @staticmethod
+    def build_intelligence_quality_metrics(
+        raw_df: pd.DataFrame,
+        canonical_df: pd.DataFrame,
+    ) -> Dict[str, Any]:
+        mapping_confidence = float(
+            pd.to_numeric(
+                canonical_df.get("mapping_confidence", 0.0),
+                errors="coerce",
+            )
+            .fillna(0)
+            .mean()
+            if len(canonical_df) > 0
+            else 0.0
+        )
+        mapping_confidence = float(
+            np.clip(
+                mapping_confidence,
+                0,
+                1,
+            )
+        )
+
+        inferred_mapping = infer_mapping(list(raw_df.columns))
+        matched_schema_fields = int(len(inferred_mapping.mapping))
+        required_schema_fields = int(len(REQUIRED_SCREENING_FIELDS))
+
+        completeness_pct = DataQualityProfiler.profile_column_completeness(raw_df)
+        missing_pct = DataQualityProfiler.profile_missing_values(raw_df)
+        completeness_score = float(
+            np.mean(list(completeness_pct.values())) / 100
+        ) if completeness_pct else 0.0
+
+        invalid_values = float(
+            np.mean(list(missing_pct.values())) / 100
+        ) if missing_pct else 0.0
+
+        quality_score = float(
+            np.clip(
+                (0.70 * completeness_score)
+                + (0.30 * (1 - invalid_values)),
+                0,
+                1,
+            )
+        )
+
+        return {
+            "mapping_confidence": round(mapping_confidence, 4),
+            "matched_schema_fields": matched_schema_fields,
+            "required_schema_fields": required_schema_fields,
+            "icc_transformation_coverage": round(mapping_confidence, 4),
+            "completeness_score": round(completeness_score, 4),
+            "invalid_values_rate": round(invalid_values, 4),
+            "coercion_rate": round(invalid_values, 4),
+            "schema_consistency_score": round(mapping_confidence, 4),
+            "data_quality_score": round(quality_score, 4),
+        }
+
     # ---------------------------------------------------------
     # Main pipeline
     # ---------------------------------------------------------
@@ -170,6 +232,11 @@ class PipelineManager:
         # Canonicalise
         canonical_df = self.canonicalise(raw_df)
 
+        intelligence_quality = self.build_intelligence_quality_metrics(
+            raw_df=raw_df,
+            canonical_df=canonical_df,
+        )
+
         # Validate
         validated_df = self.validate(canonical_df)
 
@@ -184,12 +251,37 @@ class PipelineManager:
 
         # Operational insights
         system_insights = generate_operational_insights(scored_df)
+        system_insights.update(
+            {
+                "mapping_confidence": intelligence_quality.get("mapping_confidence", 0.0),
+                "matched_schema_fields": intelligence_quality.get("matched_schema_fields", 0),
+                "required_schema_fields": intelligence_quality.get("required_schema_fields", 0),
+                "icc_transformation_coverage": intelligence_quality.get("icc_transformation_coverage", 0.0),
+                "data_quality_score": intelligence_quality.get("data_quality_score", 0.0),
+            }
+        )
 
         # Priority queue
         priority_queue = self.generate_priority_queue(scored_df)
 
         # Processing metadata
         processing_metadata = self.build_processing_metadata(execution_seconds=time.time() - start_time)
+        processing_metadata.update(
+            {
+                "intelligence_quality": intelligence_quality,
+                "mapping_confidence": intelligence_quality.get("mapping_confidence", 0.0),
+                "matched_schema_fields": intelligence_quality.get("matched_schema_fields", 0),
+                "required_schema_fields": intelligence_quality.get("required_schema_fields", 0),
+                "icc_transformation_coverage": intelligence_quality.get("icc_transformation_coverage", 0.0),
+                "data_quality": {
+                    "completeness": intelligence_quality.get("completeness_score", 0.0),
+                    "invalid_values_rate": intelligence_quality.get("invalid_values_rate", 0.0),
+                    "coercion_rate": intelligence_quality.get("coercion_rate", 0.0),
+                    "schema_consistency_score": intelligence_quality.get("schema_consistency_score", 0.0),
+                    "overall_quality_score": intelligence_quality.get("data_quality_score", 0.0),
+                },
+            }
+        )
 
         # Result package
         result = {

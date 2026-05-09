@@ -84,7 +84,10 @@ def infer_mapping(columns: List[str]) -> MappingResult:
                 break
 
     missing_required = [field for field in REQUIRED_SCREENING_FIELDS if field not in mapping]
-    confidence = hits / max(len(REQUIRED_SCREENING_FIELDS), 1)
+    confidence = min(
+        hits / max(len(REQUIRED_SCREENING_FIELDS), 1),
+        1.0,
+    )
 
     return MappingResult(
         mapping=mapping,

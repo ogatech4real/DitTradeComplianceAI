@@ -148,12 +148,16 @@ class WorkflowEngine:
 
         return pd.Series(
             np.where(
-                score >= 0.66,
-                "high",
+                score >= 0.75,
+                "critical",
                 np.where(
-                    score >= 0.33,
-                    "medium",
-                    "low",
+                    score >= 0.50,
+                    "high",
+                    np.where(
+                        score >= 0.25,
+                        "medium",
+                        "low",
+                    ),
                 ),
             ),
             index=score.index,
@@ -257,11 +261,9 @@ class WorkflowEngine:
             )
 
             for col in fraud_results.columns:
-
-                if col not in out.columns:
-                    out[col] = fraud_results[
-                        col
-                    ]
+                out[col] = fraud_results[
+                    col
+                ]
 
         except Exception as exc:
 
@@ -300,11 +302,9 @@ class WorkflowEngine:
             )
 
             for col in batch_results.columns:
-
-                if col not in out.columns:
-                    out[col] = batch_results[
-                        col
-                    ]
+                out[col] = batch_results[
+                    col
+                ]
 
         except Exception as exc:
 
@@ -635,6 +635,19 @@ class WorkflowEngine:
             )
         )
 
+        out["requires_review"] = (
+            out["severity_level"]
+            .astype(str)
+            .str.lower()
+            .isin(
+                [
+                    "critical",
+                    "high",
+                    "medium",
+                ]
+            )
+        )
+
         out["compliance_issue"] = (
             out.apply(
                 determine_compliance_issue,
@@ -800,6 +813,18 @@ class WorkflowEngine:
             ).sum()
         )
 
+        if "requires_review" in scored_df.columns:
+            records_requiring_review = int(
+                scored_df[
+                    "requires_review"
+                ]
+                .fillna(False)
+                .astype(bool)
+                .sum()
+            )
+        else:
+            records_requiring_review = flagged_records
+
         avg_score = float(
             pd.to_numeric(
                 scored_df[
@@ -816,7 +841,10 @@ class WorkflowEngine:
                 total_records,
 
             "flagged_records":
-                flagged_records,
+                records_requiring_review,
+
+            "records_requiring_review":
+                records_requiring_review,
 
             "critical_records":
                 critical_records,
