@@ -301,12 +301,17 @@ class RiskTables:
             .copy()
         )
 
-        top_k = st.slider(
-            "Records for operational review",
-            min_value=5,
-            max_value=100,
-            value=20,
-            step=5,
+        top_n_options = [
+            n for n in [20, 50, 100]
+            if n <= len(ranked_df)
+        ]
+        if not top_n_options:
+            top_n_options = [len(ranked_df)]
+
+        top_k = st.selectbox(
+            "Records shown for operational review",
+            options=top_n_options,
+            index=0,
         )
 
         ranked_df = ranked_df.head(
@@ -314,7 +319,7 @@ class RiskTables:
         )
 
         st.caption(
-            "Queue is ranked by hybrid risk score; records shown are for operational triage."
+            f"Queue is ranked by hybrid risk score; showing top {top_k} of {len(df)} screened records."
         )
 
         # -------------------------------------------------
@@ -566,6 +571,49 @@ class RiskTables:
             file_name="priority_review_queue.csv",
             mime="text/csv",
         )
+
+        requires_review_series = None
+        if "requires_review" in df.columns:
+            requires_review_series = (
+                df["requires_review"]
+                .fillna(False)
+                .astype(bool)
+            )
+        elif "severity_level" in df.columns:
+            requires_review_series = (
+                df["severity_level"]
+                .astype(str)
+                .str.lower()
+                .isin(
+                    [
+                        "critical",
+                        "high",
+                        "medium",
+                    ]
+                )
+            )
+
+        if requires_review_series is not None:
+            requires_review_df = df[
+                requires_review_series
+            ].copy()
+            requires_review_export_cols = [
+                col for col in display_columns
+                if col in requires_review_df.columns
+            ]
+            if requires_review_export_cols:
+                requires_review_csv_data = requires_review_df[
+                    requires_review_export_cols
+                ].to_csv(
+                    index=False
+                ).encode("utf-8")
+
+                st.download_button(
+                    label="Download Full Requires Review CSV",
+                    data=requires_review_csv_data,
+                    file_name="requires_review_records.csv",
+                    mime="text/csv",
+                )
 
     # =====================================================
     # FLAGGED RECORDS

@@ -287,32 +287,36 @@ Operational Compliance Status: {overall_status.upper()}
     st.markdown(
         "### Operational Exposure"
     )
-
-    review_progress = min(
-        review_rate_percent / 100,
-        1.0,
-    )
-
-    high_risk_progress = min(
-        high_risk_rate_percent / 100,
-        1.0,
-    )
+    exposure_col1, exposure_col2, exposure_col3, exposure_col4 = st.columns(4)
+    with exposure_col1:
+        st.metric(
+            "Requires Review",
+            f"{flagged_records:,}",
+            f"{review_rate_percent:.2f}%",
+        )
+    with exposure_col2:
+        high_severity_count = int(
+            high_risk_records + critical_records
+        )
+        st.metric(
+            "High Severity",
+            f"{high_severity_count:,}",
+            f"{high_risk_rate_percent:.2f}%",
+        )
+    with exposure_col3:
+        st.metric(
+            "Critical Cases",
+            f"{critical_records:,}",
+        )
+    with exposure_col4:
+        st.metric(
+            "Cleared",
+            f"{cleared_records:,}",
+        )
 
     st.caption(
-        "Records requiring operational review"
+        f"Exposure metrics are computed on full screened results (n={total_records:,})."
     )
-
-    st.progress(review_progress)
-
-    st.caption(
-        f"{review_rate_percent:.1f}% of uploaded records require review."
-    )
-
-    st.caption(
-        "High severity compliance exposure"
-    )
-
-    st.progress(high_risk_progress)
 
     if mapping_confidence < 0.65:
 
