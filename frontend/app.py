@@ -2,9 +2,43 @@
 
 from __future__ import annotations
 
+import os
 import sys
 from pathlib import Path
 from typing import Any, Dict
+
+
+def normalise_api_base_url(raw: str) -> str:
+    """
+    Render / production URLs must be https without a trailing slash
+    when building endpoints.
+    """
+
+    stripped = raw.strip().rstrip("/")
+
+    return stripped
+
+
+def resolved_api_base_url() -> str:
+    """
+    API host for compliance scoring. Set API_BASE_URL in Render / Streamlit
+    Cloud Secrets to the deployed FastAPI public URL (e.g. HTTPS on Render).
+    """
+
+    fallback = (
+        os.environ.get("STREAMLIT_API_BASE_URL", "").strip()
+    )
+
+    if fallback:
+
+        return normalise_api_base_url(fallback)
+
+    return normalise_api_base_url(
+        os.environ.get(
+            "API_BASE_URL",
+            "http://localhost:8000",
+        )
+    )
 
 import numpy as np
 import pandas as pd
@@ -73,7 +107,7 @@ export_service = ExportService()
 # API CONFIGURATION
 # =============================================================================
 
-API_BASE_URL = "http://localhost:8000"
+API_BASE_URL = resolved_api_base_url()
 
 MAX_DISPLAY_ROWS = 1000
 MAX_CHART_ROWS = 5000
