@@ -180,27 +180,77 @@ def sanitise_dataframe(
     """
     Ensure dataframe is safe for
     API transfer and rendering.
+
+    Pandas 2+/3 Arrow string dtypes reject ``fillna(0)`` on string columns — use
+    per-dtype fills (aligned with backend scoring sanitisation).
     """
 
     out = df.copy()
 
-    out.replace(
-        [np.inf, -np.inf],
-        0,
-        inplace=True,
-    )
-
-    out.fillna(
-        0,
-        inplace=True,
-    )
-
     out = out.loc[
-          :,
-          ~out.columns.duplicated()
+        :,
+        ~out.columns.duplicated(),
     ]
 
-    out = out.infer_objects()
+    numeric_cols = out.select_dtypes(
+        include=[np.number],
+    ).columns
+
+    if len(numeric_cols) > 0:
+
+        out[numeric_cols] = (
+            out[numeric_cols]
+            .replace(
+                [np.inf, -np.inf],
+                np.nan,
+            )
+            .apply(
+                pd.to_numeric,
+                errors="coerce",
+            )
+            .fillna(0)
+        )
+
+    bool_cols = out.select_dtypes(
+        include=["bool", "boolean"],
+    ).columns
+
+    if len(bool_cols) > 0:
+
+        out[bool_cols] = (
+            out[bool_cols]
+            .fillna(False)
+        )
+
+    other_cols = (
+        out.columns
+        .difference(numeric_cols)
+        .difference(bool_cols)
+    )
+
+    if len(other_cols) > 0:
+
+        for col in other_cols:
+
+            series = out[col]
+
+            if pd.api.types.is_datetime64_any_dtype(
+                series,
+            ):
+
+                out[col] = np.where(
+                    series.isna(),
+                    "",
+                    series.dt.strftime("%Y-%m-%d"),
+                )
+
+            else:
+
+                out[col] = series.map(
+                    lambda cell: ""
+                    if pd.isna(cell)
+                    else str(cell),
+                )
 
     return out
 
