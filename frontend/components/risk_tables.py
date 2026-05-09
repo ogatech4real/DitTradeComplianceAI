@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import ast
+import json
 import pandas as pd
 import streamlit as st
 
@@ -63,6 +65,47 @@ class RiskTables:
         )
 
         return out
+
+    @staticmethod
+    def parse_icc_payload(
+        payload: object,
+    ) -> object:
+        """
+        Parse ICC payloads that may arrive as dict objects or
+        Python-dict-like strings from serialised backend rows.
+        """
+        if isinstance(
+            payload,
+            (dict, list),
+        ):
+            return payload
+
+        if payload is None:
+            return {}
+
+        text = str(payload).strip()
+        if not text:
+            return {}
+
+        # First try strict JSON.
+        try:
+            return json.loads(text)
+        except Exception:
+            pass
+
+        # Fallback for Python literal strings (single quotes / None / True / False).
+        try:
+            parsed = ast.literal_eval(text)
+            if isinstance(
+                parsed,
+                (dict, list),
+            ):
+                return parsed
+        except Exception:
+            pass
+
+        # Return original text when structured parsing fails.
+        return {"raw_icc_payload": text}
 
     # =====================================================
     # MAIN RENDER
@@ -259,11 +302,15 @@ class RiskTables:
             with st.expander(
                 "View ICC-normalised payload sample"
             ):
-
-                st.json(
+                sample_icc_payload = (
                     ranked_df[
                         "icc"
                     ].iloc[0]
+                )
+                st.json(
+                    RiskTables.parse_icc_payload(
+                        sample_icc_payload
+                    )
                 )
 
         col1, col2, col3 = st.columns(3)
