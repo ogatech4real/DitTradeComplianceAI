@@ -405,7 +405,7 @@ def _series_ok_for_snapshot_bar(
         series,
     )
 
-    mask = cleaned.str.ne(
+    mask = cleaned.ne(
         "Unknown",
     )
 
