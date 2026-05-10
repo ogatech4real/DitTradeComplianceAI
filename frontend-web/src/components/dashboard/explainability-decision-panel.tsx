@@ -16,7 +16,11 @@ export function ExplainabilityDecisionPanel({
         Explainability — decision narratives
       </h3>
       <p className="mt-1 text-[11px] text-muted-foreground leading-relaxed">
-        Automated clustering of operator explanations — never raw dataframe inspection.
+        Themes prefer each row&apos;s{" "}
+        <span className="font-mono text-foreground/80">records[].explanation</span> (
+        <span className="font-mono">build_operator_explanation</span>), then Streamlit-aligned
+        risk-driver signals (fraud ≥0.5, batch ≥0.33, rules, anomalies) when the narrative is
+        otherwise generic — same tier logic as queue drill-down copy.
       </p>
       <ul className="mt-4 space-y-3">
         {themes.map((t) => (

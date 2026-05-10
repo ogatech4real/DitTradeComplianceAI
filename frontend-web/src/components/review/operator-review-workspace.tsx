@@ -43,6 +43,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
+import { buildOperatorRiskDrivers } from "@/lib/intelligence/decision/operator-risk-drivers";
 
 type EnrichedRow = PriorityReviewItem & {
   recordSignals?: Record<string, unknown>;
@@ -200,6 +201,11 @@ export function OperatorReviewWorkspace() {
   const signalLines =
     briefingRow?.recordSignals != null ? summarizeSignals(briefingRow.recordSignals) : [];
 
+  const riskDrivers =
+    briefingRow?.recordSignals != null
+      ? buildOperatorRiskDrivers(briefingRow.recordSignals)
+      : [];
+
   if (latest.isPending) {
     return <Skeleton className="h-[480px] w-full rounded-xl" />;
   }
@@ -227,11 +233,39 @@ export function OperatorReviewWorkspace() {
             <section className="space-y-3 text-sm">
               <div>
                 <h4 className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                  Operator narrative
+                  API narrative{" "}
+                  <span className="font-normal normal-case text-muted-foreground">
+                    (<span className="font-mono">records[].explanation</span>)
+                  </span>
                 </h4>
                 <p className="mt-1 leading-relaxed text-foreground/95">
-                  {briefingRow?.explanation ?? "—"}
+                  {(() => {
+                    const fromRecord = briefingRow?.recordSignals?.explanation;
+                    const raw =
+                      fromRecord !== undefined && fromRecord !== null && String(fromRecord).trim() !== ""
+                        ? String(fromRecord)
+                        : (briefingRow?.explanation ?? "");
+                    return raw.trim() !== "" ? raw : "—";
+                  })()}
                 </p>
+              </div>
+              <div>
+                <h4 className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                  Risk drivers
+                  <span className="ml-1 font-normal normal-case text-muted-foreground">
+                    (Streamlit &quot;Why this record&quot; — fraud/batch/rule/anomaly tiers)
+                  </span>
+                </h4>
+                <ul className="mt-2 space-y-1.5 text-xs text-muted-foreground">
+                  {riskDrivers.map((line) => (
+                    <li
+                      key={line}
+                      className="rounded-md border border-border/60 bg-background/70 px-2 py-1.5 text-foreground/95"
+                    >
+                      {line}
+                    </li>
+                  ))}
+                </ul>
               </div>
               <div>
                 <h4 className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
