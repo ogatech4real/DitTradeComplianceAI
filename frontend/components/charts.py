@@ -94,9 +94,17 @@ def _order_risk_label_counts(counts: pd.Series) -> pd.Series:
     )
 
 
-def slice_operational_review_dataframe(
+def operational_review_backlog_state(
     df: pd.DataFrame,
-) -> tuple[pd.DataFrame | None, str]:
+) -> tuple[pd.DataFrame | None, str, str]:
+
+    """
+    Returns (backlog_df_or_none, caption, state_code).
+
+    state_code — one of ``no_mask`` (cannot isolate backlog),
+    ``empty`` (rule fired but cohort empty),
+    ``backlog`` (canonical subset).
+    """
 
     mask, provenance_short = RiskTables.operational_review_mask(
         df,
@@ -105,12 +113,16 @@ def slice_operational_review_dataframe(
     if mask is None:
 
         caption = (
-            f"Charts use **all {len(df):,} screened records** "
-            "(workflow fields needed to isolate **requires_review** backlog "
-            "were not detected — same view as full export)."
+            f"Workflow fields to isolate the review backlog are missing — "
+            f"**{len(df):,}** screened records are shown intake-wide. "
+            "Charts labelled backlog-only are suppressed or use full intake."
         )
 
-        return df.copy(), caption
+        return (
+            None,
+            caption,
+            "no_mask",
+        )
 
     backlog = df[
         mask.fillna(False)
@@ -118,15 +130,86 @@ def slice_operational_review_dataframe(
 
     if backlog.empty:
 
-        return None, ""
+        return (
+            None,
+            "",
+            "empty",
+        )
 
     caption = (
-        f"Charts use the **full operational review backlog** "
-        f"(**{len(backlog):,}** records; {provenance_short}). "
-        "Same rule as **Flagged Compliance Records**."
+        f"Backlog-focused charts use the **operational review cohort** "
+        f"(**{len(backlog):,}** rows; {provenance_short}) — same rule as "
+        "**Flagged Compliance Records**."
     )
 
-    return backlog, caption
+    return backlog, caption, "backlog"
+
+
+def slice_operational_review_dataframe(
+    df: pd.DataFrame,
+) -> tuple[pd.DataFrame | None, str]:
+
+    """
+    Back-compat wrapper returning (backlog, caption) only.
+    Prefer operational_review_backlog_state when state matters.
+    """
+
+    bl, cap, _state = operational_review_backlog_state(
+        df,
+    )
+
+    return bl, cap
+
+
+def _geo_column_for_intake(df: pd.DataFrame) -> str | None:
+
+    for candidate in (
+        "destination_market",
+        "applicable_jurisdiction",
+        "destination_country",
+        "country_of_export",
+        "declared_origin_country",
+    ):
+
+        if (
+            candidate
+            in df.columns
+        ):
+            return candidate
+
+    return None
+
+
+def _sanitize_geo_labels(
+    series: pd.Series,
+) -> pd.Series:
+
+    raw = (
+        series.fillna(
+            "",
+        )
+        .astype(
+            str,
+        )
+        .str.strip()
+    )
+
+    out = raw.mask(
+        raw.eq(
+            "",
+        ),
+        "Unknown",
+    )
+
+    return out.mask(
+        out.str.casefold().isin(
+            {
+                "nan",
+                "none",
+            }
+        ),
+        "Unknown",
+    )
 
 
 class Charts:
@@ -202,11 +285,18 @@ class Charts:
     @staticmethod
     def render_risk_distribution(
         df: pd.DataFrame,
+        scope_note: str = "",
     ) -> None:
 
         st.subheader(
             "Compliance Risk Distribution"
         )
+
+        if scope_note:
+
+            st.caption(
+                scope_note,
+            )
 
         if df.empty:
 
@@ -874,21 +964,17 @@ class Charts:
         st.pyplot(fig)
 
     # =====================================================
-    # REVIEW BACKLOG — OPERATOR KPIs + WORKLOAD GEO
+    # MANAGER / OPERATOR DASHBOARD BLOCKS
     # =====================================================
 
     @staticmethod
-    def render_review_backlog_kpis(
+    def _critical_high_share(
         df: pd.DataFrame,
-    ) -> None:
+    ) -> float | None:
 
         if df.empty:
 
-            return
-
-        n_backlog = len(df)
-
-        ch_hi_share: float | None = None
+            return None
 
         if (
             "hybrid_risk_label"
@@ -906,7 +992,7 @@ class Charts:
                 .str.lower()
             )
 
-            ch_hi_share = round(
+            return round(
                 100.0
                 * float(
                     tier.isin(
@@ -919,7 +1005,7 @@ class Charts:
                 1,
             )
 
-        elif (
+        if (
             "severity_level"
             in df.columns
         ):
@@ -935,7 +1021,7 @@ class Charts:
                 .str.lower()
             )
 
-            ch_hi_share = round(
+            return round(
                 100.0
                 * float(
                     tier.isin(
@@ -948,18 +1034,144 @@ class Charts:
                 1,
             )
 
+        return None
+
+    @staticmethod
+    def render_dashboard_metrics_bundle(
+        full_df: pd.DataFrame,
+        backlog_df: pd.DataFrame | None,
+        backlog_state: str,
+    ) -> None:
+
+        if full_df.empty:
+
+            return
+
+        n_total = len(full_df)
+
+        can_quantify_review = backlog_state != "no_mask"
+
+        bl = (
+            backlog_df
+            if backlog_df is not None
+            else pd.DataFrame()
+        )
+
+        n_backlog = len(bl)
+
+        review_rate_disp: float | str
+
+        backlog_count_disp: str
+
+        rr_help = (
+            "Share of screened rows in the operational review backlog "
+            "(requires_review-aligned rule)."
+            if can_quantify_review
+            else "Needs workflow fields that define operational review backlog.",
+        )
+
+        if (
+            backlog_state == "no_mask"
+        ):
+
+            review_rate_disp = "N/A"
+
+            backlog_count_disp = "N/A"
+
+        else:
+
+            review_rate_disp = round(
+                100.0
+                * n_backlog
+                / max(
+                    n_total,
+                    1,
+                ),
+                1,
+            )
+
+            backlog_count_disp = f"{n_backlog:,}"
+
+        intake_ch_hi = Charts._critical_high_share(
+            full_df,
+        )
+
+        st.markdown(
+            "##### Intake & oversight (full screened upload)"
+        )
+
+        m1, m2, m3, m4 = st.columns(
+            4,
+        )
+
+        with m1:
+
+            st.metric(
+                "Records screened",
+                f"{n_total:,}",
+            )
+
+        with m2:
+
+            st.metric(
+                "Operational review backlog",
+                backlog_count_disp,
+                help=(
+                    "Rows matched by backlog rule."
+                    if can_quantify_review
+                    else rr_help,
+                ),
+            )
+
+        with m3:
+
+            st.metric(
+                "Review rate",
+                (
+                    f"{review_rate_disp}%"
+                    if isinstance(review_rate_disp, float)
+                    else review_rate_disp
+                ),
+                help=rr_help,
+            )
+
+        with m4:
+
+            st.metric(
+                "Critical / High (whole intake)",
+                (
+                    f"{intake_ch_hi:.1f}%"
+                    if intake_ch_hi is not None
+                    else "N/A"
+                ),
+                help=(
+                    "Hybrid tier or severity view across every screened row.",
+                ),
+            )
+
+        if (
+            backlog_df is None
+            or backlog_df.empty
+        ):
+
+            return
+
+        bl_ch_hi = Charts._critical_high_share(
+            backlog_df,
+        )
+
         avg_composite_pct: float | None = None
 
         if (
             "hybrid_score"
-            in df.columns
+            in backlog_df.columns
         ):
 
             avg_composite_pct = round(
                 100.0
                 * float(
                     pd.to_numeric(
-                        df[
+                        backlog_df[
                             "hybrid_score"
                         ],
                         errors="coerce",
@@ -971,7 +1183,7 @@ class Charts:
             )
 
         vc_series = Charts.derive_violation_count(
-            df,
+            backlog_df,
         )
 
         median_violations: float | None = None
@@ -985,32 +1197,29 @@ class Charts:
                 2,
             )
 
-        k1, k2, k3, k4 = st.columns(
+        st.markdown(
+            "##### Review queue snapshot (backlog only)"
+        )
+
+        o1, o2, o3, o4 = st.columns(
             4,
         )
 
-        with k1:
+        with o1:
 
             st.metric(
-                "Backlog records",
-                f"{n_backlog:,}",
-            )
-
-        with k2:
-
-            st.metric(
-                "Critical / High share",
+                "Backlog Critical / High",
                 (
-                    f"{ch_hi_share:.1f}%"
-                    if ch_hi_share is not None
+                    f"{bl_ch_hi:.1f}%"
+                    if bl_ch_hi is not None
                     else "N/A"
                 ),
             )
 
-        with k3:
+        with o2:
 
             st.metric(
-                "Avg composite risk",
+                "Avg composite risk (backlog)",
                 (
                     f"{avg_composite_pct:.1f}%"
                     if avg_composite_pct is not None
@@ -1018,167 +1227,578 @@ class Charts:
                 ),
             )
 
-        with k4:
+        with o3:
 
             st.metric(
-                "Median violations / row",
+                "Median rule hits (backlog)",
                 (
                     f"{median_violations:.2f}"
                     if median_violations is not None
                     else "N/A"
                 ),
                 help=(
-                    "Per-row aggregate of rule-hit columns when explicit "
-                    "rule_flag_count is absent."
-                    if vc_series is not None
-                    else None
+                    "Uses rule_flag_count when present; otherwise inferred "
+                    "from rule-indicator columns.",
+                ),
+            )
+
+        with o4:
+
+            st.metric(
+                "Queue depth",
+                f"{n_backlog:,}",
+                help=(
+                    "Rows requiring operational review for this intake.",
                 ),
             )
 
     @staticmethod
-    def render_top_destination_workload_bar(
-        df: pd.DataFrame,
-        top_n: int = 8,
+    def render_corridor_intake_vs_backlog(
+        full_df: pd.DataFrame,
+        backlog_df: pd.DataFrame | None,
+        top_n: int = 10,
     ) -> None:
 
         st.subheader(
-            "Top workload corridors"
+            "Corridor workload (full intake)"
         )
 
-        geo_col = None
+        st.caption(
+            "Ranked by how many screened records each corridor owns. "
+            "The backlog series shows how review work stacks in the "
+            "same corridors when a backlog rule applies.",
+        )
 
-        if (
-            "destination_market"
-            in df.columns
-        ):
-            geo_col = "destination_market"
-
-        elif (
-            "applicable_jurisdiction"
-            in df.columns
-        ):
-            geo_col = "applicable_jurisdiction"
+        geo_col = _geo_column_for_intake(
+            full_df,
+        )
 
         if geo_col is None:
 
-            st.caption(
-                "Destination market and jurisdiction columns are not "
-                "available on this backlog."
+            st.info(
+                "No destination / corridor field found "
+                "(e.g. destination_market)."
             )
 
             return
 
-        raw_geo = (
-            df[
+        intake_labels = _sanitize_geo_labels(
+            full_df[
                 geo_col
+            ],
+        )
+
+        intake_counts = intake_labels.value_counts()
+
+        mask_exists = (
+            RiskTables.operational_review_mask(
+                full_df,
+            )[
+                0
             ]
-            .fillna(
-                "",
-            )
-            .astype(
-                str,
-            )
-            .str.strip()
+            is not None
         )
 
-        labels = raw_geo.mask(
-            raw_geo.eq(
-                "",
-            ),
-            "Unknown",
-        )
+        top_idx = intake_counts.head(
+            top_n,
+        ).index
 
-        labels = labels.mask(
-            labels.str.casefold().isin(
-                {
-                    "nan",
-                    "none",
-                }
-            ),
-            "Unknown",
-        )
+        backlog_counts_map: dict[
+            object,
+            int,
+        ] = {}
 
-        vc = labels.value_counts().head(top_n)
+        if (
+            mask_exists
+            and backlog_df is not None
+            and not backlog_df.empty
+            and geo_col
+            in backlog_df.columns
+        ):
 
-        if vc.empty:
-
-            st.caption(
-                "No corridor labels populated for backlog rows."
+            bl_labels = _sanitize_geo_labels(
+                backlog_df[
+                    geo_col
+                ],
             )
 
-            return
+            bl_vc = bl_labels.value_counts()
+
+            for corridor in top_idx:
+
+                backlog_counts_map[
+                    corridor
+                ] = int(
+                    bl_vc.get(
+                        corridor,
+                        0,
+                    )
+                )
+
+        y_labels = [
+            (
+                str(x)[:42] + "…"
+                if len(
+                    str(x),
+                )
+                > 44
+                else str(x)
+            )
+            for x in top_idx
+        ]
+
+        intake_vals = [
+            int(
+                intake_counts.get(
+                    c,
+                    0,
+                )
+            )
+            for c in top_idx
+        ]
+
+        backlog_vals = [
+            backlog_counts_map.get(
+                c,
+                0,
+            )
+            for c in top_idx
+        ]
 
         fig, ax = plt.subplots(
             figsize=(
-                7,
+                7.8,
                 max(
-                    3.8,
-                    0.42 * len(vc),
+                    4.0,
+                    0.42 * len(top_idx),
                 ),
             ),
         )
 
-        palette = plt.cm.Blues_r(
-            np.linspace(
-                0.35,
-                0.88,
-                len(vc),
+        y_pos = np.arange(
+            len(top_idx),
+        )
+
+        gap = 0.36
+
+        if (
+            mask_exists
+            and sum(
+                backlog_vals,
             )
-        )
+            > 0
+        ):
 
-        y_positions = np.arange(
-            len(vc),
-        )
+            ax.barh(
+                y_pos
+                - gap
+                / 2,
+                intake_vals,
+                height=gap,
+                label="All screened",
+                color="#90A4AE",
+                edgecolor="white",
+                linewidth=0.5,
+            )
 
-        bars = ax.barh(
-            y_positions,
-            vc.values,
-            color=palette,
-            edgecolor="white",
-            linewidth=0.6,
-            height=0.72,
-        )
+            ax.barh(
+                y_pos
+                + gap
+                / 2,
+                backlog_vals,
+                height=gap,
+                label="In review backlog",
+                color="#1565C0",
+                edgecolor="white",
+                linewidth=0.5,
+            )
 
-        readable_col = geo_col.replace(
-            "_",
-            " ",
-        )
+        else:
+
+            ax.barh(
+                y_pos,
+                intake_vals,
+                height=0.55,
+                label="All screened",
+                color="#1565C0",
+                edgecolor="white",
+                linewidth=0.5,
+            )
 
         ax.set_yticks(
-            y_positions,
+            y_pos,
         )
 
-        wrap_labels = []
-
-        for label in vc.index.astype(str):
-
-            text = (
-                (
-                    label[:38] + "…"
-                    if len(label)
-                    > 40
-                    else label
-                )
-            )
-
-            wrap_labels.append(
-                text,
-            )
-
         ax.set_yticklabels(
-            wrap_labels,
+            y_labels,
             fontsize=9,
         )
 
         ax.set_xlabel(
-            f"{readable_col.title()} — records in backlog"
+            "Record count"
+        )
+
+        readable = geo_col.replace(
+            "_",
+            " ",
+        )
+
+        ax.legend(
+            loc="lower right",
+            fontsize=8,
+            framealpha=0.93,
         )
 
         apply_chart_style(ax)
 
         ax.invert_yaxis()
 
-        for bar, count in zip(
+        plt.tight_layout()
+
+        st.pyplot(fig)
+
+        st.caption(
+            f"{readable.title()}: top {len(top_idx)} corridors by screened "
+            "volume. Matches backlog rule used in flagged CSV when available."
+        )
+
+    @staticmethod
+    def render_backlog_risk_concentration(
+        backlog_df: pd.DataFrame,
+    ) -> None:
+
+        st.subheader(
+            "Where backlog risk concentrates"
+        )
+
+        st.caption(
+            "Rows ordered from highest composite risk downward. Tracks how "
+            "much of summed composite exposure you capture scanning the backlog "
+            "from the top.",
+        )
+
+        if backlog_df.empty:
+
+            st.warning(
+                "Backlog is empty."
+            )
+
+            return
+
+        if (
+            "hybrid_score"
+            not in backlog_df.columns
+        ):
+
+            st.info(
+                "Needs hybrid_score on backlog rows to chart concentration.",
+            )
+
+            return
+
+        scores_raw = pd.to_numeric(
+            backlog_df[
+                "hybrid_score"
+            ],
+            errors="coerce",
+        ).fillna(
+            0,
+        )
+
+        vals = scores_raw.to_numpy()
+
+        order = np.argsort(
+            vals,
+        )[
+            ::-1
+        ]
+
+        scores = vals[
+            order
+        ]
+
+        if (
+            scores.size
+            == 0
+            or scores.sum()
+            <= 0
+        ):
+
+            st.info(
+                "No positive composite scores in the backlog to aggregate.",
+            )
+
+            return
+
+        total = float(
+            scores.sum(),
+        )
+
+        n = len(
+            scores,
+        )
+
+        cum = np.cumsum(
+            scores,
+        )
+
+        x_pct = (
+            np.arange(
+                1,
+                n + 1,
+            )
+            / n
+            * 100.0
+        )
+
+        y_pct = cum / total * 100.0
+
+        fig, ax = plt.subplots(
+            figsize=(
+                7,
+                4.2,
+            ),
+        )
+
+        ax.plot(
+            x_pct,
+            y_pct,
+            color="#BF360C",
+            linewidth=2.5,
+        )
+
+        ax.fill_between(
+            x_pct,
+            y_pct,
+            alpha=0.12,
+            color="#BF360C",
+        )
+
+        ax.axhline(
+            80,
+            color="#546E7A",
+            linestyle=":",
+            linewidth=1,
+            label="80% reference",
+        )
+
+        ax.axvline(
+            20,
+            color="#546E7A",
+            linestyle="--",
+            linewidth=0.85,
+            alpha=0.7,
+            label="Top 20% of backlog rows",
+        )
+
+        ix20 = max(
+            0,
+            min(
+                int(
+                    np.ceil(
+                        0.2 * n,
+                    ),
+                )
+                - 1,
+                n - 1,
+            ),
+        )
+
+        pct_at_twenty = round(
+            float(
+                y_pct[
+                    ix20
+                ],
+            ),
+            1,
+        )
+
+        ax.scatter(
+            [
+                x_pct[
+                    ix20
+                ],
+            ],
+            [
+                y_pct[
+                    ix20
+                ],
+            ],
+            color="#FFB300",
+            s=54,
+            zorder=6,
+            edgecolor="#263238",
+            linewidth=0.6,
+        )
+
+        ax.set_xlabel(
+            "% of backlog rows (priority queue order)"
+        )
+
+        ax.set_ylabel(
+            "% of summed composite scores captured"
+        )
+
+        apply_chart_style(ax)
+
+        ax.set_ylim(
+            0,
+            103,
+        )
+
+        ax.set_xlim(
+            0,
+            100,
+        )
+
+        ax.legend(
+            fontsize=8,
+            loc="lower right",
+            framealpha=0.93,
+        )
+
+        plt.tight_layout()
+
+        st.pyplot(fig)
+
+        st.metric(
+            "Pareto-style readout",
+            (
+                "Top fifth of backlog rows carry about "
+                f"{pct_at_twenty}% of summed composite scores"
+                if n
+                >= 5
+                else "Backlog too small for a fifth-band readout."
+            ),
+        )
+
+    @staticmethod
+    def render_compliance_themes_full_intake(
+        full_df: pd.DataFrame,
+        top_n: int = 12,
+    ) -> None:
+
+        st.subheader(
+            "Top compliance themes (full intake)"
+        )
+
+        st.caption(
+            "Most frequent compliance_issue labels across all screened rows — "
+            "manager-facing portfolio briefing.",
+        )
+
+        if full_df.empty:
+
+            return
+
+        if (
+            "compliance_issue"
+            not in full_df.columns
+        ):
+
+            st.info(
+                "compliance_issue field not available for this upload.",
+            )
+
+            return
+
+        text = (
+            full_df[
+                "compliance_issue"
+            ]
+            .astype(
+                str,
+            )
+            .str.strip()
+        )
+
+        text = text.mask(
+            text.eq(
+                "",
+            )
+            | text.str.casefold().isin(
+                {
+                    "nan",
+                    "none",
+                    "unknown",
+                }
+            ),
+            "Unspecified",
+        )
+
+        vc = text.value_counts().head(
+            top_n,
+        )
+
+        if vc.empty:
+
+            st.caption(
+                "No compliance issue text populated on this intake.",
+            )
+
+            return
+
+        fig, ax = plt.subplots(
+            figsize=(
+                7.2,
+                max(
+                    3.6,
+                    0.38 * len(vc),
+                ),
+            ),
+        )
+
+        palette = plt.cm.Purples_r(
+            np.linspace(
+                0.25,
+                0.92,
+                len(vc),
+            )
+        )
+
+        y_p = np.arange(
+            len(vc),
+        )
+
+        bars = ax.barh(
+            y_p,
+            vc.values,
+            color=palette,
+            edgecolor="white",
+            linewidth=0.5,
+            height=0.65,
+        )
+
+        ax.set_yticks(
+            y_p,
+        )
+
+        wrap = [
+            (
+                str(ix)[:44] + "…"
+                if len(
+                    str(ix),
+                )
+                > 46
+                else str(ix)
+            )
+            for ix in vc.index
+        ]
+
+        ax.set_yticklabels(
+            wrap,
+            fontsize=8,
+        )
+
+        ax.set_xlabel(
+            "Record count (all screened)"
+        )
+
+        apply_chart_style(ax)
+
+        ax.invert_yaxis()
+
+        for bar, val in zip(
             bars,
             vc.values,
         ):
@@ -1186,13 +1806,13 @@ class Charts:
             ax.text(
                 bar.get_width()
                 + max(
-                    0.015 * vc.sum(),
-                    0.4,
+                    0.02 * vc.sum(),
+                    0.35,
                 ),
                 bar.get_y()
                 + bar.get_height()
                 / 2,
-                f"{int(count):,}",
+                f"{int(val):,}",
                 va="center",
                 fontsize=8,
             )
@@ -1202,9 +1822,129 @@ class Charts:
         st.pyplot(fig)
 
         st.caption(
-            f"{readable_col}: top {len(vc)} values by backlog row count "
-            "(ties broken arbitrarily)."
+            f"Top {len(vc)} themes by row count.",
         )
+
+    @staticmethod
+    def render_queue_routing_hints(
+        backlog_df: pd.DataFrame,
+        top_n: int = 8,
+    ) -> None:
+
+        st.subheader(
+            "Recommended actions (backlog)"
+        )
+
+        st.caption(
+            "Workflow guidance frequencies for rows still needing review.",
+        )
+
+        if backlog_df.empty:
+
+            return
+
+        if (
+            "recommended_action"
+            not in backlog_df.columns
+        ):
+
+            st.info(
+                "recommended_action is not present.",
+            )
+
+            return
+
+        act = (
+            backlog_df[
+                "recommended_action"
+            ]
+            .astype(
+                str,
+            )
+            .str.strip()
+        )
+
+        act = act.mask(
+            act.eq(
+                "",
+            )
+            | act.str.casefold().isin(
+                {
+                    "nan",
+                    "none",
+                }
+            ),
+            "Unspecified",
+        )
+
+        vc = act.value_counts().head(
+            top_n,
+        )
+
+        if vc.empty:
+
+            return
+
+        fig, ax = plt.subplots(
+            figsize=(
+                7,
+                max(
+                    3.5,
+                    0.38 * len(vc),
+                ),
+            ),
+        )
+
+        hues = plt.cm.Spectral_r(
+            np.linspace(
+                0.08,
+                0.94,
+                len(vc),
+            )
+        )
+
+        y_p = np.arange(
+            len(vc),
+        )
+
+        ax.barh(
+            y_p,
+            vc.values,
+            color=hues,
+            edgecolor="white",
+            height=0.62,
+        )
+
+        ax.set_yticks(
+            y_p,
+        )
+
+        ax.set_yticklabels(
+            [
+                (
+                    str(lb)[:46] + "…"
+                    if len(
+                        str(lb),
+                    )
+                    > 48
+                    else str(lb)
+                )
+                for lb in vc.index
+            ],
+            fontsize=8,
+        )
+
+        ax.set_xlabel(
+            "Backlog rows"
+        )
+
+        apply_chart_style(ax)
+
+        ax.invert_yaxis()
+
+        plt.tight_layout()
+
+        st.pyplot(fig)
 
     # =====================================================
     # REVIEW BACKLOG — SINGLE RESULTS SCREEN
@@ -1221,77 +1961,142 @@ class Charts:
 
         backlog_df: pd.DataFrame | None
         scope_note: str
+        backlog_state: str
 
-        backlog_df, scope_note = (
-            slice_operational_review_dataframe(
-                df,
-            )
-        )
-
-        st.caption(
+        (
+            backlog_df,
             scope_note,
+            backlog_state,
+        ) = operational_review_backlog_state(
+            df,
         )
 
-        if backlog_df is None:
+        if backlog_state == "empty":
 
             st.success(
-                "Operational review backlog is empty for this run — "
-                "no flagged rows matched the backlog rule."
+                "Operational review backlog is empty for this intake — "
+                "intake dashboards still populate below.",
             )
 
-            return
+        if scope_note:
 
-        st.caption(
-            scope_note,
+            st.caption(
+                scope_note,
+            )
+
+        Charts.render_dashboard_metrics_bundle(
+            df,
+            backlog_df,
+            backlog_state,
         )
 
-        Charts.render_review_backlog_kpis(
+        st.divider()
+
+        Charts.render_corridor_intake_vs_backlog(
+            df,
             backlog_df,
         )
 
         st.divider()
 
-        row_primary_1, row_primary_2 = st.columns(
+        if backlog_state == "backlog" and backlog_df is not None:
+
+            row_risk_row, row_risk_r = st.columns(
+                2,
+            )
+
+            with row_risk_row:
+
+                Charts.render_risk_distribution(
+                    backlog_df,
+                    (
+                        "Operational review backlog only — same cohort "
+                        "as flagged compliance records."
+                    ),
+                )
+
+            with row_risk_r:
+
+                Charts.render_backlog_risk_concentration(
+                    backlog_df,
+                )
+
+            st.divider()
+
+        elif backlog_state == "no_mask":
+
+            row_fallback, row_pad = st.columns(
+                2,
+            )
+
+            with row_fallback:
+
+                Charts.render_risk_distribution(
+                    df,
+                    (
+                        "**Full screened intake.** Backlog cohort cannot be "
+                        "isolated (requires_review / severity tier fields "
+                        "absent)."
+                    ),
+                )
+
+            with row_pad:
+
+                st.markdown(
+                    "##### Risk concentration curve",
+                )
+
+                st.caption(
+                    "Available once the operational review backlog can be "
+                    "isolated from workflow fields.",
+                )
+
+            st.divider()
+
+        else:
+
+            st.info(
+                "Risk tier donut and concentration curve need at least one "
+                "row in the operational review backlog.",
+            )
+
+            st.divider()
+
+        row_op_m, row_op_r = st.columns(
             2,
         )
 
-        with row_primary_1:
+        with row_op_m:
 
-            Charts.render_risk_distribution(
-                backlog_df,
+            Charts.render_compliance_themes_full_intake(
+                df,
             )
 
-        with row_primary_2:
+        with row_op_r:
 
-            Charts.render_rule_flag_distribution(
-                backlog_df,
-            )
+            if backlog_state == "backlog" and backlog_df is not None:
 
-        row_secondary_1, row_secondary_2 = (
-            st.columns(
-                2,
-            )
-        )
+                Charts.render_queue_routing_hints(
+                    backlog_df,
+                )
 
-        with row_secondary_1:
+            else:
 
-            Charts.render_score_distribution(
-                backlog_df,
-            )
+                st.markdown(
+                    "##### Recommended actions (backlog)",
+                )
 
-        with row_secondary_2:
-
-            Charts.render_top_destination_workload_bar(
-                backlog_df,
-            )
+                st.caption(
+                    "Shows when backlog rows carry recommended_action text.",
+                )
 
         if (
             "anomaly_class"
-            in backlog_df.columns
+            in df.columns
         ):
 
-            ac = (
-                backlog_df[
+            ac_probe = (
+                df[
                     "anomaly_class"
                 ]
                 .astype(
@@ -1300,29 +2105,36 @@ class Charts:
                 .str.strip()
             )
 
-            ac = ac[
-                ac.ne(
+            ac_probe = ac_probe[
+                ac_probe.ne(
                     "",
                 )
-                & ac.str.lower().ne(
+                & ac_probe.str.lower().ne(
                     "none",
                 )
-                & ac.str.lower().ne(
+                & ac_probe.str.lower().ne(
                     "nan",
                 )
             ]
 
             if (
                 len(
-                    ac.dropna(),
+                    ac_probe.dropna(),
                 )
                 >= 1
-                and ac.nunique()
+                and ac_probe.nunique()
                 <= 36
             ):
 
+                st.divider()
+
                 Charts.render_anomaly_distribution(
-                    backlog_df,
+                    df,
+                )
+
+                st.caption(
+                    "Across **all screened records** — portfolio exposure, "
+                    "not backlog-only.",
                 )
 
 
