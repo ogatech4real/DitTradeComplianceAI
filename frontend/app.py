@@ -44,7 +44,6 @@ from frontend.components.upload_widget import render_upload_widget
 from frontend.components.summary_cards import render_summary_cards
 
 from frontend.components.risk_tables import (
-    render_flagged_records_table,
     render_top_risk_table,
 )
 
@@ -933,16 +932,6 @@ Compliance Screening Results
         )
 
         render_top_risk_table(
-            results_df
-        )
-
-        st.divider()
-
-        # =====================================================
-        # FLAGGED COMPLIANCE RECORDS
-        # =====================================================
-
-        render_flagged_records_table(
             results_df
         )
 

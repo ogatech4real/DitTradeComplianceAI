@@ -168,6 +168,155 @@ class RiskTables:
         return None, ""
 
     @staticmethod
+    def _export_operational_review_csv_bytes(
+        df: pd.DataFrame,
+        review_mask: pd.Series,
+        base_columns: list[str],
+    ) -> bytes | None:
+
+        export_columns_extra = (
+            ["severity_level", "requires_review", "review_status"]
+        )
+
+        export_columns_full = list(
+            dict.fromkeys(
+                base_columns + [
+                    col for col in export_columns_extra
+                    if col in df.columns
+                ],
+            )
+        )
+
+        if not export_columns_full:
+            return None
+
+        full_review_df = df[
+            review_mask.fillna(False)
+        ].copy()
+
+        present_cols = [
+            col for col in export_columns_full
+            if col in full_review_df.columns
+        ]
+
+        if not present_cols:
+            return None
+
+        return (
+            full_review_df[
+                present_cols
+            ]
+            .to_csv(
+                index=False,
+            )
+            .encode(
+                "utf-8",
+            )
+        )
+
+    @staticmethod
+    def render_flagged_compliance_records_section(
+        df: pd.DataFrame,
+        review_mask: pd.Series | None,
+        requires_review_csv_data: bytes | None,
+        review_source: str,
+    ) -> None:
+
+        st.subheader(
+            "Flagged Compliance Records"
+        )
+
+        st.caption(
+            "Filtered using workflow that requires review."
+        )
+
+        if review_mask is None:
+
+            st.warning(
+                "Cannot determine operational review backlog: dataset needs "
+                "requires_review, severity_level, or hybrid_risk_label."
+            )
+
+            return
+
+        flagged_df = df[
+            review_mask.fillna(False)
+        ]
+
+        if flagged_df.empty:
+
+            st.success(
+                "No records currently require operational review."
+            )
+
+            return
+
+        display_columns_flagged = [
+            col for col in [
+                "record_id",
+                "requires_review",
+                "severity_level",
+                "review_status",
+                "hybrid_risk_label",
+                "hybrid_score",
+                "rule_flag_count",
+                "destination_market",
+                "applicable_jurisdiction",
+                "compliance_issue",
+                "recommended_action",
+                "review_priority",
+                "anomaly_class",
+                "fraud_score",
+                "explanation",
+            ]
+            if col in flagged_df.columns
+        ]
+
+        display_columns_flagged = list(
+            dict.fromkeys(display_columns_flagged)
+        )
+
+        flagged_df = RiskTables.sanitise_dataframe(
+            flagged_df
+        )
+
+        st.dataframe(
+            flagged_df[
+                display_columns_flagged
+            ].head(MAX_TABLE_ROWS),
+            width="stretch",
+        )
+
+        rows_shown = min(
+            len(flagged_df),
+            MAX_TABLE_ROWS,
+        )
+
+        if len(flagged_df) > MAX_TABLE_ROWS:
+
+            st.caption(
+                f"Showing first {rows_shown:,} of {len(flagged_df):,} "
+                "operational-review rows — use the CSV export below for all."
+            )
+
+        if requires_review_csv_data is not None:
+
+            st.download_button(
+                label="Download full operational review CSV",
+                data=requires_review_csv_data,
+                file_name="requires_review_records.csv",
+                mime="text/csv",
+                help=(
+                    "Full operational review backlog"
+                    + (
+                        f" ({review_source})."
+                        if review_source
+                        else "."
+                    )
+                ),
+            )
+
+    @staticmethod
     def parse_icc_payload(
         payload: object,
     ) -> object:
@@ -332,12 +481,6 @@ class RiskTables:
         )
 
         RiskTables.render_priority_review_queue(
-            df
-        )
-
-        st.divider()
-
-        RiskTables.render_flagged_records(
             df
         )
 
@@ -536,89 +679,30 @@ class RiskTables:
 
         requires_review_csv_data = None
 
-        export_columns_extra = (
-            ["severity_level", "requires_review", "review_status"]
-        )
+        if review_mask is not None:
 
-        export_columns_full = list(
-            dict.fromkeys(
-                display_columns + [
-                    col for col in export_columns_extra
-                    if col in df.columns
-                ],
-            )
-        )
-
-        if (
-            review_mask is not None
-            and export_columns_full
-        ):
-
-            full_review_df = df[
-                review_mask.fillna(False)
-            ].copy()
-
-            present_cols = [
-                col for col in export_columns_full
-                if col in full_review_df.columns
-            ]
-
-            if present_cols:
-                requires_review_csv_data = (
-                    full_review_df[
-                        present_cols
-                    ]
-                    .to_csv(
-                        index=False,
-                    )
-                    .encode(
-                        "utf-8",
-                    )
+            requires_review_csv_data = (
+                RiskTables._export_operational_review_csv_bytes(
+                    df,
+                    review_mask,
+                    display_columns,
                 )
-
-        dl1, dl2 = st.columns(2)
-        with dl1:
-            st.download_button(
-                label="Download priority sample CSV (top 20)",
-                data=csv_data,
-                file_name="priority_review_queue.csv",
-                mime="text/csv",
-                help="Same rows as on-screen Priority Review Queue; for triage snippets.",
             )
 
-        with dl2:
-            if requires_review_csv_data is not None:
-                st.download_button(
-                    label="Download full operational review CSV",
-                    data=requires_review_csv_data,
-                    file_name="requires_review_records.csv",
-                    mime="text/csv",
-                    help=(
-                        "Authoritative backlog: all rows flagged for operational review "
-                        f"({review_source})."
-                    ),
-                )
-
-        backlog_rule = (
-            review_source if review_source else "see workflow fields"
+        st.download_button(
+            label="Download Priority queue (top 20) CSV",
+            data=csv_data,
+            file_name="priority_review_queue.csv",
+            mime="text/csv",
+            help="Same rows as on-screen Priority Review Queue; triage sample only.",
         )
 
-        with st.expander(
-            "Exports: what downloads mean (product)",
-            expanded=False,
-        ):
-            st.markdown(
-                f"""
-Two CSV downloads are supported here:
-
-| File | Role |
-|------|------|
-| `priority_review_queue.csv` | **Triage sample** — same top rows as on-screen (currently up to **20** ordered by composite risk). **Not** your full backlog. |
-| `requires_review_records.csv` | **Operational review backlog** — every row flagged for operational review (**{backlog_rule}**). **Authoritative export** for casework and audits. |
-
-**Former `flagged_records.csv`** is **retired** to avoid contradictory doubles. Scroll **Flagged Compliance Records** to browse that same backlog; use **Download full operational review CSV** once for the identical dataset.
-"""
-            )
+        RiskTables.render_flagged_compliance_records_section(
+            df,
+            review_mask,
+            requires_review_csv_data,
+            review_source,
+        )
 
         focus_row = ranked_df.iloc[
             selected_idx
@@ -793,15 +877,6 @@ Other columns (**fraud**, **rules**, **batch** where shown) use either counts or
         df: pd.DataFrame,
     ) -> None:
 
-        st.subheader(
-            "Flagged Compliance Records"
-        )
-
-        st.caption(
-            "Browse the full operational review backlog (same rule as "
-            "**Download full operational review CSV** above)."
-        )
-
         if df.empty:
 
             st.warning(
@@ -822,34 +897,7 @@ Other columns (**fraud**, **rules**, **batch** where shown) use either counts or
             df,
         )
 
-        if review_mask is None:
-
-            st.warning(
-                "Cannot determine operational review backlog: dataset needs "
-                "requires_review, severity_level, or hybrid_risk_label."
-            )
-
-            return
-
-        flagged_df = df[
-            review_mask.fillna(False)
-        ]
-
-        if flagged_df.empty:
-
-            st.success(
-                "No records currently require operational review."
-            )
-
-            return
-
-        st.info(
-            f"Filtered using **{review_source}**. "
-            "Export the backlog as `requires_review_records.csv` "
-            "from Priority Review Queue (no duplicate file here)."
-        )
-
-        display_columns = [
+        base_export_columns = [
             col for col in [
                 "record_id",
                 "requires_review",
@@ -867,35 +915,27 @@ Other columns (**fraud**, **rules**, **batch** where shown) use either counts or
                 "fraud_score",
                 "explanation",
             ]
-            if col in flagged_df.columns
+            if col in df.columns
         ]
 
-        display_columns = list(
-            dict.fromkeys(display_columns)
-        )
+        requires_review_csv_data = None
 
-        flagged_df = RiskTables.sanitise_dataframe(
-            flagged_df
-        )
+        if review_mask is not None:
 
-        st.dataframe(
-            flagged_df[
-                display_columns
-            ].head(MAX_TABLE_ROWS),
-            width="stretch",
-        )
-
-        rows_shown = min(
-            len(flagged_df),
-            MAX_TABLE_ROWS,
-        )
-
-        if len(flagged_df) > MAX_TABLE_ROWS:
-
-            st.caption(
-                f"Showing first {rows_shown:,} of {len(flagged_df):,} "
-                "operational-review rows — use the full CSV export for all."
+            requires_review_csv_data = (
+                RiskTables._export_operational_review_csv_bytes(
+                    df,
+                    review_mask,
+                    base_export_columns,
+                )
             )
+
+        RiskTables.render_flagged_compliance_records_section(
+            df,
+            review_mask,
+            requires_review_csv_data,
+            review_source,
+        )
 
     # =====================================================
     # COMPLIANCE ISSUE BREAKDOWN
