@@ -161,26 +161,141 @@ def slice_operational_review_dataframe(
     return bl, cap
 
 
-def _geo_column_for_intake(df: pd.DataFrame) -> str | None:
+COMMODITY_PROFILE_COLUMNS: frozenset[
+    str,
+] = frozenset(
+    {
+        "product_family",
+        "hs_code",
+        "product_description",
+        "commodity",
+        "material",
+        "harmonised_code",
+        "harmonized_code",
+    },
+)
 
-    for candidate in (
-        "destination_market",
-        "applicable_jurisdiction",
-        "destination_country",
-        "country_of_export",
-        "declared_origin_country",
-    ):
+_SNAPSHOT_DENY_TOKEN: tuple[
+    str,
+    ...] = (
+    "record_id",
+    "shipment_id",
+    "invoice_id",
+    "uuid",
+    "_hash",
+    "checksum",
+    "embedding",
+    "vector",
+    "timestamp",
+    "payload",
+)
 
-        if (
-            candidate
-            in df.columns
-        ):
-            return candidate
+_SNAPSHOT_DENY_PREFIX: tuple[
+    str,
+    ...] = (
+    "explain",
+    "raw_",
+)
 
-    return None
+_INTAKE_COLUMN_PRIORITY: tuple[
+    str,
+    ...] = (
+    "destination_market",
+    "applicable_jurisdiction",
+    "destination_country",
+    "declared_origin_country",
+    "country_of_export",
+    "country_of_last_substantial_transformation",
+    "production_stage_country_1",
+    "production_stage_country_2",
+    "port_of_export",
+    "port_of_entry",
+    "transport_mode",
+    "incoterm",
+    "production_method_tag",
+)
+
+_MATERIAL_KEYWORD_BUCKETS: tuple[
+    tuple[str, tuple[str, ...]],
+    ...] = (
+    (
+        "Battery / critical minerals",
+        (
+            "lithium",
+            "cobalt",
+            "nickel",
+            "graphite",
+            "rare earth",
+            "neodymium",
+        ),
+    ),
+    (
+        "Copper",
+        (
+            "copper",
+            "cathode",
+        ),
+    ),
+    (
+        "Steel / iron",
+        (
+            "steel",
+            "iron",
+            "stainless",
+            "rebar",
+            "pig iron",
+        ),
+    ),
+    (
+        "Aluminium",
+        (
+            "aluminium",
+            "aluminum",
+        ),
+    ),
+    (
+        "Plastics / polymers",
+        (
+            "plastic",
+            "polymer",
+            "polyethylene",
+            "polypropylene",
+            "pvc",
+        ),
+    ),
+    (
+        "Wood / paper",
+        (
+            "timber",
+            "lumber",
+            "wood",
+            "pulp",
+            "paper",
+        ),
+    ),
+    (
+        "Cement / concrete",
+        (
+            "cement",
+            "concrete",
+            "clinker",
+        ),
+    ),
+    (
+        "Fuels / chemicals",
+        (
+            "petrol",
+            "diesel",
+            "fuel",
+            "chemical",
+            "fertilizer",
+            "ammonia",
+        ),
+    ),
+)
 
 
-def _sanitize_geo_labels(
+def _clean_label_series(
     series: pd.Series,
 ) -> pd.Series:
 
@@ -209,6 +324,202 @@ def _sanitize_geo_labels(
             }
         ),
         "Unknown",
+    )
+
+
+def _column_name_unfit_for_intake_snapshot(
+    col: str,
+) -> bool:
+
+    key = col.lower()
+
+    if key in COMMODITY_PROFILE_COLUMNS:
+
+        return True
+
+    if any(
+        key.startswith(
+            p,
+        )
+        for p in _SNAPSHOT_DENY_PREFIX
+    ):
+
+        return True
+
+    if any(
+        tok in key for tok in _SNAPSHOT_DENY_TOKEN
+    ):
+
+        return True
+
+    if key.endswith(
+        "_score",
+    ) or key in (
+        "hybrid_risk_label",
+        "severity_level",
+        "requires_review",
+        "review_status",
+        "recommended_action",
+        "compliance_issue",
+        "anomaly_class",
+        "risk_label",
+    ):
+
+        return True
+
+    return False
+
+
+def _series_ok_for_snapshot_bar(
+    series: pd.Series,
+) -> bool:
+
+    if pd.api.types.is_datetime64_any_dtype(
+        series,
+    ):
+
+        return False
+
+    if pd.api.types.is_numeric_dtype(
+        series,
+    ):
+
+        vals = pd.to_numeric(
+            series,
+            errors="coerce",
+        ).dropna()
+
+        if vals.empty:
+
+            return False
+
+        nu = int(
+            vals.nunique(),
+        )
+
+        return (
+            2 <= nu <= 28
+        )
+
+    cleaned = _clean_label_series(
+        series,
+    )
+
+    mask = cleaned.str.ne(
+        "Unknown",
+    )
+
+    if not mask.any():
+
+        return False
+
+    tt = cleaned[
+        mask
+    ]
+
+    nu = int(
+        tt.nunique(),
+    )
+
+    if nu < 2 or nu > 46:
+
+        return False
+
+    if float(
+        tt.str.len().mean(),
+    ) > 58.0:
+
+        return False
+
+    return True
+
+
+def pick_ranked_intake_snapshot_columns(
+    df: pd.DataFrame,
+    max_columns: int = 4,
+) -> list[str]:
+
+    chosen: list[str] = []
+
+    for col in _INTAKE_COLUMN_PRIORITY:
+
+        if col in df.columns:
+
+            if _series_ok_for_snapshot_bar(
+                df[
+                    col
+                ],
+            ):
+
+                chosen.append(
+                    col,
+                )
+
+        if len(
+            chosen,
+        ) >= max_columns:
+
+            return chosen
+
+    for col in df.columns:
+
+        if len(
+            chosen,
+        ) >= max_columns:
+
+            break
+
+        if col in chosen:
+
+            continue
+
+        if _column_name_unfit_for_intake_snapshot(
+            col,
+        ):
+
+            continue
+
+        if _series_ok_for_snapshot_bar(
+            df[
+                col
+            ],
+        ):
+
+            chosen.append(
+                col,
+            )
+
+    return chosen[
+        :max_columns
+    ]
+
+
+def _labels_for_intake_column(
+    df: pd.DataFrame,
+    col: str,
+) -> pd.Series:
+
+    series = df[
+        col
+    ]
+
+    if pd.api.types.is_numeric_dtype(
+        series,
+    ):
+
+        vals = pd.to_numeric(
+            series,
+            errors="coerce",
+        )
+
+        return vals.fillna(
+            0,
+        ).map(
+            lambda x: f"{float(x):g}",
+        )
+
+    return _clean_label_series(
+        series,
     )
 
 
@@ -968,505 +1279,551 @@ class Charts:
     # =====================================================
 
     @staticmethod
-    def _critical_high_share(
+    def _render_single_intake_column_barh(
         df: pd.DataFrame,
-    ) -> float | None:
-
-        if df.empty:
-
-            return None
-
-        if (
-            "hybrid_risk_label"
-            in df.columns
-        ):
-
-            tier = (
-                df[
-                    "hybrid_risk_label"
-                ]
-                .astype(
-                    str,
-                )
-                .str.strip()
-                .str.lower()
-            )
-
-            return round(
-                100.0
-                * float(
-                    tier.isin(
-                        [
-                            "critical",
-                            "high",
-                        ]
-                    ).mean(),
-                ),
-                1,
-            )
-
-        if (
-            "severity_level"
-            in df.columns
-        ):
-
-            tier = (
-                df[
-                    "severity_level"
-                ]
-                .astype(
-                    str,
-                )
-                .str.strip()
-                .str.lower()
-            )
-
-            return round(
-                100.0
-                * float(
-                    tier.isin(
-                        [
-                            "critical",
-                            "high",
-                        ]
-                    ).mean(),
-                ),
-                1,
-            )
-
-        return None
-
-    @staticmethod
-    def render_dashboard_metrics_bundle(
-        full_df: pd.DataFrame,
-        backlog_df: pd.DataFrame | None,
-        backlog_state: str,
+        col: str,
+        top_n: int = 8,
     ) -> None:
 
-        if full_df.empty:
-
-            return
-
-        n_total = len(full_df)
-
-        can_quantify_review = backlog_state != "no_mask"
-
-        bl = (
-            backlog_df
-            if backlog_df is not None
-            else pd.DataFrame()
+        labels = _labels_for_intake_column(
+            df,
+            col,
         )
 
-        n_backlog = len(bl)
-
-        review_rate_disp: float | str
-
-        backlog_count_disp: str
-
-        if can_quantify_review:
-
-            rr_help = (
-                "Share of screened rows in the operational review backlog "
-                "(requires_review-aligned rule)."
-            )
-
-        else:
-
-            rr_help = (
-                "Needs workflow fields that define operational review backlog."
-            )
-
-        if (
-            backlog_state == "no_mask"
-        ):
-
-            review_rate_disp = "N/A"
-
-            backlog_count_disp = "N/A"
-
-        else:
-
-            review_rate_disp = round(
-                100.0
-                * n_backlog
-                / max(
-                    n_total,
-                    1,
-                ),
-                1,
-            )
-
-            backlog_count_disp = f"{n_backlog:,}"
-
-        intake_ch_hi = Charts._critical_high_share(
-            full_df,
-        )
-
-        st.markdown(
-            "##### Intake & oversight (full screened upload)"
-        )
-
-        m1, m2, m3, m4 = st.columns(
-            4,
-        )
-
-        with m1:
-
-            st.metric(
-                "Records screened",
-                f"{n_total:,}",
-            )
-
-        with m2:
-
-            st.metric(
-                "Operational review backlog",
-                backlog_count_disp,
-                help=(
-                    "Rows matched by backlog rule."
-                    if can_quantify_review
-                    else rr_help
-                ),
-            )
-
-        with m3:
-
-            st.metric(
-                "Review rate",
-                (
-                    f"{review_rate_disp}%"
-                    if isinstance(review_rate_disp, float)
-                    else review_rate_disp
-                ),
-                help=rr_help,
-            )
-
-        with m4:
-
-            st.metric(
-                "Critical / High (whole intake)",
-                (
-                    f"{intake_ch_hi:.1f}%"
-                    if intake_ch_hi is not None
-                    else "N/A"
-                ),
-                help=(
-                    "Hybrid tier or severity view across every screened row."
-                ),
-            )
-
-        if (
-            backlog_df is None
-            or backlog_df.empty
-        ):
-
-            return
-
-        bl_ch_hi = Charts._critical_high_share(
-            backlog_df,
-        )
-
-        avg_composite_pct: float | None = None
-
-        if (
-            "hybrid_score"
-            in backlog_df.columns
-        ):
-
-            avg_composite_pct = round(
-                100.0
-                * float(
-                    pd.to_numeric(
-                        backlog_df[
-                            "hybrid_score"
-                        ],
-                        errors="coerce",
-                    )
-                    .fillna(0)
-                    .mean(),
-                ),
-                1,
-            )
-
-        vc_series = Charts.derive_violation_count(
-            backlog_df,
-        )
-
-        median_violations: float | None = None
-
-        if vc_series is not None:
-
-            median_violations = round(
-                float(
-                    vc_series.median(),
-                ),
-                2,
-            )
-
-        st.markdown(
-            "##### Review queue snapshot (backlog only)"
-        )
-
-        o1, o2, o3, o4 = st.columns(
-            4,
-        )
-
-        with o1:
-
-            st.metric(
-                "Backlog Critical / High",
-                (
-                    f"{bl_ch_hi:.1f}%"
-                    if bl_ch_hi is not None
-                    else "N/A"
-                ),
-            )
-
-        with o2:
-
-            st.metric(
-                "Avg composite risk (backlog)",
-                (
-                    f"{avg_composite_pct:.1f}%"
-                    if avg_composite_pct is not None
-                    else "N/A"
-                ),
-            )
-
-        with o3:
-
-            st.metric(
-                "Median rule hits (backlog)",
-                (
-                    f"{median_violations:.2f}"
-                    if median_violations is not None
-                    else "N/A"
-                ),
-                help=(
-                    "Uses rule_flag_count when present; otherwise inferred "
-                    "from rule-indicator columns."
-                ),
-            )
-
-        with o4:
-
-            st.metric(
-                "Queue depth",
-                f"{n_backlog:,}",
-                help=(
-                    "Rows requiring operational review for this intake."
-                ),
-            )
-
-    @staticmethod
-    def render_corridor_intake_vs_backlog(
-        full_df: pd.DataFrame,
-        backlog_df: pd.DataFrame | None,
-        top_n: int = 10,
-    ) -> None:
-
-        st.subheader(
-            "Corridor workload (full intake)"
-        )
-
-        st.caption(
-            "Ranked by how many screened records each corridor owns. "
-            "The backlog series shows how review work stacks in the "
-            "same corridors when a backlog rule applies.",
-        )
-
-        geo_col = _geo_column_for_intake(
-            full_df,
-        )
-
-        if geo_col is None:
-
-            st.info(
-                "No destination / corridor field found "
-                "(e.g. destination_market)."
-            )
-
-            return
-
-        intake_labels = _sanitize_geo_labels(
-            full_df[
-                geo_col
-            ],
-        )
-
-        intake_counts = intake_labels.value_counts()
-
-        mask_exists = (
-            RiskTables.operational_review_mask(
-                full_df,
-            )[
-                0
-            ]
-            is not None
-        )
-
-        top_idx = intake_counts.head(
+        vc = labels.value_counts().head(
             top_n,
-        ).index
+        )
 
-        backlog_counts_map: dict[
-            object,
-            int,
-        ] = {}
+        if vc.empty:
 
-        if (
-            mask_exists
-            and backlog_df is not None
-            and not backlog_df.empty
-            and geo_col
-            in backlog_df.columns
-        ):
-
-            bl_labels = _sanitize_geo_labels(
-                backlog_df[
-                    geo_col
-                ],
+            st.caption(
+                f"No usable values for `{col}`.",
             )
 
-            bl_vc = bl_labels.value_counts()
+            return
 
-            for corridor in top_idx:
-
-                backlog_counts_map[
-                    corridor
-                ] = int(
-                    bl_vc.get(
-                        corridor,
-                        0,
-                    )
-                )
-
-        y_labels = [
-            (
-                str(x)[:42] + "…"
-                if len(
-                    str(x),
-                )
-                > 44
-                else str(x)
-            )
-            for x in top_idx
-        ]
-
-        intake_vals = [
-            int(
-                intake_counts.get(
-                    c,
-                    0,
-                )
-            )
-            for c in top_idx
-        ]
-
-        backlog_vals = [
-            backlog_counts_map.get(
-                c,
-                0,
-            )
-            for c in top_idx
-        ]
+        fig_h = max(
+            3.2,
+            0.38 * len(vc),
+        )
 
         fig, ax = plt.subplots(
             figsize=(
-                7.8,
-                max(
-                    4.0,
-                    0.42 * len(top_idx),
-                ),
+                5.9,
+                fig_h,
             ),
         )
 
-        y_pos = np.arange(
-            len(top_idx),
+        y_p = np.arange(
+            len(vc),
         )
 
-        gap = 0.36
-
-        if (
-            mask_exists
-            and sum(
-                backlog_vals,
+        blues = plt.cm.Blues_r(
+            np.linspace(
+                0.32,
+                0.85,
+                len(vc),
             )
-            > 0
-        ):
+        )
 
-            ax.barh(
-                y_pos
-                - gap
-                / 2,
-                intake_vals,
-                height=gap,
-                label="All screened",
-                color="#90A4AE",
-                edgecolor="white",
-                linewidth=0.5,
-            )
-
-            ax.barh(
-                y_pos
-                + gap
-                / 2,
-                backlog_vals,
-                height=gap,
-                label="In review backlog",
-                color="#1565C0",
-                edgecolor="white",
-                linewidth=0.5,
-            )
-
-        else:
-
-            ax.barh(
-                y_pos,
-                intake_vals,
-                height=0.55,
-                label="All screened",
-                color="#1565C0",
-                edgecolor="white",
-                linewidth=0.5,
-            )
+        ax.barh(
+            y_p,
+            vc.values,
+            color=blues,
+            edgecolor="white",
+            linewidth=0.55,
+            height=0.7,
+        )
 
         ax.set_yticks(
-            y_pos,
+            y_p,
         )
 
         ax.set_yticklabels(
-            y_labels,
-            fontsize=9,
+            [
+                (
+                    str(ix)[:42] + "…"
+                    if len(
+                        str(ix),
+                    )
+                    > 44
+                    else str(ix)
+                )
+                for ix in vc.index
+            ],
+            fontsize=8,
         )
 
         ax.set_xlabel(
-            "Record count"
+            "Records"
         )
 
-        readable = geo_col.replace(
+        readable = col.replace(
             "_",
             " ",
         )
 
-        ax.legend(
-            loc="lower right",
-            fontsize=8,
-            framealpha=0.93,
+        apply_chart_style(
+            ax,
         )
-
-        apply_chart_style(ax)
 
         ax.invert_yaxis()
 
         plt.tight_layout()
 
-        st.pyplot(fig)
+        st.pyplot(
+            fig,
+        )
 
         st.caption(
-            f"{readable.title()}: top {len(top_idx)} corridors by screened "
-            "volume. Matches backlog rule used in flagged CSV when available."
+            f"`{readable}` — top {len(vc)} values (ties arbitrary).",
         )
+
+    @staticmethod
+    def render_intake_snapshot_ranked_charts(
+        full_df: pd.DataFrame,
+        max_plots: int = 4,
+        top_n_each: int = 8,
+    ) -> None:
+
+        st.subheader(
+            "Intake snapshot — ranked columns"
+        )
+
+        st.caption(
+            "Automatic pick of the most informative low-cardinality columns "
+            "(route, geography, mode, …), after schema heuristics. "
+            "Commodity-specific views sit in the next block.",
+        )
+
+        if full_df.empty:
+
+            st.warning(
+                "No rows to profile.",
+            )
+
+            return
+
+        picked = pick_ranked_intake_snapshot_columns(
+            full_df,
+            max_columns=max_plots,
+        )
+
+        if not picked:
+
+            st.info(
+                "No additional categorical columns met the bar-chart rules "
+                "for this dataset.",
+            )
+
+            return
+
+        for i in range(
+            0,
+            len(picked),
+            2,
+        ):
+
+            left, right = st.columns(
+                2,
+            )
+
+            with left:
+
+                Charts._render_single_intake_column_barh(
+                    full_df,
+                    picked[
+                        i
+                    ],
+                    top_n=top_n_each,
+                )
+
+            if i + 1 < len(picked):
+
+                with right:
+
+                    Charts._render_single_intake_column_barh(
+                        full_df,
+                        picked[
+                            i + 1
+                        ],
+                        top_n=top_n_each,
+                    )
+
+    @staticmethod
+    def render_trade_commodity_snapshot(
+        full_df: pd.DataFrame,
+        top_n_hs: int = 12,
+        top_n_family: int = 12,
+    ) -> None:
+
+        st.subheader(
+            "Trade & carbon-related commodity signals"
+        )
+
+        st.caption(
+            "HS chapter (leading digits), product_family mix, and keyword "
+            "hits from description / family text (no LLM).",
+        )
+
+        if full_df.empty:
+
+            return
+
+        col_hs, col_fam, col_kw = st.columns(
+            3,
+        )
+
+        with col_hs:
+
+            st.markdown(
+                "**HS chapter (2-digit)**",
+            )
+
+            if (
+                "hs_code"
+                not in full_df.columns
+            ):
+
+                st.caption(
+                    "No `hs_code` column.",
+                )
+
+            else:
+
+                digits = (
+                    full_df[
+                        "hs_code"
+                    ]
+                    .astype(
+                        str,
+                    )
+                    .str.replace(
+                        r"\D",
+                        "",
+                        regex=True,
+                    )
+                )
+
+                chapter = digits.str.slice(
+                    0,
+                    2,
+                )
+
+                chapter = chapter.mask(
+                    chapter.str.len() < 2,
+                    "Unknown",
+                )
+
+                vc = chapter.value_counts().head(
+                    top_n_hs,
+                )
+
+                if not vc.empty:
+
+                    fig, ax = plt.subplots(
+                        figsize=(
+                            4.6,
+                            max(
+                                2.8,
+                                0.35 * len(vc),
+                            ),
+                        ),
+                    )
+
+                    y_p = np.arange(
+                        len(vc),
+                    )
+
+                    ax.barh(
+                        y_p,
+                        vc.values,
+                        color="#5E35B1",
+                        edgecolor="white",
+                        height=0.68,
+                    )
+
+                    ax.set_yticks(
+                        y_p,
+                    )
+
+                    ax.set_yticklabels(
+                        vc.index.astype(
+                            str,
+                        ),
+                        fontsize=8,
+                    )
+
+                    ax.set_xlabel(
+                        "Rows",
+                    )
+
+                    apply_chart_style(
+                        ax,
+                    )
+
+                    ax.invert_yaxis()
+
+                    plt.tight_layout()
+
+                    st.pyplot(
+                        fig,
+                    )
+
+        with col_fam:
+
+            st.markdown(
+                "**Product family**",
+            )
+
+            if (
+                "product_family"
+                not in full_df.columns
+            ):
+
+                st.caption(
+                    "No `product_family` column.",
+                )
+
+            else:
+
+                fam = _clean_label_series(
+                    full_df[
+                        "product_family"
+                    ],
+                )
+
+                vc = fam.value_counts().head(
+                    top_n_family,
+                )
+
+                if not vc.empty:
+
+                    fig, ax = plt.subplots(
+                        figsize=(
+                            4.6,
+                            max(
+                                2.8,
+                                0.35 * len(vc),
+                            ),
+                        ),
+                    )
+
+                    y_p = np.arange(
+                        len(vc),
+                    )
+
+                    ax.barh(
+                        y_p,
+                        vc.values,
+                        color="#00695C",
+                        edgecolor="white",
+                        height=0.68,
+                    )
+
+                    ax.set_yticks(
+                        y_p,
+                    )
+
+                    ax.set_yticklabels(
+                        [
+                            (
+                                str(x)[:36] + "…"
+                                if len(
+                                    str(x),
+                                )
+                                > 38
+                                else str(x)
+                            )
+                            for x in vc.index
+                        ],
+                        fontsize=8,
+                    )
+
+                    ax.set_xlabel(
+                        "Rows",
+                    )
+
+                    apply_chart_style(
+                        ax,
+                    )
+
+                    ax.invert_yaxis()
+
+                    plt.tight_layout()
+
+                    st.pyplot(
+                        fig,
+                    )
+
+        with col_kw:
+
+            st.markdown(
+                "**Material keywords**",
+            )
+
+            blob_parts = []
+
+            for cand in (
+                "product_description",
+                "product_family",
+                "commodity",
+                "material",
+            ):
+
+                if cand in full_df.columns:
+
+                    blob_parts.append(
+                        full_df[
+                            cand
+                        ].astype(
+                            str,
+                        )
+                    )
+
+            if not blob_parts:
+
+                st.caption(
+                    "Need at least one of: product_description, "
+                    "product_family, commodity, material.",
+                )
+
+            else:
+
+                joined = (
+                    blob_parts[
+                        0
+                    ]
+                    .astype(
+                        str,
+                    )
+                    .fillna(
+                        "",
+                    )
+                )
+
+                for extra in blob_parts[
+                    1:
+                ]:
+
+                    joined = (
+                        joined
+                        + " "
+                        + extra.astype(
+                            str,
+                        ).fillna(
+                            "",
+                        )
+                    )
+
+                joined_l = joined.str.lower()
+
+                bucket = pd.Series(
+                    [""] * len(
+                        full_df,
+                    ),
+                    index=full_df.index,
+                    dtype=object,
+                )
+
+                for label, needles in _MATERIAL_KEYWORD_BUCKETS:
+
+                    empty_mask = bucket.eq(
+                        "",
+                    )
+
+                    if not empty_mask.any():
+
+                        break
+
+                    hit = pd.Series(
+                        False,
+                        index=full_df.index,
+                    )
+
+                    for nd in needles:
+
+                        hit = hit | joined_l.str.contains(
+                            nd,
+                            regex=False,
+                            na=False,
+                        )
+
+                    bucket = bucket.mask(
+                        empty_mask & hit,
+                        label,
+                    )
+
+                counts = bucket[
+                    bucket.ne(
+                        "",
+                    )
+                ].value_counts()
+
+                if counts.empty:
+
+                    st.caption(
+                        "No configured keyword buckets matched.",
+                    )
+
+                else:
+
+                    fig, ax = plt.subplots(
+                        figsize=(
+                            4.6,
+                            max(
+                                2.8,
+                                0.35 * len(counts),
+                            ),
+                        ),
+                    )
+
+                    y_p = np.arange(
+                        len(counts),
+                    )
+
+                    ax.barh(
+                        y_p,
+                        counts.values,
+                        color="#E65100",
+                        edgecolor="white",
+                        height=0.68,
+                    )
+
+                    ax.set_yticks(
+                        y_p,
+                    )
+
+                    ax.set_yticklabels(
+                        counts.index,
+                        fontsize=8,
+                    )
+
+                    ax.set_xlabel(
+                        "Rows (first matching bucket wins)",
+                    )
+
+                    apply_chart_style(
+                        ax,
+                    )
+
+                    ax.invert_yaxis()
+
+                    plt.tight_layout()
+
+                    st.pyplot(
+                        fig,
+                    )
+
+                    matched = int(
+                        bucket.ne(
+                            "",
+                        ).sum(),
+                    )
+
+                    st.caption(
+                        f"Keyword scan coverage: {matched:,} / {len(full_df):,} rows hit at least one bucket.",
+                    )
 
     @staticmethod
     def render_backlog_risk_concentration(
@@ -1990,17 +2347,14 @@ class Charts:
                 scope_note,
             )
 
-        Charts.render_dashboard_metrics_bundle(
+        Charts.render_intake_snapshot_ranked_charts(
             df,
-            backlog_df,
-            backlog_state,
         )
 
         st.divider()
 
-        Charts.render_corridor_intake_vs_backlog(
+        Charts.render_trade_commodity_snapshot(
             df,
-            backlog_df,
         )
 
         st.divider()
