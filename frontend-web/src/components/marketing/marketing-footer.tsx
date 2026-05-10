@@ -3,58 +3,54 @@ import { ExternalLink } from "lucide-react";
 
 import { WORKSPACE_ROUTES } from "@/lib/workspace-routes";
 
-const PRODUCT = [
+const PLATFORM = [
   { href: "/", label: "Home" },
   { href: "/platform", label: "Platform capabilities" },
   { href: "/research", label: "Research & innovation" },
+  { href: "/about", label: "Authors & collaborators" },
 ];
 
-const OPS = [{ href: WORKSPACE_ROUTES.home, label: "Operational workspace" }];
+const OPERATIONS = [{ href: WORKSPACE_ROUTES.home, label: "Operational workspace" }];
 
 const EXTERNAL = [
   {
     href: "https://github.com/ogatech4real/DitTradeComplianceAI",
-    label: "GitHub repository",
+    label: "GitHub",
   },
 ];
 
+const linkMuted =
+  "text-sm font-medium text-muted-foreground transition-colors hover:text-foreground";
+
 export function MarketingFooter() {
   return (
-    <footer className="relative mt-auto">
-      <div
-        className="h-[3px] w-full bg-[linear-gradient(90deg,var(--brand-tertiary),var(--primary),var(--brand-secondary))]"
-        aria-hidden
-      />
-      <div className="border-t border-[color-mix(in_oklch,var(--brand-secondary)_24%,var(--border))] bg-[linear-gradient(178deg,color-mix(in_oklch,var(--brand-secondary)_10%,transparent),color-mix(in_oklch,var(--muted)_88%,transparent))]">
-        <div className="mx-auto grid max-w-6xl gap-12 px-4 py-14 sm:px-6 lg:grid-cols-12 lg:px-8">
+    <footer className="relative mt-auto border-t border-border/80 bg-[color-mix(in_oklch,var(--card)_55%,var(--background))]">
+      <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:px-8">
+        <div className="grid gap-12 lg:grid-cols-12 lg:gap-10">
           <div className="lg:col-span-5">
-            <p className="text-gradient-brand font-[family-name:var(--font-heading)] text-lg font-semibold tracking-tight">
+            <p className="font-[family-name:var(--font-heading)] text-lg font-semibold tracking-tight text-foreground">
               Digital Trade Compliance AI
             </p>
-            <p className="mt-4 max-w-sm text-sm leading-relaxed text-muted-foreground">
-              AI-assisted screening, hybrid intelligence orchestration, and explainable governance signals for digitally integrated
-              trade ecosystems.
+            <p className="mt-4 max-w-md text-sm leading-relaxed text-muted-foreground">
+              A public institutional front for a research-grounded, AI-assisted operational intelligence workspace — built for
+              explainable trade governance, partner diligence, and funding-ready disclosure without substituting legal or
+              jurisdictional advice.
             </p>
-            <p className="mt-6 text-xs text-muted-foreground">
-              For partnership, evaluation, or research collaboration, reach out through institutional channels cited in{" "}
-              <Link href="/about" className="font-semibold text-primary underline-offset-4 hover:text-[color-mix(in_oklch,var(--primary)_82%,var(--brand-secondary)_18%)] hover:underline">
+            <p className="mt-6 text-xs leading-relaxed text-muted-foreground">
+              Contact and collaboration paths are described on{" "}
+              <Link href="/about" className="font-medium text-foreground underline-offset-4 hover:underline">
                 About
-              </Link>{" "}
-              and the GitHub organisation.
+              </Link>
+              . Operational filings remain governed by your organisation&apos;s workspace policies.
             </p>
           </div>
-          <div className="grid gap-8 sm:grid-cols-3 lg:col-span-7">
+          <div className="grid gap-10 sm:grid-cols-3 lg:col-span-7">
             <div>
-              <h3 className="text-[11px] font-semibold uppercase tracking-[0.2em] text-primary/80">
-                Platform
-              </h3>
+              <h3 className="public-kicker text-foreground/90">Platform</h3>
               <ul className="mt-4 space-y-2.5">
-                {PRODUCT.map((l) => (
+                {PLATFORM.map((l) => (
                   <li key={l.href}>
-                    <Link
-                      href={l.href}
-                      className="text-sm font-medium text-muted-foreground transition-colors hover:text-[color-mix(in_oklch,var(--foreground)_74%,var(--brand-secondary)_26%)]"
-                    >
+                    <Link href={l.href} className={linkMuted}>
                       {l.label}
                     </Link>
                   </li>
@@ -62,16 +58,11 @@ export function MarketingFooter() {
               </ul>
             </div>
             <div>
-              <h3 className="text-[11px] font-semibold uppercase tracking-[0.2em] text-primary/80">
-                Operational access
-              </h3>
+              <h3 className="public-kicker text-foreground/90">Workspace</h3>
               <ul className="mt-4 space-y-2.5">
-                {OPS.map((l) => (
+                {OPERATIONS.map((l) => (
                   <li key={l.href}>
-                    <Link
-                      href={l.href}
-                      className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
-                    >
+                    <Link href={l.href} className={linkMuted}>
                       {l.label}
                     </Link>
                   </li>
@@ -79,9 +70,7 @@ export function MarketingFooter() {
               </ul>
             </div>
             <div>
-              <h3 className="text-[11px] font-semibold uppercase tracking-[0.2em] text-primary/80">
-                Repository
-              </h3>
+              <h3 className="public-kicker text-foreground/90">Repository</h3>
               <ul className="mt-4 space-y-2.5">
                 {EXTERNAL.map((l) => (
                   <li key={l.href}>
@@ -89,7 +78,7 @@ export function MarketingFooter() {
                       href={l.href}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-[color-mix(in_oklch,var(--brand-secondary)_75%,white)]"
+                      className={`inline-flex items-center gap-1.5 ${linkMuted}`}
                     >
                       {l.label}
                       <ExternalLink className="size-3.5 shrink-0 opacity-60" aria-hidden />
@@ -100,9 +89,9 @@ export function MarketingFooter() {
             </div>
           </div>
         </div>
-        <div className="border-t border-border/55 bg-[color-mix(in_oklch,var(--marketing-canvas)_70%,transparent)] py-7 text-center text-[11px] leading-relaxed text-muted-foreground">
-          Institutional presentation aligned with ICC Digital Toolkit positioning for interoperable trade data — not legal advice
-          or jurisdictional certification.
+        <div className="mt-14 border-t border-border/70 pt-8 text-center text-[11px] leading-relaxed text-muted-foreground lg:text-left">
+          ICC Digital Trade Toolkit alignment describes interoperable data discipline — not certification, clearance guarantees,
+          or autonomous regulatory outcomes. The operational workspace remains the venue for live screening and disposition.
         </div>
       </div>
     </footer>

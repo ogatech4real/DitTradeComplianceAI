@@ -203,6 +203,77 @@
   );
 }
 
+/*
+ * Public marketing shell — premium dark institutional fintech (OKX-adjacent layout discipline:
+ * calm surfaces, strong type, restrained motion). Scoped so /workspace keeps :root light theme.
+ */
+.public-site.dark {
+  --brand-secondary: oklch(0.62 0.1 200);
+  --brand-secondary-soft: oklch(0.26 0.04 200);
+  --brand-tertiary: oklch(0.58 0.09 165);
+  --brand-tertiary-soft: oklch(0.24 0.035 165);
+
+  --background: oklch(0.14 0.022 264);
+  --foreground: oklch(0.97 0.008 264);
+  --card: oklch(0.175 0.028 264);
+  --card-foreground: oklch(0.97 0.008 264);
+  --popover: oklch(0.19 0.03 264);
+  --popover-foreground: oklch(0.97 0.008 264);
+
+  --primary: oklch(0.66 0.13 264);
+  --primary-foreground: oklch(0.14 0.03 264);
+
+  --secondary: oklch(0.24 0.03 264);
+  --secondary-foreground: oklch(0.92 0.015 264);
+
+  --muted: oklch(0.22 0.025 264);
+  --muted-foreground: oklch(0.7 0.022 264);
+  --accent: oklch(0.26 0.04 264);
+  --accent-foreground: oklch(0.96 0.01 264);
+  --destructive: oklch(0.58 0.18 22);
+  --border: oklch(1 0 0 / 9%);
+  --input: oklch(1 0 0 / 11%);
+  --ring: oklch(0.62 0.12 264);
+
+  --chart-1: oklch(0.64 0.12 264);
+  --chart-2: oklch(0.6 0.1 200);
+  --chart-3: oklch(0.58 0.09 165);
+  --chart-4: oklch(0.62 0.14 22);
+  --chart-5: oklch(0.58 0.12 158);
+
+  --semantic-emerald: oklch(0.62 0.12 158);
+  --semantic-emerald-soft: oklch(0.28 0.04 158);
+  --accent-intelligence: oklch(0.62 0.11 280);
+  --accent-intelligence-soft: oklch(0.26 0.04 280);
+  --accent-governance: oklch(0.64 0.12 264);
+  --accent-fraud: oklch(0.62 0.14 22);
+
+  --marketing-canvas: oklch(0.125 0.02 264);
+
+  --mesh-a: radial-gradient(
+    ellipse 80% 55% at 78% -8%,
+    oklch(0.42 0.1 264 / 0.22),
+    transparent 58%
+  );
+  --mesh-b: radial-gradient(
+    ellipse 55% 45% at 8% 22%,
+    oklch(0.38 0.08 200 / 0.14),
+    transparent 52%
+  );
+  --mesh-c: radial-gradient(
+    ellipse 45% 38% at 92% 88%,
+    oklch(0.36 0.07 280 / 0.12),
+    transparent 50%
+  );
+
+  --gradient-brand: linear-gradient(
+    118deg,
+    oklch(0.72 0.11 264) 0%,
+    oklch(0.66 0.1 200) 48%,
+    oklch(0.62 0.09 165) 100%
+  );
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -305,5 +376,25 @@
     pointer-events: none;
     animation: mesh-shift 18s ease-in-out infinite;
     opacity: 0.85;
+  }
+
+  .public-site-hero-grid {
+    background-image:
+      linear-gradient(
+        to right,
+        color-mix(in oklch, var(--foreground) 6%, transparent) 1px,
+        transparent 1px
+      ),
+      linear-gradient(
+        to bottom,
+        color-mix(in oklch, var(--foreground) 6%, transparent) 1px,
+        transparent 1px
+      );
+    background-size: 48px 48px;
+    mask-image: radial-gradient(ellipse 70% 65% at 50% 45%, black 12%, transparent 72%);
+  }
+
+  .public-kicker {
+    @apply text-[11px] font-semibold uppercase tracking-[0.28em] text-muted-foreground;
   }
 }
