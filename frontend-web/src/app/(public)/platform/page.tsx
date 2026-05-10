@@ -11,6 +11,7 @@ import {
   Shield,
 } from "lucide-react";
 
+import { MarketingArticleShell } from "@/components/marketing/marketing-article-shell";
 import { WORKSPACE_ROUTES } from "@/lib/workspace-routes";
 import { buttonVariants } from "@/components/ui/button";
 
@@ -65,47 +66,88 @@ const DEEP_CAPS = [
 
 export default function PlatformCapabilitiesPage() {
   return (
-    <article className="mx-auto max-w-6xl px-4 pb-28 pt-12 sm:px-6 lg:px-8 lg:pb-36 lg:pt-16">
-      <header className="max-w-3xl border-b border-border/60 pb-12">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">Platform overview</p>
-        <h1 className="mt-4 font-[family-name:var(--font-heading)] text-3xl font-semibold tracking-tight sm:text-[2.125rem]">
-          Capabilities spanning intake, interpretation, enforcement assist, and review
-        </h1>
-        <p className="mt-5 text-[1.0625rem] leading-relaxed text-muted-foreground">
+    <MarketingArticleShell
+      kicker="Platform overview"
+      title={
+        <>
+          Capabilities from intake through review — engineered for{" "}
+          <span className="text-gradient-brand">explainable</span> governance
+        </>
+      }
+      description={
+        <>
           The platform concentrates on disciplined pre-filing orchestration — not certificate issuance — aligning engineering
-          choices with internationally recognised interoperable trade data practices.
-        </p>
-        <div className="mt-10 flex flex-wrap gap-4">
-          <Link href={WORKSPACE_ROUTES.home} className={buttonVariants({ size: "lg", className: "rounded-xl px-8" })}>
+          choices with internationally recognised interoperable trade data practices and documented API contracts.
+        </>
+      }
+      actions={
+        <>
+          <Link href={WORKSPACE_ROUTES.home} className={buttonVariants({ size: "lg", className: "rounded-lg px-8" })}>
             Launch workspace
           </Link>
-          <Link href="/research" className={buttonVariants({ variant: "outline", size: "lg", className: "rounded-xl px-8" })}>
+          <Link href="/research" className={buttonVariants({ variant: "outline", size: "lg", className: "rounded-lg px-8" })}>
             Research foundations
           </Link>
+        </>
+      }
+      headerAside={
+        <div className="space-y-5">
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">Positioning</p>
+            <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+              Pre-filing intelligence and supervisory assist — not legal certification, clearance guarantees, or autonomous
+              regulatory outcomes.
+            </p>
+          </div>
+          <ul className="space-y-2.5 border-t border-border/50 pt-5 text-[13px] font-medium leading-snug text-foreground/90">
+            <li className="flex gap-2">
+              <span className="text-primary" aria-hidden>
+                ·
+              </span>
+              ICC Digital Trade Toolkit discipline
+            </li>
+            <li className="flex gap-2">
+              <span className="text-primary" aria-hidden>
+                ·
+              </span>
+              Hybrid rules + empirical models
+            </li>
+            <li className="flex gap-2">
+              <span className="text-primary" aria-hidden>
+                ·
+              </span>
+              Human disposition boundary
+            </li>
+          </ul>
         </div>
-      </header>
-      <div className="mt-20 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+      }
+      contentClassName="space-y-0"
+    >
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {DEEP_CAPS.map((c) => {
           const Icon = c.icon;
           return (
             <div
               key={c.title}
-              className="rounded-[1.35rem] border border-border/70 bg-card/94 p-6 shadow-[0_26px_60px_-40px_oklch(0_0_0_/0.28)] transition-transform hover:-translate-y-[3px]"
+              className="rounded-2xl border border-border/80 bg-[color-mix(in_oklch,var(--background)_50%,var(--card))] p-6 transition-colors duration-300 hover:border-[color-mix(in_oklch,var(--primary)_40%,var(--border))]"
             >
-              <Icon className="size-8 text-primary" strokeWidth={1.25} aria-hidden />
-              <h2 className="mt-5 font-[family-name:var(--font-heading)] text-lg font-semibold leading-snug">{c.title}</h2>
-              <p className="mt-4 text-[14px] leading-relaxed text-muted-foreground">{c.body}</p>
+              <Icon className="size-7 text-[color-mix(in_oklch,var(--primary)_90%,transparent)]" strokeWidth={1.35} aria-hidden />
+              <h2 className="mt-5 font-[family-name:var(--font-heading)] text-[1.05rem] font-semibold leading-snug">
+                {c.title}
+              </h2>
+              <p className="mt-3 text-[13px] leading-relaxed text-muted-foreground">{c.body}</p>
             </div>
           );
         })}
       </div>
-      <aside className="mt-24 rounded-[1.5rem] border border-dashed border-border/65 bg-muted/35 p-10 text-center lg:mx-auto lg:max-w-3xl">
+
+      <aside className="mt-16 rounded-2xl border border-dashed border-border/60 bg-[color-mix(in_oklch,var(--card)_28%,var(--background))] p-8 text-center lg:mx-auto lg:max-w-3xl lg:px-10">
         <p className="text-sm leading-relaxed text-muted-foreground">
           Capability statements describe engineering intent exercised through the operational workspace UI and documented API
           contracts. Adoption maturity depends on organisational validation — not inferred from generic marketing uptake
           metrics.
         </p>
       </aside>
-    </article>
+    </MarketingArticleShell>
   );
 }

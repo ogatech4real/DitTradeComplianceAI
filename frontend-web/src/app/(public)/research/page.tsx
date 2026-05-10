@@ -2,6 +2,10 @@ import type { Metadata } from "next";
 
 import Link from "next/link";
 
+import {
+  MarketingArticleCtaBand,
+  MarketingArticleShell,
+} from "@/components/marketing/marketing-article-shell";
 import { WORKSPACE_ROUTES } from "@/lib/workspace-routes";
 import { buttonVariants } from "@/components/ui/button";
 
@@ -40,61 +44,78 @@ const PILLARS = [
 
 export default function ResearchInnovationPage() {
   return (
-    <article className="mx-auto max-w-6xl px-4 pb-28 pt-12 sm:px-6 lg:px-8 lg:pb-36 lg:pt-16">
-      <header className="mx-auto max-w-3xl text-center lg:mx-0 lg:text-left">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.26em] text-muted-foreground">Research legitimacy</p>
-        <h1 className="mt-5 font-[family-name:var(--font-heading)] text-3xl font-semibold tracking-tight sm:text-[2.375rem]">
-          Research narratives that underpin the engineered workspace
-        </h1>
-        <p className="mx-auto mt-6 max-w-2xl text-[1.05rem] leading-relaxed text-muted-foreground lg:mx-0">
+    <MarketingArticleShell
+      kicker="Research legitimacy"
+      title={
+        <>
+          Narratives that underpin the engineered <span className="text-gradient-brand">workspace</span>
+        </>
+      }
+      description={
+        <>
           Institutional stakeholders should expect traceable rationales bridging academic contribution, interoperability pilots,
-          and responsibly scoped operational analytics — not unsubstantiated production claims.
-        </p>
-      </header>
-      <div className="mt-16 grid gap-10 lg:mt-20 lg:grid-cols-[1fr_1.15fr]">
-        <aside className="order-2 h-fit rounded-3xl border border-border/65 bg-muted/35 p-8 lg:order-1">
-          <h2 className="font-[family-name:var(--font-heading)] text-lg font-semibold">Evaluation posture</h2>
-          <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
-            Controlled experiments complement partner pilots. Published outputs and artefacts remain the authoritative venue
-            for quantitative efficacy statements.
-          </p>
-          <div className="mt-10 space-y-3 text-sm leading-relaxed text-muted-foreground">
-            <p>• Transparency on model roles, failure modes, and human override paths.</p>
-            <p>• Traceable ingestion diagnostics for mapping and cohort fitness narratives.</p>
-            <p>• Documentation aligning API contracts with supervisory UI disclosures.</p>
+          and responsibly scoped operational analytics — not unsubstantiated production claims or marketing uplift statistics.
+        </>
+      }
+      headerAside={
+        <div className="space-y-5">
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">Evaluation posture</p>
+            <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+              Controlled experiments complement partner pilots. Published outputs and repository artefacts remain the authoritative
+              venue for quantitative efficacy statements.
+            </p>
           </div>
           <Link
             href="https://github.com/ogatech4real/DitTradeComplianceAI"
-            className={buttonVariants({
-              variant: "outline",
-              className: "mt-10 w-full rounded-xl",
-            })}
+            className={buttonVariants({ variant: "outline", className: "w-full rounded-lg sm:w-auto" })}
             target="_blank"
             rel="noopener noreferrer"
           >
-            Review implementation artefacts on GitHub
+            Review implementation artefacts
           </Link>
+        </div>
+      }
+      contentClassName="space-y-0"
+    >
+      <div className="grid gap-12 lg:grid-cols-12 lg:items-start lg:gap-14">
+        <aside className="order-2 rounded-2xl border border-border/70 bg-[color-mix(in_oklch,var(--card)_35%,var(--background))] p-8 lg:order-1 lg:col-span-4 lg:sticky lg:top-28">
+          <h2 className="font-[family-name:var(--font-heading)] text-lg font-semibold">Disclosure commitments</h2>
+          <div className="mt-6 space-y-4 text-sm leading-relaxed text-muted-foreground">
+            <p>Transparency on model roles, failure modes, and human override paths.</p>
+            <p>Traceable ingestion diagnostics for mapping and cohort fitness narratives.</p>
+            <p>Documentation aligning API contracts with supervisory UI disclosures.</p>
+          </div>
         </aside>
-        <div className="order-1 space-y-12 lg:order-2">
+        <div className="order-1 space-y-12 lg:order-2 lg:col-span-8">
           {PILLARS.map((pillar) => (
-            <section key={pillar.title} className="border-l-2 border-[var(--accent-governance)]/45 pl-6">
-              <h2 className="font-[family-name:var(--font-heading)] text-xl font-semibold">{pillar.title}</h2>
+            <section
+              key={pillar.title}
+              className="border-l-2 border-[color-mix(in_oklch,var(--primary)_55%,transparent)] pl-6 lg:pl-8"
+            >
+              <h2 className="font-[family-name:var(--font-heading)] text-xl font-semibold leading-snug">{pillar.title}</h2>
               <p className="mt-4 text-[15px] leading-relaxed text-muted-foreground">{pillar.body}</p>
             </section>
           ))}
         </div>
       </div>
-      <div className="mt-20 rounded-3xl bg-gradient-to-r from-muted/65 via-transparent to-[var(--accent-intelligence-soft)]/45 p-[1px]">
-        <div className="rounded-[calc(1.5rem-1px)] bg-[var(--marketing-canvas)] p-10 text-center lg:text-left">
-          <p className="text-[15px] leading-relaxed text-foreground">
-            Launch the sandbox workspace to correlate these research themes with tactile operator flows — ingestion, cohort
-            intelligence, explainability narratives, investigations, and export readiness.
-          </p>
-          <Link href={WORKSPACE_ROUTES.home} className={buttonVariants({ className: "mt-8 rounded-xl" })}>
-            Open operational workspace
-          </Link>
-        </div>
+
+      <div className="mt-20">
+        <MarketingArticleCtaBand
+          body={
+            <>
+              Launch the operational workspace to correlate these research themes with tactile flows — ingestion, cohort
+              intelligence, explainability narratives, investigations, and export readiness — under your organisation&apos;s
+              controls.
+            </>
+          }
+          actions={
+            <Link href={WORKSPACE_ROUTES.home} className={buttonVariants({ size: "lg", className: "rounded-lg px-8" })}>
+              Open operational workspace
+            </Link>
+          }
+        />
       </div>
-    </article>
+    </MarketingArticleShell>
   );
 }
