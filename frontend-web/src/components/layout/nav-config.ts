@@ -2,6 +2,8 @@ import { LayoutDashboard, Layers, ListChecks } from "lucide-react";
 
 import type { LucideIcon } from "lucide-react";
 
+import { WORKSPACE_ROUTES } from "@/lib/workspace-routes";
+
 export interface NavItem {
   href: string;
   label: string;
@@ -19,13 +21,13 @@ export const navSections: NavSection[] = [
     heading: "Intelligence workspace",
     items: [
       {
-        href: "/",
+        href: WORKSPACE_ROUTES.home,
         label: "Command overview",
         hint: "Executive surface & import",
         icon: Layers,
       },
       {
-        href: "/dashboard",
+        href: WORKSPACE_ROUTES.dashboard,
         label: "Decision intelligence",
         hint: "Exposure, rationale, posture",
         icon: LayoutDashboard,
@@ -36,7 +38,7 @@ export const navSections: NavSection[] = [
     heading: "Operations",
     items: [
       {
-        href: "/review",
+        href: WORKSPACE_ROUTES.review,
         label: "Investigations",
         hint: "Prioritised review & evidence",
         icon: ListChecks,

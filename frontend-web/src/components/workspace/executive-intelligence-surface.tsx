@@ -19,6 +19,7 @@ import { isEmptyEnvelope } from "@/lib/contracts/envelope";
 import type { ScreeningSuccessResponse } from "@/lib/contracts/screening";
 import { useWorkflowUiStore } from "@/stores/workflow-ui-store";
 import { WORKFLOW_PHASE_METADATA } from "@/lib/contracts/workflow";
+import { WORKSPACE_ROUTES } from "@/lib/workspace-routes";
 
 function fmt(n: number) {
   return n.toLocaleString("en-US");
@@ -204,11 +205,11 @@ export function ExecutiveIntelligenceSurface() {
             <a href="#import-screen" className={buttonVariants({ size: "default" })}>
               Upload declarations
             </a>
-            <Link href="/dashboard" className={buttonVariants({ variant: "secondary", size: "default" })}>
+            <Link href={WORKSPACE_ROUTES.dashboard} className={buttonVariants({ variant: "secondary", size: "default" })}>
               Open decision intelligence
             </Link>
             <Link
-              href="/review"
+              href={WORKSPACE_ROUTES.review}
               className={buttonVariants({ variant: "outline", size: "default" })}
             >
               Investigation workspace

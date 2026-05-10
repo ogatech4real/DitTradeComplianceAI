@@ -6,6 +6,7 @@ import { Menu } from "lucide-react";
 import { useState } from "react";
 
 import { cn } from "@/lib/utils";
+import { isWorkspaceNavActive } from "@/lib/nav-active";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -44,9 +45,7 @@ export function MobileNavSheet() {
         </SheetHeader>
         <nav className="flex flex-col gap-1 p-3">
           {mainNavItems.map((item) => {
-            const active =
-              pathname === item.href ||
-              pathname.startsWith(`${item.href}/`);
+            const active = isWorkspaceNavActive(pathname, item.href);
             const Icon = item.icon;
             return (
               <Link

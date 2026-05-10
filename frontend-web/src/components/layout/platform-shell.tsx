@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import { usePathname } from "next/navigation";
 
 import { AppShell } from "@/components/layout/app-shell";
+import { WORKSPACE_ROUTES } from "@/lib/workspace-routes";
 
 interface RouteMeta {
   title: string;
@@ -11,17 +12,17 @@ interface RouteMeta {
 }
 
 const ROUTES: Record<string, RouteMeta> = {
-  "/": {
+  [WORKSPACE_ROUTES.home]: {
     title: "Operational intelligence workspace",
     description:
       "Executive posture, secure import, and immediate navigation into decision-grade surfaces.",
   },
-  "/dashboard": {
+  [WORKSPACE_ROUTES.dashboard]: {
     title: "Decision intelligence",
     description:
       "Exposure concentrations, rationale themes, governance quality, and review pressure in one coherent view.",
   },
-  "/review": {
+  [WORKSPACE_ROUTES.review]: {
     title: "Investigation workspace",
     description:
       "Prioritised declarations with severity context, narrative explainability, and disposition guidance.",
@@ -36,7 +37,9 @@ const DEFAULT_META: RouteMeta = {
 
 export function PlatformShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
-  const meta = ROUTES[pathname] ?? DEFAULT_META;
+  const path =
+    pathname.length > 1 && pathname.endsWith("/") ? pathname.slice(0, -1) : pathname;
+  const meta = ROUTES[path] ?? DEFAULT_META;
 
   return (
     <AppShell title={meta.title} description={meta.description}>

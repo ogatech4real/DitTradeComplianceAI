@@ -23,6 +23,7 @@ import { ApiHttpError } from "@/lib/api/errors";
 import { TradeFileParseError } from "@/lib/file-ingest/parse-trade-file";
 import { useWorkflowUiStore } from "@/stores/workflow-ui-store";
 import { WORKFLOW_PHASE_METADATA } from "@/lib/contracts/workflow";
+import { WORKSPACE_ROUTES } from "@/lib/workspace-routes";
 import { shouldUseMockApi } from "@/lib/api/mock-mode";
 
 function workflowProgressPercent(phaseId: string, isRunning: boolean): number {
@@ -197,7 +198,7 @@ export function OperationalIngestPanel() {
                 </span>
               </div>
               <Link
-                href="/dashboard"
+                href={WORKSPACE_ROUTES.dashboard}
                 className={buttonVariants({ size: "sm" })}
               >
                 View decision intelligence

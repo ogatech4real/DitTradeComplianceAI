@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 
 import { cn } from "@/lib/utils";
 import { navSections } from "@/components/layout/nav-config";
+import { isWorkspaceNavActive } from "@/lib/nav-active";
 
 export function AppSidebar() {
   const pathname = usePathname();
@@ -33,10 +34,7 @@ export function AppSidebar() {
             </p>
             <div className="flex flex-col gap-0.5">
               {section.items.map((item) => {
-                const active =
-                  item.href === "/"
-                    ? pathname === "/" || pathname === ""
-                    : pathname === item.href || pathname.startsWith(`${item.href}/`);
+                const active = isWorkspaceNavActive(pathname, item.href);
                 const Icon = item.icon;
                 return (
                   <Link
@@ -71,8 +69,13 @@ export function AppSidebar() {
           </div>
         ))}
       </nav>
-      <div className="relative border-t border-sidebar-border/70 p-4 text-[11px] leading-relaxed text-muted-foreground">
-        Session-linked screening outputs. Navigation reflects your active compliance intelligence run.
+      <div className="relative space-y-3 border-t border-sidebar-border/70 p-4 text-[11px] leading-relaxed text-muted-foreground">
+        <p>
+          Session-linked screening outputs. Navigation reflects your active compliance intelligence run.
+        </p>
+        <Link href="/" className="inline-flex font-medium text-primary underline-offset-4 hover:underline">
+          Back to institutional site →
+        </Link>
       </div>
     </aside>
   );

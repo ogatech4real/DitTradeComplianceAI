@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
+import { WORKSPACE_ROUTES } from "@/lib/workspace-routes";
 import { cn } from "@/lib/utils";
 import {
   WORKFLOW_PHASE_METADATA,
@@ -138,7 +139,10 @@ export function WorkflowStatusRail() {
       {activePhaseId === "review_queue" ? (
         <p className="mt-3 text-[11px] leading-relaxed text-muted-foreground">
           At this stage, prioritised investigations are surfaced in the workspace.{" "}
-          <Link href="/review" className="font-medium text-primary underline-offset-4 hover:underline">
+          <Link
+            href={WORKSPACE_ROUTES.review}
+            className="font-medium text-primary underline-offset-4 hover:underline"
+          >
             Open investigations
           </Link>
         </p>

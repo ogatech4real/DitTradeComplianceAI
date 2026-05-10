@@ -20,24 +20,9 @@ import { SeverityConcentrationChart } from "@/components/dashboard/severity-conc
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { buttonVariants } from "@/components/ui/button";
+import { WORKSPACE_ROUTES } from "@/lib/workspace-routes";
 import { shouldUseMockApi } from "@/lib/api/mock-mode";
-
-function EmptyDecisionState({ message }: { message?: string }) {
-  return (
-    <div className="operational-surface rounded-2xl border border-dashed border-border/80 p-12 text-center">
-      <p className="font-[family-name:var(--font-heading)] text-lg font-semibold text-foreground">
-        No decision intelligence loaded
-      </p>
-      <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-muted-foreground">
-        {message ??
-          "Import a declaration file from the workspace home to hydrate screening outputs. Operators with demo deployments can enable deterministic sample data via environment flags."}
-      </p>
-      <Link href="/" className={buttonVariants({ className: "mt-8" })}>
-        Return to workspace home
-      </Link>
-    </div>
-  );
-}
+import { EmptyDecisionState } from "@/components/dashboard/empty-decision-state";
 
 export function DashboardDecisionSurface() {
   const q = useLatestResultsQuery(true);
@@ -140,7 +125,7 @@ export function DashboardDecisionSurface() {
         <p className="text-sm text-muted-foreground">
           Move from macro posture to investigative evidence with filters, severity ribbons, and narrative drawers.
         </p>
-        <Link href="/review" className={buttonVariants({ variant: "secondary" })}>
+        <Link href={WORKSPACE_ROUTES.review} className={buttonVariants({ variant: "secondary" })}>
           Open investigation workspace
         </Link>
       </div>
