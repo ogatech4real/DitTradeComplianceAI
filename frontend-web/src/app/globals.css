@@ -132,78 +132,74 @@
 }
 
 .dark {
-  /* Electro-cyan + hyperspace violet / mint — workstation-first palette */
-  --brand-secondary: oklch(0.71 0.26 307);
-  --brand-secondary-soft: oklch(0.3 0.1 307);
-  --brand-tertiary: oklch(0.76 0.14 175);
-  --brand-tertiary-soft: oklch(0.245 0.06 182);
+  --brand-secondary: oklch(0.74 0.18 328);
+  --brand-secondary-soft: oklch(0.32 0.08 328);
+  --brand-tertiary: oklch(0.72 0.12 175);
+  --brand-tertiary-soft: oklch(0.26 0.05 175);
 
-  --background: oklch(0.128 0.048 264);
-  --foreground: oklch(0.96 0.022 258);
-  --card: oklch(0.176 0.052 266);
-  --card-foreground: oklch(0.965 0.018 258);
-  --popover: oklch(0.195 0.055 266);
-  --popover-foreground: oklch(0.96 0.02 258);
+  --background: oklch(0.2 0.04 278);
+  --foreground: oklch(0.96 0.02 278);
+  --card: oklch(0.238 0.045 286);
+  --card-foreground: oklch(0.96 0.02 278);
+  --popover: oklch(0.25 0.046 286);
+  --popover-foreground: oklch(0.96 0.02 278);
 
-  --primary: oklch(0.74 0.15 238);
-  --primary-foreground: oklch(0.14 0.055 268);
+  --primary: oklch(0.72 0.16 268);
+  --primary-foreground: oklch(0.17 0.05 278);
 
-  --secondary: oklch(0.28 0.055 296);
-  --secondary-foreground: oklch(0.95 0.024 296);
+  --secondary: oklch(0.32 0.06 298);
+  --secondary-foreground: oklch(0.94 0.02 298);
 
-  --muted: oklch(0.255 0.042 274);
-  --muted-foreground: oklch(0.742 0.035 266);
-  --accent: oklch(0.32 0.1 296);
-  --accent-foreground: oklch(0.99 0.01 0);
-  --destructive: oklch(0.64 0.21 22);
-  --border: oklch(1 0 0 / 13%);
+  --muted: oklch(0.3 0.04 278);
+  --muted-foreground: oklch(0.72 0.03 278);
+  --accent: oklch(0.38 0.08 268);
+  --accent-foreground: oklch(0.98 0 0);
+  --destructive: oklch(0.62 0.2 22);
+  --border: oklch(1 0 0 / 12%);
   --input: oklch(1 0 0 / 14%);
-  --ring: oklch(0.72 0.18 296);
+  --ring: oklch(0.68 0.16 305);
 
-  --chart-1: oklch(0.76 0.16 238);
-  --chart-2: oklch(0.71 0.22 307);
-  --chart-3: oklch(0.7 0.14 205);
-  --chart-4: oklch(0.78 0.16 92);
-  --chart-5: oklch(0.66 0.14 172);
+  --chart-1: oklch(0.72 0.17 268);
+  --chart-2: oklch(0.7 0.18 328);
+  --chart-3: oklch(0.66 0.14 205);
+  --chart-4: oklch(0.74 0.15 82);
+  --chart-5: oklch(0.62 0.14 158);
 
-  --sidebar: oklch(0.152 0.05 266);
-  --sidebar-foreground: oklch(0.958 0.024 258);
-  --sidebar-primary: oklch(0.76 0.15 238);
-  --sidebar-primary-foreground: oklch(0.13 0.06 274);
-  --sidebar-accent: oklch(0.26 0.07 294);
-  --sidebar-accent-foreground: oklch(0.97 0.026 294);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.72 0.18 296);
+  --sidebar: oklch(0.218 0.042 286);
+  --sidebar-foreground: oklch(0.95 0.02 278);
+  --sidebar-primary: oklch(0.72 0.16 268);
+  --sidebar-primary-foreground: oklch(0.17 0.05 278);
+  --sidebar-accent: oklch(0.34 0.08 298);
+  --sidebar-accent-foreground: oklch(0.96 0.02 298);
+  --sidebar-border: oklch(1 0 0 / 11%);
+  --sidebar-ring: oklch(0.68 0.16 305);
 
-  --semantic-critical-soft: oklch(0.3 0.09 22);
-  --semantic-orange-soft: oklch(0.32 0.07 82);
-  --accent-intelligence: oklch(0.7 0.22 296);
-  --accent-intelligence-soft: oklch(0.28 0.09 296);
-  --accent-governance: oklch(0.64 0.18 268);
-  --accent-fraud: oklch(0.7 0.2 332);
-  --marketing-canvas: oklch(0.125 0.048 266);
+  --semantic-critical-soft: oklch(0.32 0.08 22);
+  --semantic-orange-soft: oklch(0.34 0.06 82);
+  --accent-intelligence-soft: oklch(0.3 0.08 298);
+  --marketing-canvas: oklch(0.205 0.04 278);
 
   --mesh-a: radial-gradient(
-    ellipse 92% 68% at 72% -4%,
-    oklch(0.62 0.24 296 / 0.38),
-    transparent 56%
+    ellipse 90% 70% at 78% -5%,
+    oklch(0.52 0.2 293 / 0.35),
+    transparent 54%
   );
   --mesh-b: radial-gradient(
-    ellipse 72% 58% at 14% 20%,
-    oklch(0.54 0.16 238 / 0.42),
-    transparent 52%
+    ellipse 70% 55% at 12% 18%,
+    oklch(0.45 0.14 258 / 0.28),
+    transparent 50%
   );
   --mesh-c: radial-gradient(
-    ellipse 62% 50% at 86% 90%,
-    oklch(0.62 0.18 352 / 0.38),
-    transparent 52%
+    ellipse 55% 45% at 88% 88%,
+    oklch(0.48 0.16 328 / 0.28),
+    transparent 48%
   );
 
   --gradient-brand: linear-gradient(
-    132deg,
-    oklch(0.74 0.15 238),
-    oklch(0.68 0.24 307) 48%,
-    oklch(0.76 0.14 175) 100%
+    125deg,
+    oklch(0.72 0.16 268),
+    oklch(0.68 0.18 328) 52%,
+    oklch(0.74 0.14 352) 100%
   );
 }
 
@@ -249,64 +245,6 @@
   }
 }
 
-@keyframes workspace-halo-opacity {
-  0%,
-  100% {
-    opacity: 0.74;
-    filter: saturate(105%) hue-rotate(-2deg);
-  }
-  50% {
-    opacity: 0.94;
-    filter: saturate(128%) hue-rotate(4deg);
-  }
-}
-
-@keyframes workspace-grid-shift {
-  0% {
-    background-position:
-      0 0,
-      0 0;
-  }
-  100% {
-    background-position:
-      72px 56px,
-      -56px 72px;
-  }
-}
-
-@keyframes workspace-scan-flicker {
-  0%,
-  100% {
-    opacity: 0.038;
-    transform: translate3d(0, 0, 0);
-  }
-  50% {
-    opacity: 0.072;
-    transform: translate3d(0, 2px, 0);
-  }
-}
-
-@keyframes ai-header-shimmer {
-  0% {
-    background-position: 0% center;
-  }
-  100% {
-    background-position: 200% center;
-  }
-}
-
-@keyframes sidebar-breathe {
-  0%,
-  100% {
-    opacity: 0.42;
-    background-position: 0% 0%;
-  }
-  50% {
-    opacity: 0.72;
-    background-position: 100% 100%;
-  }
-}
-
 @layer utilities {
   .text-gradient-brand {
     background-image: var(--gradient-brand);
@@ -333,66 +271,6 @@
     animation: float-soft 12s ease-in-out infinite;
   }
 
-  /* Workspace-only ambience primitives (applied under `.dark[data-workspace-shell]`) */
-  .animate-workspace-halo {
-    animation: workspace-halo-opacity 20s ease-in-out infinite;
-  }
-
-  .workspace-holo-grid {
-    opacity: 0.095;
-    background-image:
-      linear-gradient(
-        98deg,
-        color-mix(in oklch, var(--primary) 38%, transparent) 0.85px,
-        transparent 0.85px
-      ),
-      linear-gradient(
-        6deg,
-        color-mix(in oklch, var(--brand-secondary) 42%, transparent) 0.8px,
-        transparent 0.8px
-      );
-    background-size:
-      64px 64px,
-      88px 88px;
-    animation: workspace-grid-shift 42s linear infinite;
-  }
-
-  .workspace-noise-mask {
-    background-image: radial-gradient(oklch(1 0 0 / 0.06) 0.95px, transparent 1px);
-    background-size: 3px 3px;
-  }
-
-  .workspace-scan-lines {
-    background-image: repeating-linear-gradient(
-      182deg,
-      transparent,
-      transparent 3px,
-      oklch(1 0 0 / 0.065) 3px,
-      oklch(1 0 0 / 0.065) 4px
-    );
-    background-size: 100% 100%;
-  }
-
-  .animate-workspace-scan {
-    animation: workspace-scan-flicker 9s ease-in-out infinite;
-  }
-
-  .animate-ai-header-shimmer {
-    animation: ai-header-shimmer 10s linear infinite;
-  }
-
-  .animate-sidebar-shimmer {
-    background-image: linear-gradient(
-      135deg,
-      transparent,
-      color-mix(in oklch, var(--brand-secondary) 18%, transparent) 43%,
-      color-mix(in oklch, var(--primary) 14%, transparent) 62%,
-      transparent 88%
-    );
-    background-size: 220% 220%;
-    animation: sidebar-breathe 14s ease-in-out infinite;
-  }
-
   .enterprise-surface,
   .operational-surface {
     @apply rounded-xl border text-card-foreground backdrop-blur-md;
@@ -407,29 +285,6 @@
       inset 0 1px 0 color-mix(in oklch, white 62%, transparent),
       0 4px 20px color-mix(in oklch, var(--primary) 18%, transparent),
       0 22px 56px color-mix(in oklch, var(--brand-secondary) 14%, transparent);
-  }
-
-  /* AI cockpit polish on dark workspace shells */
-  .dark[data-workspace-shell] .operational-surface,
-  .dark[data-workspace-shell] .enterprise-surface {
-    backdrop-filter: blur(12px);
-    background: linear-gradient(
-        164deg,
-        color-mix(in oklch, var(--card) 88%, transparent) 0%,
-        color-mix(in oklch, var(--card) 55%, transparent) 72%,
-        color-mix(in oklch, var(--primary) 14%, transparent)
-      ),
-      linear-gradient(
-        218deg,
-        color-mix(in oklch, var(--card) 96%, transparent),
-        color-mix(in oklch, var(--card) 86%, transparent)
-      );
-    border-color: color-mix(in oklch, var(--primary) 32%, transparent);
-    box-shadow:
-      inset 0 1px 0 oklch(1 0 0 / 0.06),
-      0 0 0 1px color-mix(in oklch, var(--brand-secondary) 18%, transparent),
-      0 8px 32px oklch(0 0 0 / 0.42),
-      0 0 72px -32px color-mix(in oklch, var(--primary) 45%, transparent);
   }
 
   .surface-spotlight {

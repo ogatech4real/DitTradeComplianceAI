@@ -14,17 +14,16 @@ export function AppSidebar() {
   return (
     <aside
       className={cn(
-        "relative hidden shrink-0 flex-col overflow-hidden border-r border-[color-mix(in_oklch,var(--primary)_35%,transparent)] bg-[linear-gradient(175deg,color-mix(in_oklch,var(--sidebar)_98%,transparent),color-mix(in_oklch,var(--sidebar)_82%,transparent))] text-sidebar-foreground shadow-[4px_0_48px_-18px_color-mix(in_oklch,var(--primary)_42%,transparent),inset_-1px_0_0_color-mix(in_oklch,white_6%,transparent)] backdrop-blur-xl md:flex md:w-[15.75rem] lg:w-[17rem]",
+        "relative hidden shrink-0 flex-col overflow-hidden border-r border-border/70 bg-sidebar/95 text-sidebar-foreground backdrop-blur-md md:flex md:w-[15.5rem] lg:w-[16.25rem]",
       )}
       aria-label="Primary navigation"
     >
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_120%_100%_at_40%_-12%,color-mix(in_oklch,var(--primary)_22%,transparent),transparent_52%)]" />
-      <div className="pointer-events-none absolute inset-0 animate-sidebar-shimmer opacity-[0.55]" aria-hidden />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_130%_90%_at_50%_-20%,oklch(0.55_0.1_264_/_0.12),transparent_55%)]" />
       <div className="relative border-b border-sidebar-border/80 px-5 py-5">
         <div className="text-[11px] font-semibold uppercase tracking-[0.22em] text-primary/80">
           Digital Trade
         </div>
-        <div className="mt-1.5 bg-[linear-gradient(92deg,var(--foreground),color-mix(in_oklch,var(--primary)_72%,transparent),color-mix(in_oklch,var(--brand-secondary)_92%,transparent))] bg-clip-text font-[family-name:var(--font-heading)] text-[15px] font-semibold leading-tight tracking-tight text-transparent">
+        <div className="mt-1.5 bg-[linear-gradient(92deg,var(--foreground),color-mix(in_oklch,var(--foreground)_55%,var(--brand-secondary)_45%))] bg-clip-text font-[family-name:var(--font-heading)] text-[15px] font-semibold leading-tight tracking-tight text-transparent">
           Compliance intelligence
         </div>
       </div>
@@ -46,8 +45,8 @@ export function AppSidebar() {
                     className={cn(
                       "group flex items-start gap-2.5 rounded-xl px-3 py-2.5 text-[13px] font-medium transition-all duration-200",
                       active
-                        ? "bg-[linear-gradient(115deg,color-mix(in_oklch,var(--primary)_52%,transparent),color-mix(in_oklch,var(--brand-secondary-soft)_74%,transparent))] text-sidebar-primary-foreground shadow-[0_0_28px_-8px_color-mix(in_oklch,var(--primary)_55%,transparent)] ring-2 ring-[color-mix(in_oklch,var(--brand-secondary)_58%,transparent)]"
-                        : "text-muted-foreground hover:bg-sidebar-accent/90 hover:text-sidebar-accent-foreground hover:shadow-[0_0_22px_-10px_color-mix(in_oklch,var(--primary)_35%,transparent)] hover:ring-1 hover:ring-[color-mix(in_oklch,var(--primary)_35%,transparent)]",
+                        ? "bg-[linear-gradient(110deg,color-mix(in_oklch,var(--sidebar-accent)_94%,transparent),color-mix(in_oklch,var(--brand-secondary-soft)_82%,transparent))] text-sidebar-accent-foreground shadow-md shadow-[color-mix(in_oklch,var(--primary)_18%,transparent)] ring-2 ring-[color-mix(in_oklch,var(--brand-secondary)_45%,transparent)]"
+                        : "text-muted-foreground hover:bg-sidebar-accent/80 hover:text-sidebar-accent-foreground hover:ring-1 hover:ring-primary/20",
                     )}
                   >
                     <Icon
