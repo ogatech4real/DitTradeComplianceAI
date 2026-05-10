@@ -8,6 +8,9 @@ from fastapi import (
     APIRouter,
     HTTPException,
 )
+from fastapi.encoders import (
+    jsonable_encoder,
+)
 
 from backend.orchestration.pipeline_manager import (
     PipelineManager,
@@ -51,7 +54,9 @@ def store_latest_results(
 
     global LATEST_RESULTS
 
-    LATEST_RESULTS = results
+    # Normalise nested numpy / Decimal / etc. so GET /latest always JSON-serialises
+    # the same shapes as outbound POST scoring (survives in-memory round-trip).
+    LATEST_RESULTS = jsonable_encoder(results)
 
 
 # =========================================================
@@ -144,7 +149,7 @@ def latest_results():
             "success",
         )
 
-        return payload
+        return jsonable_encoder(payload)
 
     except Exception as exc:
 

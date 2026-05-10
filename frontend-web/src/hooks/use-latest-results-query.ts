@@ -10,6 +10,10 @@ export function useLatestResultsQuery(enabled = true) {
     queryKey: queryKeys.latestResults(),
     queryFn: fetchLatestResults,
     enabled,
-    staleTime: 10_000,
+    // Keep client-side hydration from mutation; avoid stripping it on focus/remount churn.
+    staleTime: Infinity,
+    refetchOnWindowFocus: false,
+    retry: 2,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 10_000),
   });
 }

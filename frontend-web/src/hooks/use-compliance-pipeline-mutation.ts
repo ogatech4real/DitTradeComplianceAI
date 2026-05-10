@@ -39,10 +39,10 @@ export function useCompliancePipelineMutation() {
 
       sf.setActivePhase("review_queue");
       sf.setPipelineMessage("Hydrating decision intelligence cache…");
+      // Authoritative screening response — do not invalidate/refetch `/results/latest`
+      // here: refetch loses data on transient errors, empty server memory across
+      // workers, or focus/stale churn and clears the hydrated dashboard briefly.
       queryClient.setQueryData(queryKeys.latestResults(), result);
-      await queryClient.invalidateQueries({
-        queryKey: queryKeys.latestResults(),
-      });
 
       sf.setPipelineMessage(null);
       sf.setStatus("succeeded");
