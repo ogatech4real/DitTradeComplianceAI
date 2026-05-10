@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import os
 import sys
+import time
 from pathlib import Path
 from typing import Any, Dict
 
@@ -283,6 +284,91 @@ def get_scoring_request_timeout_sec() -> float:
     return 600.0
 
 
+def get_scoring_max_attempts() -> int:
+    """
+    Retries for transient gateway / cold-start failures (502/503/504, connect).
+
+    Override with env or Streamlit secret ``STREAMLIT_SCORING_MAX_ATTEMPTS``
+    (minimum 1, capped at 10).
+    """
+
+    for env_key in (
+        "STREAMLIT_SCORING_MAX_ATTEMPTS",
+        "SCORING_MAX_ATTEMPTS",
+    ):
+
+        raw = os.environ.get(
+            env_key,
+            "",
+        ).strip()
+
+        if raw:
+
+            try:
+
+                return max(
+                    1,
+                    min(
+                        10,
+                        int(raw),
+                    ),
+                )
+
+            except ValueError:
+
+                pass
+
+    try:
+
+        sec = st.secrets.get(
+            "STREAMLIT_SCORING_MAX_ATTEMPTS",
+        )
+
+        if sec is not None:
+
+            return max(
+                1,
+                min(
+                    10,
+                    int(sec),
+                ),
+            )
+
+    except Exception:
+
+        pass
+
+    return 4
+
+
+_SCORING_TRANSIENT_STATUS = frozenset(
+    {
+        502,
+        503,
+        504,
+    }
+)
+
+
+def _wake_scoring_backend() -> None:
+    """
+    Light health hit so a sleeping Render worker can spin up before heavy POST.
+
+    Failures are ignored — the scoring call still runs next.
+    """
+
+    try:
+
+        requests.get(
+            f"{get_api_base_url()}/health/",
+            timeout=22,
+        )
+
+    except Exception:
+
+        pass
+
+
 def format_scoring_http_error(
     response: requests.Response,
 ) -> str:
@@ -299,8 +385,9 @@ def format_scoring_http_error(
             f"HTTP {code}: API gateway could not reach the scoring service "
             f"or it timed out ({get_api_base_url()}). Typical causes: "
             "instance memory/CPU limits, Render proxy timeout, or cold start. "
-            "Check API logs on Render; consider a larger plan or "
-            "``STREAMLIT_SCORING_TIMEOUT_SEC`` if the client gave up early."
+            "Check API logs on Render; try increasing "
+            "``STREAMLIT_SCORING_TIMEOUT_SEC``, ``STREAMLIT_SCORING_MAX_ATTEMPTS`` "
+            "on Streamlit Cloud, or a larger Render plan."
         )
 
     text = (
@@ -345,7 +432,7 @@ def run_screening_via_api(
     dataframe: pd.DataFrame,
 ) -> Dict[str, Any]:
     """
-    Send dataframe to backend API.
+    Send dataframe to backend API with retries for cold starts / gateway flakes.
     """
 
     dataframe = sanitise_dataframe(
@@ -358,21 +445,105 @@ def run_screening_via_api(
 
     timeout_sec = get_scoring_request_timeout_sec()
 
-    response = requests.post(
-        f"{get_api_base_url()}/scoring/run",
-        json={"records": payload},
-        timeout=timeout_sec,
+    attempts = get_scoring_max_attempts()
+
+    backoffs_sec = (
+        1.5,
+        3.5,
+        9.0,
+        18.0,
+        28.0,
+        38.0,
+        48.0,
+        58.0,
     )
 
-    if response.status_code != 200:
+    _wake_scoring_backend()
+
+    url = f"{get_api_base_url()}/scoring/run"
+
+    session = requests.Session()
+
+    response: requests.Response | None = None
+
+    for attempt_idx in range(attempts):
+
+        if attempt_idx > 0:
+
+            sleep_sec = backoffs_sec[
+                min(
+                    attempt_idx - 1,
+                    len(backoffs_sec) - 1,
+                )
+            ]
+
+            time.sleep(
+                sleep_sec,
+            )
+
+            st.warning(
+                f"Waiting for scoring service (attempt "
+                f"{attempt_idx + 1} of {attempts}) … "
+                "Render cold starts / gateway timeouts often clear on retry."
+            )
+
+        try:
+
+            response = session.post(
+                url,
+                json={"records": payload},
+                timeout=timeout_sec,
+            )
+
+        except (
+            requests.Timeout,
+            requests.ConnectionError,
+        ) as exc:
+
+            if attempt_idx == attempts - 1:
+
+                raise RuntimeError(
+                    f"Backend scoring failed after {attempts} attempt(s): "
+                    f"{type(exc).__name__}: {exc!s}. "
+                    "Increase STREAMLIT_SCORING_TIMEOUT_SEC or check Render "
+                    "API logs.",
+                ) from exc
+
+            continue
+
+        if response.status_code == 200:
+
+            break
+
+        if (
+            response.status_code in _SCORING_TRANSIENT_STATUS
+            and attempt_idx < attempts - 1
+        ):
+
+            continue
 
         error_detail = format_scoring_http_error(
             response,
         )
 
+        suffix = ""
+
+        if attempts > 1:
+
+            suffix = (
+                f" (no recovery after {attempts} attempts; "
+                "see Render scoring service logs)."
+            )
+
         raise RuntimeError(
             f"Backend scoring failed: "
-            f"{error_detail}"
+            f"{error_detail}{suffix}",
+        )
+
+    if response is None or response.status_code != 200:
+
+        raise RuntimeError(
+            "Backend scoring failed unexpectedly after retries.",
         )
 
     api_result = response.json()
