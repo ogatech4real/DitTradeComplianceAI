@@ -1119,7 +1119,7 @@ class Charts:
                 help=(
                     "Rows matched by backlog rule."
                     if can_quantify_review
-                    else rr_help,
+                    else rr_help
                 ),
             )
 
@@ -1145,7 +1145,7 @@ class Charts:
                     else "N/A"
                 ),
                 help=(
-                    "Hybrid tier or severity view across every screened row.",
+                    "Hybrid tier or severity view across every screened row."
                 ),
             )
 
@@ -1238,7 +1238,7 @@ class Charts:
                 ),
                 help=(
                     "Uses rule_flag_count when present; otherwise inferred "
-                    "from rule-indicator columns.",
+                    "from rule-indicator columns."
                 ),
             )
 
@@ -1248,7 +1248,7 @@ class Charts:
                 "Queue depth",
                 f"{n_backlog:,}",
                 help=(
-                    "Rows requiring operational review for this intake.",
+                    "Rows requiring operational review for this intake."
                 ),
             )
 
