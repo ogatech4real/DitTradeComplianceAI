@@ -19,6 +19,10 @@ import {
 import { WORKSPACE_ROUTES } from "@/lib/workspace-routes";
 import { HeroExecutiveSurface } from "@/components/marketing/hero-executive-surface";
 import { WorkspaceIntelligencePreview } from "@/components/marketing/workspace-intelligence-preview";
+import { MarketingFigure } from "@/components/marketing/illustrations/marketing-figure";
+import { DigitalTradeContextCollage } from "@/components/marketing/illustrations/digital-trade-context-collage";
+import { WorkflowPipelineStripArt } from "@/components/marketing/illustrations/workflow-pipeline-strip-art";
+import { ResearchSynthesisVisual } from "@/components/marketing/illustrations/research-synthesis-visual";
 import { buttonVariants } from "@/components/ui/button";
 
 const CAPABILITIES = [
@@ -82,7 +86,7 @@ export function PublicHomePage() {
 
       <section className="relative mx-auto max-w-6xl px-4 py-24 sm:px-6 lg:px-8">
         <div className="pointer-events-none absolute left-8 top-[18%] h-52 w-52 rounded-full bg-[radial-gradient(circle,color-mix(in_oklch,var(--primary)_26%,transparent),transparent_72%)] blur-3xl" />
-        <div className="grid gap-12 lg:grid-cols-[1fr_minmax(0,1.15fr)] lg:gap-16">
+        <div className="grid items-start gap-12 lg:grid-cols-[1fr_minmax(0,1.08fr)] lg:gap-16">
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
               Section 02 · systemic context
@@ -95,20 +99,38 @@ export function PublicHomePage() {
               outpacing analogue review throughput. Institutions need explainable oversight that scales with filings yet
               keeps humans accountable at the adjudication boundary.
             </p>
+            <MarketingFigure
+              caption="Editorial schematic: heterogeneous CBAM-, origin-, and disclosure-shaped tiles collapsing into one governed screening lens — illustrative only."
+              className="mt-10 lg:hidden"
+            >
+              <div className="aspect-[480/340] max-h-[340px] w-full [&_svg]:size-full [&_svg]:object-contain">
+                <DigitalTradeContextCollage />
+              </div>
+            </MarketingFigure>
           </div>
-          <div className="space-y-5 text-[15px] leading-relaxed text-muted-foreground">
-            <p>
-              Border carbon measures and extended producer responsibility widen the documentary surface area that must be
-              checked coherently — not field-by-field in isolation.
-            </p>
-            <p>
-              Traceability regimes expect consistent identifiers, harmonised descriptions, and evidence trails aligned to
-              global standards; manual adjudication struggles to reconcile cross-border inconsistencies at volume.
-            </p>
-            <p>
-              The platform investigates records pre-orchestration: hybrid scoring proposes posture, narratives justify attention,
-              and reviewers retain authority — an AI governance posture grounded in supervisory realism, not full automation hype.
-            </p>
+          <div className="space-y-6">
+            <div className="space-y-5 text-[15px] leading-relaxed text-muted-foreground">
+              <p>
+                Border carbon measures and extended producer responsibility widen the documentary surface area that must be
+                checked coherently — not field-by-field in isolation.
+              </p>
+              <p>
+                Traceability regimes expect consistent identifiers, harmonised descriptions, and evidence trails aligned to
+                global standards; manual adjudication struggles to reconcile cross-border inconsistencies at volume.
+              </p>
+              <p>
+                The platform investigates records pre-orchestration: hybrid scoring proposes posture, narratives justify attention,
+                and reviewers retain authority — an AI governance posture grounded in supervisory realism, not full automation hype.
+              </p>
+            </div>
+            <MarketingFigure
+              caption="Tiles stand in for heterogeneous filings converging toward a single explainable supervisory aperture — schematic, non-operational imagery."
+              className="hidden lg:block lg:sticky lg:top-[5.75rem]"
+            >
+              <div className="aspect-[480/340] w-full [&_svg]:size-full [&_svg]:object-contain">
+                <DigitalTradeContextCollage />
+              </div>
+            </MarketingFigure>
           </div>
         </div>
       </section>
@@ -173,29 +195,39 @@ export function PublicHomePage() {
             confidence — suitable for stakeholder decks without exposing internal identifiers.
           </p>
         </div>
-        <div className="relative mt-16 rounded-3xl border border-[color-mix(in_oklch,var(--brand-secondary)_28%,var(--border))] bg-[linear-gradient(90deg,color-mix(in_oklch,var(--muted)_82%,transparent),transparent)] px-6 py-8 pl-8 sm:pl-12 lg:max-w-[44rem]">
-          {WORKFLOW.map((step, idx) => (
-            <div key={step} className="relative pb-14 last:pb-0">
-              <div className="absolute top-1 -left-[43px] flex size-[24px] items-center justify-center rounded-full border-2 border-[color-mix(in_oklch,var(--brand-secondary)_75%,transparent)] bg-[linear-gradient(135deg,var(--primary),var(--brand-secondary))] shadow-md shadow-[color-mix(in_oklch,var(--brand-secondary)_40%,transparent)] sm:-left-[51px]" />
-              <div className="flex flex-wrap items-baseline gap-3">
-                <ListOrdered className="size-[18px] text-primary" aria-hidden />
-                <span className="font-medium text-muted-foreground">Stage {idx + 1}</span>
+        <div className="mt-16 grid gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:items-start lg:gap-14">
+          <div className="relative rounded-3xl border border-[color-mix(in_oklch,var(--brand-secondary)_28%,var(--border))] bg-[linear-gradient(90deg,color-mix(in_oklch,var(--muted)_82%,transparent),transparent)] px-6 py-8 pl-8 sm:pl-12">
+            {WORKFLOW.map((step, idx) => (
+              <div key={step} className="relative pb-14 last:pb-0">
+                <div className="absolute top-1 -left-[43px] flex size-[24px] items-center justify-center rounded-full border-2 border-[color-mix(in_oklch,var(--brand-secondary)_75%,transparent)] bg-[linear-gradient(135deg,var(--primary),var(--brand-secondary))] shadow-md shadow-[color-mix(in_oklch,var(--brand-secondary)_40%,transparent)] sm:-left-[51px]" />
+                <div className="flex flex-wrap items-baseline gap-3">
+                  <ListOrdered className="size-[18px] text-primary" aria-hidden />
+                  <span className="font-medium text-muted-foreground">Stage {idx + 1}</span>
+                </div>
+                <p className="mt-2 font-[family-name:var(--font-heading)] text-lg font-semibold text-foreground">{step}</p>
               </div>
-              <p className="mt-2 font-[family-name:var(--font-heading)] text-lg font-semibold text-foreground">{step}</p>
-            </div>
-          ))}
-          <Link
-            href={WORKSPACE_ROUTES.home}
-            className={`${buttonVariants({ variant: "link" })} !px-0 text-sm`}
+            ))}
+            <Link
+              href={WORKSPACE_ROUTES.home}
+              className={`${buttonVariants({ variant: "link" })} !px-0 text-sm`}
+            >
+              Experience the staging rail inside the workspace →
+            </Link>
+          </div>
+          <MarketingFigure
+            caption="Horizontal mnemonic of the ingestion-to-disposition chain — aligns with staged workspace rail; labels abbreviated for legibility."
+            className="lg:sticky lg:top-[6rem]"
           >
-            Experience the staging rail inside the workspace →
-          </Link>
+            <div className="aspect-[520/132] min-h-[100px] w-full py-6 [&_svg]:size-full [&_svg]:object-contain">
+              <WorkflowPipelineStripArt />
+            </div>
+          </MarketingFigure>
         </div>
       </section>
 
       <section className="relative overflow-hidden border-t border-[color-mix(in_oklch,var(--brand-secondary)_32%,var(--border))] bg-[linear-gradient(168deg,color-mix(in_oklch,var(--accent-intelligence-soft)_70%,transparent),color-mix(in_oklch,var(--brand-tertiary-soft)_38%,transparent),transparent)] py-28">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-          <div className="grid gap-14 lg:grid-cols-[1fr_minmax(0,1fr)] lg:gap-16">
+          <div className="grid gap-14 lg:grid-cols-[1fr_minmax(0,1fr)] lg:gap-16 lg:items-start">
             <div className="space-y-4">
               <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
                 Section 05 · scholarly &amp; engineering integrity
@@ -226,6 +258,14 @@ export function PublicHomePage() {
                 Read the research pillars
               </Link>
             </div>
+            <MarketingFigure
+              caption="Concept sketch: corroborating standard cues and evidentiary traces braided into supervisory narrative artefacts — illustrative research posture, not data."
+              className="lg:sticky lg:top-[6rem]"
+            >
+              <div className="aspect-[440/280] w-full [&_svg]:size-full [&_svg]:object-contain">
+                <ResearchSynthesisVisual />
+              </div>
+            </MarketingFigure>
           </div>
         </div>
       </section>
