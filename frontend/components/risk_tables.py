@@ -299,19 +299,12 @@ class RiskTables:
             .copy()
         )
 
-        top_n_options = [
-            n for n in [20, 50, 100]
-            if n <= len(ranked_df)
-        ]
-        if not top_n_options:
-            top_n_options = [len(ranked_df)]
-
-        top_k = st.selectbox(
-            "Records shown for operational review",
-            options=top_n_options,
-            index=0,
+        # Fixed on-screen queue depth for stable operator workflow (exports still allow full sets).
+        QUEUE_DISPLAY_TOP_N = 20
+        top_k = min(
+            QUEUE_DISPLAY_TOP_N,
+            len(ranked_df),
         )
-
         ranked_df = ranked_df.head(
             top_k
         )
@@ -422,6 +415,73 @@ class RiskTables:
             ),
             index=0,
         )
+
+        queue_table_df = ranked_df[
+            display_columns
+        ].head(MAX_TABLE_ROWS)
+
+        st.dataframe(
+            queue_table_df,
+            width="stretch",
+        )
+
+        csv_data = queue_table_df.to_csv(
+            index=False,
+        ).encode("utf-8")
+
+        requires_review_series = None
+        if "requires_review" in df.columns:
+            requires_review_series = (
+                df["requires_review"]
+                .fillna(False)
+                .astype(bool)
+            )
+        elif "severity_level" in df.columns:
+            requires_review_series = (
+                df["severity_level"]
+                .astype(str)
+                .str.lower()
+                .isin(
+                    [
+                        "critical",
+                        "high",
+                        "medium",
+                    ]
+                )
+            )
+
+        requires_review_csv_data = None
+        if requires_review_series is not None:
+            requires_review_df = df[
+                requires_review_series
+            ].copy()
+            requires_review_export_cols = [
+                col for col in display_columns
+                if col in requires_review_df.columns
+            ]
+            if requires_review_export_cols:
+                requires_review_csv_data = requires_review_df[
+                    requires_review_export_cols
+                ].to_csv(
+                    index=False,
+                ).encode("utf-8")
+
+        dl1, dl2 = st.columns(2)
+        with dl1:
+            st.download_button(
+                label="Download Review Queue CSV",
+                data=csv_data,
+                file_name="priority_review_queue.csv",
+                mime="text/csv",
+            )
+        with dl2:
+            if requires_review_csv_data is not None:
+                st.download_button(
+                    label="Download Full Requires Review CSV",
+                    data=requires_review_csv_data,
+                    file_name="requires_review_records.csv",
+                    mime="text/csv",
+                )
 
         focus_row = ranked_df.iloc[
             selected_idx
@@ -586,69 +646,6 @@ Other columns (**fraud**, **rules**, **batch** where shown) use either counts or
                 "Avg composite risk",
                 f"{avg_hybrid_pct:.1f}%",
             )
-
-        st.dataframe(
-            ranked_df[
-                display_columns
-            ].head(MAX_TABLE_ROWS),
-            width="stretch",
-        )
-
-        csv_data = ranked_df[
-            display_columns
-        ].to_csv(
-            index=False
-        ).encode("utf-8")
-
-        st.download_button(
-            label="Download Review Queue CSV",
-            data=csv_data,
-            file_name="priority_review_queue.csv",
-            mime="text/csv",
-        )
-
-        requires_review_series = None
-        if "requires_review" in df.columns:
-            requires_review_series = (
-                df["requires_review"]
-                .fillna(False)
-                .astype(bool)
-            )
-        elif "severity_level" in df.columns:
-            requires_review_series = (
-                df["severity_level"]
-                .astype(str)
-                .str.lower()
-                .isin(
-                    [
-                        "critical",
-                        "high",
-                        "medium",
-                    ]
-                )
-            )
-
-        if requires_review_series is not None:
-            requires_review_df = df[
-                requires_review_series
-            ].copy()
-            requires_review_export_cols = [
-                col for col in display_columns
-                if col in requires_review_df.columns
-            ]
-            if requires_review_export_cols:
-                requires_review_csv_data = requires_review_df[
-                    requires_review_export_cols
-                ].to_csv(
-                    index=False
-                ).encode("utf-8")
-
-                st.download_button(
-                    label="Download Full Requires Review CSV",
-                    data=requires_review_csv_data,
-                    file_name="requires_review_records.csv",
-                    mime="text/csv",
-                )
 
     # =====================================================
     # FLAGGED RECORDS

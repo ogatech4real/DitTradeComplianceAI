@@ -925,26 +925,6 @@ Compliance Screening Results
             st.divider()
 
         # =====================================================
-        # CHARTS
-        # =====================================================
-
-        col1, col2 = st.columns(2)
-
-        with col1:
-
-            render_risk_distribution_chart(
-                chart_df
-            )
-
-        with col2:
-
-            render_risk_breakdown_chart(
-                chart_df
-            )
-
-        st.divider()
-
-        # =====================================================
         # PRIORITY REVIEW QUEUE
         # =====================================================
 
@@ -959,16 +939,32 @@ Compliance Screening Results
         st.divider()
 
         # =====================================================
-        # FLAGGED RECORDS
+        # FLAGGED COMPLIANCE RECORDS
         # =====================================================
-
-        st.subheader(
-            "Flagged Shipments"
-        )
 
         render_flagged_records_table(
             results_df
         )
+
+        st.divider()
+
+        # =====================================================
+        # CHARTS (last section for operator scan top-to-bottom)
+        # =====================================================
+
+        col_chart1, col_chart2 = st.columns(2)
+
+        with col_chart1:
+
+            render_risk_distribution_chart(
+                chart_df
+            )
+
+        with col_chart2:
+
+            render_risk_breakdown_chart(
+                chart_df
+            )
 
 # =============================================================================
 # EXPORT RESULTS
