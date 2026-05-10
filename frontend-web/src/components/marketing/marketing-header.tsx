@@ -36,11 +36,11 @@ export function MarketingHeader() {
         transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
       >
         <Link href="/" className="group flex flex-col gap-0.5">
-          <span className="font-[family-name:var(--font-heading)] text-[15px] font-semibold tracking-tight text-foreground">
-            Digital Trade Compliance AI
+          <span className="text-[15px] font-semibold tracking-tight text-foreground">
+            Digital Trade
           </span>
-          <span className="text-[11px] font-medium uppercase tracking-[0.22em] text-muted-foreground transition-colors group-hover:text-foreground/90">
-            Institutional platform
+          <span className="text-gradient-home text-[15px] font-semibold leading-none tracking-tight">
+            Compliance intelligence
           </span>
         </Link>
         <nav className="hidden items-center gap-1 md:flex" aria-label="Site sections">

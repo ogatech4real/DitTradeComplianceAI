@@ -24,11 +24,11 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "Digital Trade Compliance AI — institutional platform",
-    template: "%s · Digital Trade Compliance AI",
+    default: "Digital Trade Compliance Intelligence",
+    template: "%s · Digital Trade Compliance Intelligence",
   },
   description:
-    "Public research positioning and institutional platform narrative, plus operational AI-assisted trade compliance workspace for screening, explainability, and investigations.",
+    "Digital Trade Compliance Intelligence — public positioning and operational workspace for AI-assisted trade screening, explainability, and review.",
 };
 
 export default function RootLayout({

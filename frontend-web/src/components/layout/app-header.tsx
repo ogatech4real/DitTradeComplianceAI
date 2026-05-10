@@ -10,16 +10,16 @@ interface AppHeaderProps {
 
 export function AppHeader({ title, description }: AppHeaderProps) {
   return (
-    <header className="sticky top-0 z-40 border-b border-[color-mix(in_oklch,var(--brand-secondary)_18%,transparent)] bg-[color-mix(in_oklch,var(--background)_86%,transparent)] shadow-[0_16px_40px_-32px_color-mix(in_oklch,var(--primary)_45%,transparent)] backdrop-blur-2xl">
+    <header className="sticky top-0 z-40 border-b border-[color-mix(in_oklch,var(--home-accent)_22%,var(--border))] bg-[color-mix(in_oklch,var(--background)_88%,transparent)] shadow-[0_16px_40px_-32px_color-mix(in_oklch,var(--home-accent)_32%,transparent)] backdrop-blur-2xl">
       <div
-        className="h-[3px] w-full bg-[linear-gradient(90deg,var(--primary),color-mix(in_oklch,var(--brand-secondary)_82%,transparent),var(--brand-tertiary))]"
+        className="h-[3px] w-full bg-[linear-gradient(90deg,var(--home-accent-deep),var(--home-accent),color-mix(in_oklch,var(--home-accent)_65%,oklch(0.72_0.1_85)_35%))]"
         aria-hidden
       />
       <div className="flex items-start justify-between gap-4 px-4 py-4 sm:px-6 lg:px-10">
         <div className="flex items-start gap-3">
           <MobileNavSheet />
           <div>
-            <h1 className="font-[family-name:var(--font-heading)] text-xl font-semibold tracking-tight text-[color-mix(in_oklch,var(--foreground)_94%,var(--primary)_6%)] sm:text-[1.38rem]">
+            <h1 className="text-xl font-semibold tracking-tight text-foreground sm:text-[1.38rem]">
               {title}
             </h1>
             {description ? (

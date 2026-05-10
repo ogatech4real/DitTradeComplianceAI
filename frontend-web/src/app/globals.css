@@ -305,6 +305,48 @@
   color: color-mix(in oklch, var(--home-accent) 68%, var(--muted-foreground) 32%);
 }
 
+/*
+ * Operational workspace (/workspace) — light UI with same warm accent family + Inter-first type.
+ */
+.workspace-app {
+  --home-accent: oklch(0.54 0.155 58);
+  --home-accent-deep: oklch(0.47 0.17 52);
+  --home-accent-fg: oklch(0.99 0.008 90);
+  --gradient-home: linear-gradient(
+    118deg,
+    oklch(0.5 0.165 55),
+    oklch(0.63 0.13 72)
+  );
+  --home-topology-fg: color-mix(in oklch, var(--home-accent) 48%, var(--foreground) 52%);
+
+  font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.workspace-app h1,
+.workspace-app h2,
+.workspace-app h3 {
+  font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.workspace-app .ws-cta-primary {
+  border-color: transparent !important;
+  background-image: linear-gradient(
+    134deg,
+    var(--home-accent-deep),
+    color-mix(in oklch, var(--home-accent) 88%, white 12%)
+  ) !important;
+  color: var(--home-accent-fg) !important;
+  box-shadow: 0 10px 28px -14px color-mix(in oklch, var(--home-accent) 38%, transparent);
+}
+
+.workspace-app .ws-cta-primary:hover {
+  filter: brightness(1.05);
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -476,5 +518,26 @@
 
   .public-site.dark.marketing-warm .home-topology-svg {
     color: var(--home-topology-fg);
+  }
+
+  .workspace-app .workspace-mesh-warm {
+    background: radial-gradient(
+      ellipse 70% 50% at 50% -5%,
+      color-mix(in oklch, var(--home-accent) 18%, transparent),
+      transparent 62%
+    );
+  }
+
+  .workspace-app .workspace-grid-warm {
+    background-image: linear-gradient(
+        118deg,
+        color-mix(in oklch, var(--home-accent) 35%, transparent) 0.5px,
+        transparent 0.5px
+      ),
+      linear-gradient(
+        -14deg,
+        color-mix(in oklch, var(--home-accent) 22%, transparent) 0.5px,
+        transparent 0.5px
+      );
   }
 }

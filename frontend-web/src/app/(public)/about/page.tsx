@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 export const metadata: Metadata = {
   title: "About",
   description:
-    "Digital Trade Compliance AI — platform purpose, research & technical lead Adewale O., research direction, and governance philosophy.",
+    "Digital Trade Compliance Intelligence — platform purpose, research & technical lead Adewale O., research direction, and philosophy.",
 };
 
 const RESEARCH_DIRECTION = [
@@ -42,7 +42,7 @@ export default function AboutPage() {
       kicker="About"
       title={
         <>
-          Digital Trade Compliance AI <span className="text-gradient-home">Platform</span>
+          Digital Trade <span className="text-gradient-home">Compliance intelligence</span>
         </>
       }
       description="An AI-assisted operational intelligence system for digital trade governance — explainable screening, fraud and batch signals, and jurisdiction-aware triage. The workspace is where operations run; this page states who builds it and why."

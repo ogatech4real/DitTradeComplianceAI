@@ -16,7 +16,7 @@ export function AppShell({
   children,
 }: AppShellProps) {
   return (
-    <div className="relative flex min-h-dvh overflow-hidden bg-background">
+    <div className="workspace-app relative flex min-h-dvh overflow-hidden bg-background">
       <WorkspaceAtmosphere />
       <AppSidebar />
       <div className="relative flex min-w-0 flex-1 flex-col">

@@ -29,7 +29,7 @@ export function MarketingFooter() {
         <div className="grid gap-12 lg:grid-cols-12 lg:gap-10">
           <div className="lg:col-span-5">
             <p className="text-lg font-semibold tracking-tight text-foreground">
-              Digital Trade <span className="text-gradient-home">Compliance AI</span>
+              Digital Trade <span className="text-gradient-home">Compliance intelligence</span>
             </p>
             <p className="mt-4 max-w-md text-sm leading-relaxed text-muted-foreground">
               Public site for a research-grounded operational intelligence workspace — explainable trade screening, partner

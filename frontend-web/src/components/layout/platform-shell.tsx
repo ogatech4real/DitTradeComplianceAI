@@ -13,26 +13,22 @@ interface RouteMeta {
 
 const ROUTES: Record<string, RouteMeta> = {
   [WORKSPACE_ROUTES.home]: {
-    title: "Operational intelligence workspace",
-    description:
-      "Executive posture, secure import, and immediate navigation into decision-grade surfaces.",
+    title: "Overview & import",
+    description: "Executive surface, workflow rail, and secure intake into screening.",
   },
   [WORKSPACE_ROUTES.dashboard]: {
-    title: "Decision intelligence",
-    description:
-      "Exposure concentrations, rationale themes, governance quality, and review pressure in one coherent view.",
+    title: "Decision dashboard",
+    description: "Exposure, rationale themes, governance posture, and review pressure in one view.",
   },
   [WORKSPACE_ROUTES.review]: {
-    title: "Investigation workspace",
-    description:
-      "Prioritised declarations with severity context, narrative explainability, and disposition guidance.",
+    title: "Review queue",
+    description: "Prioritised records with severity context, explainability, and disposition support.",
   },
 };
 
 const DEFAULT_META: RouteMeta = {
-  title: "Digital Trade Compliance",
-  description:
-    "Production trade compliance intelligence for operators, supervisors, and control teams.",
+  title: "Digital Trade Compliance Intelligence",
+  description: "Operational workspace for AI-assisted trade screening — human-led disposition.",
 };
 
 export function PlatformShell({ children }: { children: ReactNode }) {

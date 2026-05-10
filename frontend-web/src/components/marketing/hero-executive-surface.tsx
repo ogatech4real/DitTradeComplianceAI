@@ -19,14 +19,14 @@ export function HeroExecutiveSurface() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
         >
-          <p className="public-kicker">Digital trade compliance</p>
-          <h1 className="mt-4 text-[clamp(1.85rem,4.2vw,2.85rem)] font-semibold leading-[1.08] text-foreground">
-            AI-assisted digital trade{" "}
-            <span className="text-gradient-home">compliance intelligence</span>
+          <p className="public-kicker">Product</p>
+          <h1 className="mt-4 text-[clamp(1.85rem,4.2vw,2.95rem)] font-semibold leading-[1.06] tracking-tight">
+            <span className="block text-foreground">Digital Trade</span>
+            <span className="mt-1 block text-gradient-home">Compliance intelligence</span>
           </h1>
           <p className="mt-5 max-w-xl text-muted-foreground">
-            Screening, explainable analytics, fraud and batch signals, and jurisdiction-aware governance — built for teams that
-            adjudicate real filings, not slide decks alone.
+            AI-assisted screening, explainable analytics, fraud and batch signals, and jurisdiction-aware governance — for teams
+            that adjudicate real filings.
           </p>
 
           <div className="mt-7 rounded-xl border border-border/70 bg-card/45 px-4 py-4 backdrop-blur-sm sm:px-5">

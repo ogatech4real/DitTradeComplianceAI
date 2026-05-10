@@ -18,13 +18,13 @@ export function AppSidebar() {
       )}
       aria-label="Primary navigation"
     >
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_130%_90%_at_50%_-20%,oklch(0.55_0.1_264_/_0.12),transparent_55%)]" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_130%_90%_at_50%_-20%,color-mix(in_oklch,var(--home-accent)_14%,transparent),transparent_58%)]" />
       <div className="relative border-b border-sidebar-border/80 px-5 py-5">
-        <div className="text-[11px] font-semibold uppercase tracking-[0.22em] text-primary/80">
+        <div className="text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
           Digital Trade
         </div>
-        <div className="mt-1.5 bg-[linear-gradient(92deg,var(--foreground),color-mix(in_oklch,var(--foreground)_55%,var(--brand-secondary)_45%))] bg-clip-text font-[family-name:var(--font-heading)] text-[15px] font-semibold leading-tight tracking-tight text-transparent">
-          Compliance intelligence
+        <div className="mt-1.5 text-[15px] font-semibold leading-tight tracking-tight">
+          <span className="text-gradient-home">Compliance intelligence</span>
         </div>
       </div>
       <PublicPlatformMiniNav />
@@ -45,14 +45,14 @@ export function AppSidebar() {
                     className={cn(
                       "group flex items-start gap-2.5 rounded-xl px-3 py-2.5 text-[13px] font-medium transition-all duration-200",
                       active
-                        ? "bg-[linear-gradient(110deg,color-mix(in_oklch,var(--sidebar-accent)_94%,transparent),color-mix(in_oklch,var(--brand-secondary-soft)_82%,transparent))] text-sidebar-accent-foreground shadow-md shadow-[color-mix(in_oklch,var(--primary)_18%,transparent)] ring-2 ring-[color-mix(in_oklch,var(--brand-secondary)_45%,transparent)]"
-                        : "text-muted-foreground hover:bg-sidebar-accent/80 hover:text-sidebar-accent-foreground hover:ring-1 hover:ring-primary/20",
+                        ? "bg-[color-mix(in_oklch,var(--home-accent)_16%,var(--sidebar))] text-foreground shadow-md shadow-[color-mix(in_oklch,var(--home-accent)_22%,transparent)] ring-2 ring-[color-mix(in_oklch,var(--home-accent)_38%,transparent)]"
+                        : "text-muted-foreground hover:bg-sidebar-accent/80 hover:text-sidebar-accent-foreground hover:ring-1 hover:ring-[color-mix(in_oklch,var(--home-accent)_25%,transparent)]",
                     )}
                   >
                     <Icon
                       className={cn(
                         "mt-0.5 size-[17px] shrink-0 opacity-80 transition-opacity",
-                        active ? "opacity-100" : "group-hover:opacity-100",
+                        active ? "text-[color-mix(in_oklch,var(--home-accent)_85%,var(--foreground)_15%)] opacity-100" : "group-hover:opacity-100",
                       )}
                       aria-hidden
                     />
@@ -72,11 +72,12 @@ export function AppSidebar() {
         ))}
       </nav>
       <div className="relative space-y-3 border-t border-sidebar-border/70 p-4 text-[11px] leading-relaxed text-muted-foreground">
-        <p>
-          Session-linked screening outputs. Navigation reflects your active compliance intelligence run.
-        </p>
-        <Link href="/" className="inline-flex font-medium text-primary underline-offset-4 hover:underline">
-          Back to institutional site →
+        <p>Outputs are session-scoped. Use the links above for the live run; public pages explain positioning only.</p>
+        <Link
+          href="/"
+          className="inline-flex font-medium text-[color-mix(in_oklch,var(--home-accent)_78%,var(--foreground)_22%)] underline-offset-4 hover:underline"
+        >
+          Public site →
         </Link>
       </div>
     </aside>

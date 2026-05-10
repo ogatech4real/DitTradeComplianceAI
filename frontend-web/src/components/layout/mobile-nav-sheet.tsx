@@ -39,12 +39,18 @@ export function MobileNavSheet() {
         <Menu className="size-5" />
       </SheetTrigger>
       <SheetContent side="left" className="w-[min(100vw,20rem)] p-0">
-        <SheetHeader className="border-b px-4 py-3 text-left">
-          <SheetTitle className="text-base font-semibold">
-            Workspace
+        <SheetHeader className="border-b border-border/60 px-4 py-3 text-left">
+          <SheetTitle className="text-sm font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+            Digital Trade
           </SheetTitle>
+          <p className="text-base font-semibold leading-tight">
+            <span className="text-gradient-home">Compliance intelligence</span>
+          </p>
         </SheetHeader>
         <nav className="flex flex-col gap-1 p-3">
+          <p className="px-3 pb-1 pt-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+            Workspace
+          </p>
           {mainNavItems.map((item) => {
             const active = isWorkspaceNavActive(pathname, item.href);
             const Icon = item.icon;
@@ -56,7 +62,7 @@ export function MobileNavSheet() {
                 className={cn(
                   "flex items-center gap-2 rounded-lg px-3 py-3 text-sm font-medium",
                   active
-                    ? "bg-accent text-accent-foreground"
+                    ? "bg-[color-mix(in_oklch,var(--home-accent)_14%,var(--accent))] text-foreground ring-1 ring-[color-mix(in_oklch,var(--home-accent)_35%,transparent)]"
                     : "text-muted-foreground hover:bg-muted",
                 )}
               >
@@ -65,9 +71,9 @@ export function MobileNavSheet() {
               </Link>
             );
           })}
-          <div className="mx-3 my-4 border-t border-[color-mix(in_oklch,var(--brand-secondary)_30%,transparent)] pt-4">
-            <p className="px-3 pb-2 text-[10px] font-bold uppercase tracking-[0.2em] text-primary">
-              Public platform
+          <div className="mx-3 my-4 border-t border-border/60 pt-4">
+            <p className="px-3 pb-2 text-[10px] font-bold uppercase tracking-[0.2em] text-[color-mix(in_oklch,var(--home-accent)_72%,var(--muted-foreground)_28%)]">
+              Public site
             </p>
             {PUBLIC_PLATFORM_LINKS.map((item) => {
               const isHome = item.href === "/";
@@ -82,7 +88,7 @@ export function MobileNavSheet() {
                   className={cn(
                     "mx-3 flex rounded-lg px-3 py-2.5 text-[13px] font-semibold transition-colors last:mb-2",
                     active
-                      ? "bg-primary text-primary-foreground"
+                      ? "ws-cta-primary text-[var(--home-accent-fg)]"
                       : "text-muted-foreground hover:bg-muted hover:text-foreground",
                   )}
                 >
