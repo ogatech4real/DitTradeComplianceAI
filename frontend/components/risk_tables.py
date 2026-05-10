@@ -255,9 +255,7 @@ class RiskTables:
         df: pd.DataFrame,
     ) -> None:
 
-        st.subheader(
-            "Priority Review Queue"
-        )
+        # Section title rendered once by app.py (avoid duplicate headings).
 
         if df.empty:
 
@@ -404,12 +402,23 @@ class RiskTables:
         selector_options = list(
             range(len(ranked_df))
         )
+        def _hybrid_pct(
+            row: pd.Series,
+        ) -> float:
+            raw = pd.to_numeric(
+                row.get("hybrid_score", 0),
+                errors="coerce",
+            )
+            if pd.isna(raw):
+                raw = 0.0
+            return float(raw) * 100.0
+
         selected_idx = st.selectbox(
             "Inspect record for operator explanation",
             options=selector_options,
             format_func=lambda idx: (
                 f"{ranked_df.iloc[idx].get('record_id', f'row_{idx + 1}')} "
-                f"| risk={float(pd.to_numeric(ranked_df.iloc[idx].get('hybrid_score', 0), errors='coerce') or 0):.3f}"
+                f"| composite risk {_hybrid_pct(ranked_df.iloc[idx]):.1f}%"
             ),
             index=0,
         )
@@ -442,6 +451,10 @@ class RiskTables:
             )
         )
 
+        hybrid_pct_display = (
+            _hybrid_pct(focus_row)
+        )
+
         st.markdown(
             "### Operator Decision Snapshot"
         )
@@ -458,8 +471,27 @@ class RiskTables:
             )
         with snapshot_col3:
             st.metric(
-                "Hybrid Risk Score",
-                f"{float(pd.to_numeric(focus_row.get('hybrid_score', 0), errors='coerce') or 0):.3f}",
+                label="Composite risk",
+                value=f"{hybrid_pct_display:.1f}%",
+                help="Combined score on a 0–100 scale (see definitions below).",
+            )
+
+        with st.expander(
+            "What do severity and composite risk mean?",
+            expanded=False,
+        ):
+            st.markdown(
+                """
+**Severity**
+
+Classification for triage (**Low**, **Medium**, **High**, **Critical**) from blended signals (rules, model, anomalies, emissions, traceability guidance). Operators should escalate when severity is Critical or High.
+
+**Composite risk (0–100%)**
+
+Single priority number for sorting the queue. It combines model likelihood, anomaly score, compliance rules, and supporting intelligence signals on an internal scale: **≈25%–50% medium**, **≥50% high urgency**, higher values merit faster review alongside severity.
+
+Other columns (**fraud**, **rules**, **batch** where shown) use either counts or percentages; treat higher fraud-related percentages as needing extra documentation checks.
+"""
             )
 
         st.info(
@@ -535,21 +567,24 @@ class RiskTables:
 
         with col4:
 
-            avg_score = round(
-                pd.to_numeric(
-                    ranked_df[
-                        "hybrid_score"
-                    ],
-                    errors="coerce",
-                )
-                .fillna(0)
-                .mean(),
-                3,
+            avg_hybrid_pct = round(
+                100.0
+                * float(
+                    pd.to_numeric(
+                        ranked_df[
+                            "hybrid_score"
+                        ],
+                        errors="coerce",
+                    )
+                    .fillna(0)
+                    .mean()
+                ),
+                2,
             )
 
             st.metric(
-                "Average Risk",
-                avg_score,
+                "Avg composite risk",
+                f"{avg_hybrid_pct:.1f}%",
             )
 
         st.dataframe(

@@ -72,11 +72,6 @@ def render_summary_cards(
         0,
     )
 
-    average_risk_score = screening_summary.get(
-        "average_risk_score",
-        0.0,
-    )
-
     review_rate_percent = (
         operational_metrics.get(
             "review_rate_percent",
@@ -89,16 +84,6 @@ def render_summary_cards(
             "high_risk_rate_percent",
             0.0,
         )
-    )
-
-    fraud_alerts = operational_metrics.get(
-        "fraud_alerts",
-        0,
-    )
-
-    anomaly_records = operational_metrics.get(
-        "anomaly_records",
-        0,
     )
 
     batch_risk_score = operational_metrics.get(
@@ -117,102 +102,95 @@ def render_summary_cards(
     )
 
     # =====================================================
-    # PRIMARY METRICS
+    # SCREENING SUMMARY (operator order)
     # =====================================================
 
     st.markdown(
         "### Screening Summary"
     )
 
-    col1, col2, col3, col4, col5 = (
-        st.columns(5)
-    )
+    c1, c2, c3, c4, c5 = st.columns(5)
 
-    with col1:
-
+    with c1:
         st.metric(
             label="Total Shipments",
             value=f"{total_records:,}",
         )
 
-    with col2:
-
-        st.metric(
-            label="Records Requiring Review",
-            value=f"{flagged_records:,}",
-        )
-
-    with col3:
-
-        st.metric(
-            label="High Severity Cases",
-            value=f"{high_risk_records:,}",
-        )
-
-    with col4:
-
+    with c2:
         st.metric(
             label="Cleared Records",
             value=f"{cleared_records:,}",
         )
 
-    with col5:
+    with c3:
+        st.metric(
+            label="Records Requiring Review",
+            value=f"{flagged_records:,}",
+        )
 
+    with c4:
+        st.metric(
+            label="High Severity Cases",
+            value=f"{high_risk_records:,}",
+        )
+
+    with c5:
         st.metric(
             label="Critical Cases",
             value=f"{critical_records:,}",
         )
 
-    st.divider()
-
     # =====================================================
-    # SECONDARY METRICS
+    # OPERATIONAL EXPOSURE (immediately below summary)
     # =====================================================
 
-    col6, col7, col8, col9, col10 = (
-        st.columns(5)
+    st.markdown(
+        "### Operational Exposure"
     )
 
-    with col6:
+    exposure_col1, exposure_col2, exposure_col3, exposure_col4 = (
+        st.columns(4)
+    )
 
+    with exposure_col1:
         st.metric(
-            label="Medium Severity Cases",
-            value=f"{medium_risk_records:,}",
+            "Requires Review",
+            f"{flagged_records:,}",
+            f"{review_rate_percent:.2f}%",
         )
 
-    with col7:
-
+    with exposure_col2:
+        high_severity_count = int(
+            high_risk_records + critical_records
+        )
         st.metric(
-            label="Average Risk Score",
-            value=f"{average_risk_score:.3f}",
+            "High Severity",
+            f"{high_severity_count:,}",
+            f"{high_risk_rate_percent:.2f}%",
         )
 
-    with col8:
-
+    with exposure_col3:
         st.metric(
-            label="Review Rate",
-            value=f"{review_rate_percent:.1f}%",
+            "Critical Cases",
+            f"{critical_records:,}",
         )
 
-    with col9:
-
+    with exposure_col4:
         st.metric(
-            label="Fraud Alerts",
-            value=f"{fraud_alerts:,}",
+            "Cleared",
+            f"{cleared_records:,}",
         )
 
-    with col10:
+    st.caption(
+        f"Exposure is based on full screened results (n={total_records:,})."
+    )
 
-        st.metric(
-            label="Anomaly Records",
-            value=f"{anomaly_records:,}",
-        )
+    st.divider()
 
     # =====================================================
     # INTELLIGENCE QUALITY
     # =====================================================
-
-    st.divider()
 
     st.markdown(
         "### Intelligence Quality"
@@ -221,29 +199,28 @@ def render_summary_cards(
     iq1, iq2, iq3 = st.columns(3)
 
     with iq1:
-
         st.metric(
             label="Batch Risk Score",
-            value=f"{batch_risk_score:.3f}",
+            value=f"{batch_risk_score:.1%}",
         )
 
     with iq2:
-
         st.metric(
             label="Mapping Confidence",
             value=f"{mapping_confidence:.2%}",
         )
 
     with iq3:
-
         st.metric(
             label="Data Quality Score",
             value=f"{data_quality_score:.2%}",
         )
 
-    # =====================================================
-    # REVIEW PROGRESS
-    # =====================================================
+    st.caption(
+        "Scores are percentages (0–100%) where applicable: mapping and data "
+        "quality describe how confidently the dataset was understood; batch "
+        "risk summarises shipment-cluster signals."
+    )
 
     # =====================================================
     # OVERALL RISK STATUS
@@ -265,6 +242,8 @@ def render_summary_cards(
         "#00C853",
     )
 
+    st.divider()
+
     st.markdown(
         f"""
 <div style="
@@ -284,40 +263,6 @@ Operational Compliance Status: {overall_status.upper()}
 
     st.divider()
 
-    st.markdown(
-        "### Operational Exposure"
-    )
-    exposure_col1, exposure_col2, exposure_col3, exposure_col4 = st.columns(4)
-    with exposure_col1:
-        st.metric(
-            "Requires Review",
-            f"{flagged_records:,}",
-            f"{review_rate_percent:.2f}%",
-        )
-    with exposure_col2:
-        high_severity_count = int(
-            high_risk_records + critical_records
-        )
-        st.metric(
-            "High Severity",
-            f"{high_severity_count:,}",
-            f"{high_risk_rate_percent:.2f}%",
-        )
-    with exposure_col3:
-        st.metric(
-            "Critical Cases",
-            f"{critical_records:,}",
-        )
-    with exposure_col4:
-        st.metric(
-            "Cleared",
-            f"{cleared_records:,}",
-        )
-
-    st.caption(
-        f"Exposure metrics are computed on full screened results (n={total_records:,})."
-    )
-
     if mapping_confidence < 0.65:
 
         st.warning(
@@ -331,7 +276,3 @@ Operational Compliance Status: {overall_status.upper()}
             "Data quality degradation detected. "
             "Review missing values, invalid units, or malformed records."
         )
-
-    st.caption(
-        f"{high_risk_rate_percent:.2f}% classified as high severity."
-    )
