@@ -25,22 +25,15 @@ async def upload_file(
 
     try:
 
-        upload_result = (
-            upload_service.process_upload(
-                file
-            )
-        )
+        ingest = upload_service.ingest_upload(file)
+        dataframe = ingest["dataframe"]
 
         return {
             "status": "success",
-            "filename": file.filename,
-            "rows": upload_result["row_count"],
-            "columns": upload_result["columns"],
-            "preview": (
-                upload_result["dataframe"]
-                .head(5)
-                .to_dict(orient="records")
-            ),
+            "filename": file.filename or "",
+            "rows": len(dataframe),
+            "columns": [str(column) for column in dataframe.columns.tolist()],
+            "preview": dataframe.head(5).fillna("").to_dict(orient="records"),
         }
 
     except Exception as exc:
