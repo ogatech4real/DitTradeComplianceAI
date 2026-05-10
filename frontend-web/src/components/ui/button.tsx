@@ -9,7 +9,7 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          "bg-[linear-gradient(134deg,var(--primary)_0%,color-mix(in_oklch,var(--primary)_45%,var(--brand-secondary)_55%)_92%)] text-primary-foreground shadow-md shadow-[color-mix(in_oklch,var(--primary)_35%,transparent)] [a]:hover:brightness-110 aria-expanded:brightness-110 dark:shadow-[color-mix(in_oklch,var(--brand-secondary)_28%,transparent)]",
+          "bg-[linear-gradient(134deg,var(--primary)_0%,color-mix(in_oklch,var(--primary)_45%,var(--brand-secondary)_55%)_92%)] text-primary-foreground shadow-md shadow-[color-mix(in_oklch,var(--primary)_35%,transparent)] [a]:hover:brightness-110 aria-expanded:brightness-110 dark:shadow-[0_0_28px_-6px_color-mix(in_oklch,var(--primary)_48%,transparent),0_0_48px_-12px_color-mix(in_oklch,var(--brand-secondary)_32%,transparent)]",
         outline:
           "border-2 border-primary/35 bg-background/90 text-foreground hover:border-primary/55 hover:bg-primary/[0.08] hover:text-foreground aria-expanded:bg-primary/[0.08] dark:border-[color-mix(in_oklch,var(--brand-secondary)_40%,transparent)] dark:bg-background/65 dark:hover:border-[color-mix(in_oklch,var(--brand-secondary)_62%,transparent)] dark:hover:bg-[color-mix(in_oklch,var(--brand-secondary)_12%,transparent)]",
         secondary:
