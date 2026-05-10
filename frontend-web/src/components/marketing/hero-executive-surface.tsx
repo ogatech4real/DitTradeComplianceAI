@@ -25,8 +25,7 @@ export function HeroExecutiveSurface() {
             <span className="mt-1 block text-gradient-home">Compliance intelligence</span>
           </h1>
           <p className="mt-5 max-w-xl text-muted-foreground">
-            AI-assisted screening, explainable analytics, fraud and batch signals, and jurisdiction-aware governance — for teams
-            that adjudicate real filings.
+            AI-assisted digital trade compliance Platform
           </p>
 
           <div className="mt-7 rounded-xl border border-border/70 bg-card/45 px-4 py-4 backdrop-blur-sm sm:px-5">
