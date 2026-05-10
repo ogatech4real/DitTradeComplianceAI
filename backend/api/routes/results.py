@@ -121,35 +121,30 @@ def latest_results():
                 ),
             }
 
-        summary = latest_result.get(
-            "screening_summary",
-            {},
+        payload = dict(
+            latest_result,
         )
 
-        records = latest_result.get(
+        records = payload.get(
             "records",
             [],
         )
 
         if hasattr(records, "fillna"):
-            records = (
+            payload["records"] = (
                 records
                 .fillna("")
                 .to_dict(orient="records")
             )
+        else:
+            payload["records"] = records
 
-        processing_metadata = latest_result.get(
-            "processing_metadata",
-            {},
+        payload.setdefault(
+            "status",
+            "success",
         )
 
-        return {
-            "status": "success",
-            "screening_summary": summary,
-            "processing_metadata":
-                processing_metadata,
-            "records": records,
-        }
+        return payload
 
     except Exception as exc:
 

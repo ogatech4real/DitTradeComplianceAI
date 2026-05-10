@@ -22,6 +22,10 @@ from backend.api.routes.results import (
     router as results_router,
 )
 
+from backend.api.v1_app import (
+    v1_app,
+)
+
 app = FastAPI(
     title="Digital Trade Compliance AI",
     version="2.0.0",
@@ -74,6 +78,15 @@ app.include_router(
     results_router,
     prefix="/results",
     tags=["Results"],
+)
+
+# =========================================================
+# API v1 — mounted sub-app (thin URL aliases / OpenAPI bundle)
+# =========================================================
+
+app.mount(
+    "/api/v1",
+    v1_app,
 )
 
 # =========================================================

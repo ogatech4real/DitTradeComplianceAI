@@ -29,6 +29,10 @@ from backend.orchestration.pipeline_manager import (
     PipelineManager,
 )
 
+from backend.api.routes.results import (
+    store_latest_results,
+)
+
 router = APIRouter()
 
 logger = logging.getLogger(__name__)
@@ -237,7 +241,7 @@ async def run_scoring(
         # RESPONSE
         # =================================================
 
-        return {
+        response_body = {
             "status": "success",
 
             "upload_summary":
@@ -294,6 +298,12 @@ async def run_scoring(
                     "records"
                 ],
         }
+
+        store_latest_results(
+            response_body,
+        )
+
+        return response_body
 
     except HTTPException:
 

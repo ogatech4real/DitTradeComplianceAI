@@ -1,0 +1,211 @@
+/**
+ * Partial typed row keys we surface in decision UX (not exhaustive vs backend).
+ */
+
+export interface DecisionRecordSignals {
+  record_id: string;
+  destination_market?: string;
+  destination_country?: string;
+  declared_origin_country?: string;
+  severity_level?: string;
+  hybrid_risk_label?: string;
+  hybrid_score?: number;
+  fraud_score?: number;
+  fraud_risk_label?: string;
+  batch_risk_score?: number;
+  rule_flag_count?: number;
+  compliance_issue?: string;
+  recommended_action?: string;
+  review_status?: string;
+  explanation?: string;
+  review_priority?: number;
+}
+
+export const MOCK_DECISION_RECORDS: Record<string, unknown>[] = [
+  {
+    record_id: "REC-DE-CBAM-9821",
+    destination_market: "EU",
+    destination_country: "DE",
+    declared_origin_country: "VN",
+    product_family: "steel_coil",
+    severity_level: "critical",
+    hybrid_risk_label: "critical",
+    hybrid_score: 0.91,
+    fraud_score: 0.62,
+    fraud_risk_label: "medium",
+    batch_risk_score: 0.55,
+    rule_flag_count: 4,
+    compliance_issue: "Multiple Compliance Violations",
+    recommended_action: "Escalate immediately to compliance leadership",
+    review_status: "Immediate Review",
+    explanation:
+      "4 compliance inconsistencies detected; elevated embedded emissions profile; weak supply-chain traceability evidence",
+  },
+  {
+    record_id: "REC-US-4482",
+    destination_market: "US",
+    destination_country: "US",
+    declared_origin_country: "CN",
+    product_family: "aluminum_ingot",
+    severity_level: "high",
+    hybrid_risk_label: "high",
+    hybrid_score: 0.78,
+    fraud_score: 0.44,
+    fraud_risk_label: "medium",
+    batch_risk_score: 0.33,
+    rule_flag_count: 3,
+    compliance_issue: "Carbon Disclosure Risk",
+    recommended_action: "Conduct priority manual compliance review",
+    review_status: "Priority Review",
+    explanation:
+      "3 compliance inconsistencies detected; elevated embedded emissions profile",
+  },
+  {
+    record_id: "REC-EU-7710",
+    destination_market: "EU",
+    destination_country: "NL",
+    declared_origin_country: "TR",
+    product_family: "cement_clinker",
+    severity_level: "high",
+    hybrid_risk_label: "high",
+    hybrid_score: 0.72,
+    fraud_score: 0.33,
+    fraud_risk_label: "medium",
+    batch_risk_score: 0.41,
+    rule_flag_count: 2,
+    compliance_issue: "Traceability Documentation Gap",
+    recommended_action: "Conduct priority manual compliance review",
+    review_status: "Priority Review",
+    explanation:
+      "2 compliance inconsistencies detected; weak supply-chain traceability evidence",
+  },
+  {
+    record_id: "REC-GB-2201",
+    destination_market: "UK",
+    destination_country: "GB",
+    declared_origin_country: "IN",
+    product_family: "organic_chemicals",
+    severity_level: "medium",
+    hybrid_risk_label: "medium",
+    hybrid_score: 0.48,
+    fraud_score: 0.22,
+    fraud_risk_label: "low",
+    batch_risk_score: 0.28,
+    rule_flag_count: 1,
+    compliance_issue: "General Compliance Monitoring",
+    recommended_action: "Request supporting trade documentation",
+    review_status: "Secondary Review",
+    explanation: "1 compliance inconsistencies detected",
+  },
+  {
+    record_id: "REC-CN-INTERNAL-009",
+    destination_market: "CN",
+    destination_country: "CN",
+    declared_origin_country: "CN",
+    product_family: "rare_earth_mix",
+    severity_level: "medium",
+    hybrid_risk_label: "medium",
+    hybrid_score: 0.45,
+    fraud_score: 0.28,
+    fraud_risk_label: "medium",
+    batch_risk_score: 0.67,
+    rule_flag_count: 1,
+    compliance_issue: "General Compliance Monitoring",
+    recommended_action: "Request supporting trade documentation",
+    review_status: "Secondary Review",
+    explanation:
+      "elevated concentration risk detected in cohort; anomaly in batch-level supplier exposure",
+  },
+  {
+    record_id: "REC-BR-5512",
+    destination_market: "BR",
+    destination_country: "BR",
+    declared_origin_country: "BR",
+    product_family: "soy_aggregate",
+    severity_level: "low",
+    hybrid_risk_label: "low",
+    hybrid_score: 0.17,
+    fraud_score: 0.06,
+    fraud_risk_label: "low",
+    batch_risk_score: 0.11,
+    rule_flag_count: 0,
+    compliance_issue: "General Compliance Monitoring",
+    recommended_action: "No immediate compliance action required",
+    review_status: "Cleared",
+    explanation: "record passed standard compliance screening",
+  },
+  {
+    record_id: "REC-JP-8834",
+    destination_market: "JP",
+    destination_country: "JP",
+    declared_origin_country: "KR",
+    product_family: "battery_cells",
+    severity_level: "high",
+    hybrid_risk_label: "high",
+    hybrid_score: 0.69,
+    fraud_score: 0.5,
+    fraud_risk_label: "medium",
+    batch_risk_score: 0.22,
+    rule_flag_count: 2,
+    compliance_issue: "Carbon Disclosure Risk",
+    recommended_action: "Conduct priority manual compliance review",
+    review_status: "Priority Review",
+    explanation:
+      "2 compliance inconsistencies detected; elevated embedded emissions profile",
+  },
+  {
+    record_id: "REC-VN-FRAUDPROBE-331",
+    destination_market: "EU",
+    destination_country: "FR",
+    declared_origin_country: "VN",
+    product_family: "textiles_processed",
+    severity_level: "critical",
+    hybrid_risk_label: "critical",
+    hybrid_score: 0.86,
+    fraud_score: 0.71,
+    fraud_risk_label: "high",
+    batch_risk_score: 0.38,
+    rule_flag_count: 5,
+    compliance_issue: "Multiple Compliance Violations",
+    recommended_action: "Escalate immediately to compliance leadership",
+    review_status: "Immediate Review",
+    explanation:
+      "5 compliance inconsistencies detected; contradictory origin attestations surfaced in cohort",
+  },
+  {
+    record_id: "REC-IN-1209",
+    destination_market: "IN",
+    destination_country: "IN",
+    declared_origin_country: "LK",
+    product_family: "graphite_blocks",
+    severity_level: "low",
+    hybrid_risk_label: "low",
+    hybrid_score: 0.21,
+    fraud_score: 0.11,
+    fraud_risk_label: "low",
+    batch_risk_score: 0.08,
+    rule_flag_count: 0,
+    compliance_issue: "General Compliance Monitoring",
+    recommended_action: "No immediate compliance action required",
+    review_status: "Cleared",
+    explanation: "record passed standard compliance screening",
+  },
+  {
+    record_id: "REC-KR-6610",
+    destination_market: "KR",
+    destination_country: "KR",
+    declared_origin_country: "JP",
+    product_family: "semiconductor_substrates",
+    severity_level: "medium",
+    hybrid_risk_label: "medium",
+    hybrid_score: 0.41,
+    fraud_score: 0.19,
+    fraud_risk_label: "low",
+    batch_risk_score: 0.19,
+    rule_flag_count: 1,
+    compliance_issue: "General Compliance Monitoring",
+    recommended_action: "Request supporting trade documentation",
+    review_status: "Secondary Review",
+    explanation: "1 compliance inconsistencies detected",
+  },
+];
