@@ -13,12 +13,16 @@ export function ExecutiveBriefPanel({
     <div className="enterprise-surface relative overflow-hidden rounded-xl border p-5">
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/8 via-transparent to-transparent" />
       <div className="relative">
-        <h3 className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-          Executive briefing
-        </h3>
-        <p className="mt-3 text-sm leading-relaxed text-foreground/95">
-          {payload.executive_summary}
-        </p>
+        <div>
+          <h3 className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+            Executive briefing
+          </h3>
+          <p className="mt-1 font-mono text-[10px] leading-relaxed text-muted-foreground">
+            API field <span className="text-foreground/90">executive_summary</span> (verbatim operator narrative — cross-check counts
+            against Screening Summary rows above).
+          </p>
+        </div>
+        <p className="mt-3 text-sm leading-relaxed text-foreground/95">{payload.executive_summary}</p>
         <dl className="mt-4 grid gap-3 text-[11px] sm:grid-cols-3">
           <div>
             <dt className="uppercase tracking-wider text-muted-foreground">

@@ -28,10 +28,12 @@ export function IntelligenceQualityRail({
     <div className="enterprise-surface space-y-4 rounded-xl border p-5">
       <div>
         <h3 className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-          Intelligence quality & schema governance
+          Extended schema governance
         </h3>
-        <p className="mt-1 text-[11px] text-muted-foreground leading-relaxed">
-          ICC mapping confidence, schema coverage, and DQ envelope from processing metadata.
+        <p className="mt-1 font-mono text-[10px] leading-relaxed text-muted-foreground">
+          Drill-down on <span className="text-foreground/90">processing_metadata.intelligence_quality</span> /
+          data_quality — complements the Streamlit-aligned &quot;Intelligence Quality&quot; row above (
+          operational_metrics.*).
         </p>
       </div>
       <div className="grid gap-4 sm:grid-cols-2">

@@ -25,6 +25,9 @@ def render_summary_cards(
 ) -> None:
     """
     Render operator-facing screening metrics.
+
+    Label order and wording stay in lockstep with the Next.js Results dashboard
+    (``frontend-web`` ``OperatorAlignedMetrics``) — both read the same REST fields.
     """
 
     if not screening_summary:
@@ -109,6 +112,14 @@ def render_summary_cards(
         "### Screening Summary"
     )
 
+    st.caption(
+        "REST alignment: ``screening_summary.total_records``, "
+        "``.cleared_records``, ``.flagged_records``, "
+        "``.high_risk_records`` (severity == high only), "
+        "``.critical_records``. "
+        "Same labels as ``frontend-web`` dashboard."
+    )
+
     c1, c2, c3, c4, c5 = st.columns(5)
 
     with c1:
@@ -147,6 +158,15 @@ def render_summary_cards(
 
     st.markdown(
         "### Operational Exposure"
+    )
+
+    st.caption(
+        "Counts mirror ``screening_summary`` tiles. Percent deltas pull from "
+        "``operational_metrics.review_rate_percent`` (% of cohort with "
+        "``requires_review``) and ``operational_metrics.high_risk_rate_percent`` "
+        "(% with severity ∈ {critical, high}). "
+        "``High Severity`` card value equals ``critical_records + "
+        "high_risk_records``."
     )
 
     exposure_col1, exposure_col2, exposure_col3, exposure_col4 = (
@@ -197,6 +217,13 @@ def render_summary_cards(
 
     st.markdown(
         "### Intelligence Quality"
+    )
+
+    st.caption(
+        "REST alignment: ``operational_metrics.batch_risk_score``, "
+        "``.mapping_confidence``, ``.data_quality_score`` "
+        "(0–1 fractions rendered as percentages, "
+        "same three tiles as Next.js)."
     )
 
     iq1, iq2, iq3 = st.columns(3)
@@ -262,6 +289,12 @@ Operational Compliance Status: {overall_status.upper()}
 </div>
 """,
         unsafe_allow_html=True,
+    )
+
+    st.caption(
+        "Same banner rule as Next.js Results: "
+        "``critical_records`` > 0 → critical; elif ``high_risk_records`` "
+        "> 0 → high; elif ``medium_risk_records`` > 0 → medium; else low."
     )
 
     st.divider()

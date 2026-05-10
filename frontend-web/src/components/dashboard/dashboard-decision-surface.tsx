@@ -8,7 +8,7 @@ import { useLatestResultsQuery } from "@/hooks/use-latest-results-query";
 import { isLatestResultsSuccess } from "@/lib/api/services/results";
 import { isEmptyEnvelope } from "@/lib/contracts/envelope";
 import type { ScreeningSuccessResponse } from "@/lib/contracts/screening";
-import { DecisionMetricStrip } from "@/components/dashboard/decision-metric-strip";
+import { OperatorAlignedMetrics } from "@/components/dashboard/operator-aligned-metrics";
 import { ExecutiveBriefPanel } from "@/components/dashboard/executive-brief-panel";
 import { ExplainabilityDecisionPanel } from "@/components/dashboard/explainability-decision-panel";
 import { FraudGovernancePanel } from "@/components/dashboard/fraud-governance-panel";
@@ -82,8 +82,9 @@ export function DashboardDecisionSurface() {
         </Badge>
       </div>
 
+      <OperatorAlignedMetrics payload={payload} />
+
       <ExecutiveBriefPanel payload={payload} />
-      <DecisionMetricStrip payload={payload} />
 
       <div className="grid gap-6 lg:grid-cols-2">
         <Card className="enterprise-surface border-border/80 shadow-none">
@@ -104,12 +105,12 @@ export function DashboardDecisionSurface() {
         </Card>
       </div>
 
-      <IntelligenceQualityRail payload={payload} />
-
       <div className="grid gap-6 lg:grid-cols-2">
         <FraudGovernancePanel payload={payload} />
         <ExplainabilityDecisionPanel payload={payload} />
       </div>
+
+      <IntelligenceQualityRail payload={payload} />
     </motion.div>
   );
 }
