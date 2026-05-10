@@ -1826,369 +1826,6 @@ class Charts:
                     )
 
     @staticmethod
-    def render_backlog_risk_concentration(
-        backlog_df: pd.DataFrame,
-    ) -> None:
-
-        st.subheader(
-            "Where backlog risk concentrates"
-        )
-
-        st.caption(
-            "Rows ordered from highest composite risk downward. Tracks how "
-            "much of summed composite exposure you capture scanning the backlog "
-            "from the top.",
-        )
-
-        if backlog_df.empty:
-
-            st.warning(
-                "Backlog is empty."
-            )
-
-            return
-
-        if (
-            "hybrid_score"
-            not in backlog_df.columns
-        ):
-
-            st.info(
-                "Needs hybrid_score on backlog rows to chart concentration.",
-            )
-
-            return
-
-        scores_raw = pd.to_numeric(
-            backlog_df[
-                "hybrid_score"
-            ],
-            errors="coerce",
-        ).fillna(
-            0,
-        )
-
-        vals = scores_raw.to_numpy()
-
-        order = np.argsort(
-            vals,
-        )[
-            ::-1
-        ]
-
-        scores = vals[
-            order
-        ]
-
-        if (
-            scores.size
-            == 0
-            or scores.sum()
-            <= 0
-        ):
-
-            st.info(
-                "No positive composite scores in the backlog to aggregate.",
-            )
-
-            return
-
-        total = float(
-            scores.sum(),
-        )
-
-        n = len(
-            scores,
-        )
-
-        cum = np.cumsum(
-            scores,
-        )
-
-        x_pct = (
-            np.arange(
-                1,
-                n + 1,
-            )
-            / n
-            * 100.0
-        )
-
-        y_pct = cum / total * 100.0
-
-        fig, ax = plt.subplots(
-            figsize=(
-                7,
-                4.2,
-            ),
-        )
-
-        ax.plot(
-            x_pct,
-            y_pct,
-            color="#BF360C",
-            linewidth=2.5,
-        )
-
-        ax.fill_between(
-            x_pct,
-            y_pct,
-            alpha=0.12,
-            color="#BF360C",
-        )
-
-        ax.axhline(
-            80,
-            color="#546E7A",
-            linestyle=":",
-            linewidth=1,
-            label="80% reference",
-        )
-
-        ax.axvline(
-            20,
-            color="#546E7A",
-            linestyle="--",
-            linewidth=0.85,
-            alpha=0.7,
-            label="Top 20% of backlog rows",
-        )
-
-        ix20 = max(
-            0,
-            min(
-                int(
-                    np.ceil(
-                        0.2 * n,
-                    ),
-                )
-                - 1,
-                n - 1,
-            ),
-        )
-
-        pct_at_twenty = round(
-            float(
-                y_pct[
-                    ix20
-                ],
-            ),
-            1,
-        )
-
-        ax.scatter(
-            [
-                x_pct[
-                    ix20
-                ],
-            ],
-            [
-                y_pct[
-                    ix20
-                ],
-            ],
-            color="#FFB300",
-            s=54,
-            zorder=6,
-            edgecolor="#263238",
-            linewidth=0.6,
-        )
-
-        ax.set_xlabel(
-            "% of backlog rows (priority queue order)"
-        )
-
-        ax.set_ylabel(
-            "% of summed composite scores captured"
-        )
-
-        apply_chart_style(ax)
-
-        ax.set_ylim(
-            0,
-            103,
-        )
-
-        ax.set_xlim(
-            0,
-            100,
-        )
-
-        ax.legend(
-            fontsize=8,
-            loc="lower right",
-            framealpha=0.93,
-        )
-
-        plt.tight_layout()
-
-        st.pyplot(fig)
-
-        st.metric(
-            "Pareto-style readout",
-            (
-                "Top fifth of backlog rows carry about "
-                f"{pct_at_twenty}% of summed composite scores"
-                if n
-                >= 5
-                else "Backlog too small for a fifth-band readout."
-            ),
-        )
-
-    @staticmethod
-    def render_compliance_themes_full_intake(
-        full_df: pd.DataFrame,
-        top_n: int = 12,
-    ) -> None:
-
-        st.subheader(
-            "Top compliance themes (full intake)"
-        )
-
-        st.caption(
-            "Most frequent compliance_issue labels across all screened rows — "
-            "manager-facing portfolio briefing.",
-        )
-
-        if full_df.empty:
-
-            return
-
-        if (
-            "compliance_issue"
-            not in full_df.columns
-        ):
-
-            st.info(
-                "compliance_issue field not available for this upload.",
-            )
-
-            return
-
-        text = (
-            full_df[
-                "compliance_issue"
-            ]
-            .astype(
-                str,
-            )
-            .str.strip()
-        )
-
-        text = text.mask(
-            text.eq(
-                "",
-            )
-            | text.str.casefold().isin(
-                {
-                    "nan",
-                    "none",
-                    "unknown",
-                }
-            ),
-            "Unspecified",
-        )
-
-        vc = text.value_counts().head(
-            top_n,
-        )
-
-        if vc.empty:
-
-            st.caption(
-                "No compliance issue text populated on this intake.",
-            )
-
-            return
-
-        fig, ax = plt.subplots(
-            figsize=(
-                7.2,
-                max(
-                    3.6,
-                    0.38 * len(vc),
-                ),
-            ),
-        )
-
-        palette = plt.cm.Purples_r(
-            np.linspace(
-                0.25,
-                0.92,
-                len(vc),
-            )
-        )
-
-        y_p = np.arange(
-            len(vc),
-        )
-
-        bars = ax.barh(
-            y_p,
-            vc.values,
-            color=palette,
-            edgecolor="white",
-            linewidth=0.5,
-            height=0.65,
-        )
-
-        ax.set_yticks(
-            y_p,
-        )
-
-        wrap = [
-            (
-                str(ix)[:44] + "…"
-                if len(
-                    str(ix),
-                )
-                > 46
-                else str(ix)
-            )
-            for ix in vc.index
-        ]
-
-        ax.set_yticklabels(
-            wrap,
-            fontsize=8,
-        )
-
-        ax.set_xlabel(
-            "Record count (all screened)"
-        )
-
-        apply_chart_style(ax)
-
-        ax.invert_yaxis()
-
-        for bar, val in zip(
-            bars,
-            vc.values,
-        ):
-
-            ax.text(
-                bar.get_width()
-                + max(
-                    0.02 * vc.sum(),
-                    0.35,
-                ),
-                bar.get_y()
-                + bar.get_height()
-                / 2,
-                f"{int(val):,}",
-                va="center",
-                fontsize=8,
-            )
-
-        plt.tight_layout()
-
-        st.pyplot(fig)
-
-        st.caption(
-            f"Top {len(vc)} themes by row count.",
-        )
-
-    @staticmethod
     def render_queue_routing_hints(
         backlog_df: pd.DataFrame,
         top_n: int = 8,
@@ -2361,94 +1998,53 @@ class Charts:
 
         if backlog_state == "backlog" and backlog_df is not None:
 
-            row_risk_row, row_risk_r = st.columns(
-                2,
+            Charts.render_risk_distribution(
+                backlog_df,
+                (
+                    "Operational review backlog only — same cohort "
+                    "as flagged compliance records."
+                ),
             )
-
-            with row_risk_row:
-
-                Charts.render_risk_distribution(
-                    backlog_df,
-                    (
-                        "Operational review backlog only — same cohort "
-                        "as flagged compliance records."
-                    ),
-                )
-
-            with row_risk_r:
-
-                Charts.render_backlog_risk_concentration(
-                    backlog_df,
-                )
 
             st.divider()
 
         elif backlog_state == "no_mask":
 
-            row_fallback, row_pad = st.columns(
-                2,
+            Charts.render_risk_distribution(
+                df,
+                (
+                    "**Full screened intake.** Backlog cohort cannot be "
+                    "isolated (requires_review / severity tier fields "
+                    "absent)."
+                ),
             )
-
-            with row_fallback:
-
-                Charts.render_risk_distribution(
-                    df,
-                    (
-                        "**Full screened intake.** Backlog cohort cannot be "
-                        "isolated (requires_review / severity tier fields "
-                        "absent)."
-                    ),
-                )
-
-            with row_pad:
-
-                st.markdown(
-                    "##### Risk concentration curve",
-                )
-
-                st.caption(
-                    "Available once the operational review backlog can be "
-                    "isolated from workflow fields.",
-                )
 
             st.divider()
 
         else:
 
             st.info(
-                "Risk tier donut and concentration curve need at least one "
-                "row in the operational review backlog.",
+                "Compliance Risk Distribution chart appears once the "
+                "operational review backlog has qualifying rows.",
             )
 
             st.divider()
 
-        row_op_m, row_op_r = st.columns(
-            2,
-        )
+        if backlog_state == "backlog" and backlog_df is not None:
 
-        with row_op_m:
-
-            Charts.render_compliance_themes_full_intake(
-                df,
+            Charts.render_queue_routing_hints(
+                backlog_df,
             )
 
-        with row_op_r:
+        else:
 
-            if backlog_state == "backlog" and backlog_df is not None:
+            st.markdown(
+                "##### Recommended actions (backlog)",
+            )
 
-                Charts.render_queue_routing_hints(
-                    backlog_df,
-                )
-
-            else:
-
-                st.markdown(
-                    "##### Recommended actions (backlog)",
-                )
-
-                st.caption(
-                    "Shows when backlog rows carry recommended_action text.",
-                )
+            st.caption(
+                "Shows when backlog rows carry recommended_action text.",
+            )
 
         if (
             "anomaly_class"
