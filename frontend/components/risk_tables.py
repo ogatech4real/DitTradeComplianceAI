@@ -67,6 +67,107 @@ class RiskTables:
         return out
 
     @staticmethod
+    def operational_review_mask(
+        df: pd.DataFrame,
+    ) -> tuple[pd.Series | None, str]:
+        """
+        Canonical product rule for who belongs in operational review backlog.
+
+        Single source order:
+        1) requires_review (workflow field from orchestration).
+        2) severity_level in critical/high/medium.
+        3) hybrid_risk_label in critical/high/medium — legacy parity when 1–2 absent.
+
+        Returns (boolean mask aligned to df.index, short provenance string for captions).
+        """
+        if df is None or df.empty:
+            return None, ""
+
+        if "requires_review" in df.columns:
+
+            def _truthy_requires_review(val: object) -> bool:
+
+                if val is True:
+                    return True
+
+                if val is False:
+                    return False
+
+                txt = (
+                    str(val)
+                    .strip()
+                    .lower()
+                )
+
+                return txt in {
+                    "true",
+                    "1",
+                    "yes",
+                }
+
+            mask = (
+                df[
+                    "requires_review"
+                ]
+                .map(
+                    _truthy_requires_review,
+                )
+            )
+
+            return (
+                mask,
+                "workflow field requires_review",
+            )
+
+        if "severity_level" in df.columns:
+
+            mask = (
+                df[
+                    "severity_level"
+                ]
+                .astype(str)
+                .str.strip()
+                .str.lower()
+                .isin(
+                    [
+                        "critical",
+                        "high",
+                        "medium",
+                    ]
+                )
+            )
+
+            return (
+                mask,
+                "severity_level (critical, high, or medium)",
+            )
+
+        if "hybrid_risk_label" in df.columns:
+
+            mask = (
+                df[
+                    "hybrid_risk_label"
+                ]
+                .astype(str)
+                .str.strip()
+                .str.lower()
+                .isin(
+                    [
+                        "critical",
+                        "high",
+                        "medium",
+                    ]
+                )
+            )
+
+            return (
+                mask,
+                "hybrid_risk_label (model tier — use when workflow fields are absent)",
+            )
+
+        return None, ""
+
+    @staticmethod
     def parse_icc_payload(
         payload: object,
     ) -> object:
@@ -429,59 +530,95 @@ class RiskTables:
             index=False,
         ).encode("utf-8")
 
-        requires_review_series = None
-        if "requires_review" in df.columns:
-            requires_review_series = (
-                df["requires_review"]
-                .fillna(False)
-                .astype(bool)
-            )
-        elif "severity_level" in df.columns:
-            requires_review_series = (
-                df["severity_level"]
-                .astype(str)
-                .str.lower()
-                .isin(
-                    [
-                        "critical",
-                        "high",
-                        "medium",
-                    ]
-                )
-            )
+        review_mask, review_source = RiskTables.operational_review_mask(
+            df,
+        )
 
         requires_review_csv_data = None
-        if requires_review_series is not None:
-            requires_review_df = df[
-                requires_review_series
+
+        export_columns_extra = (
+            ["severity_level", "requires_review", "review_status"]
+        )
+
+        export_columns_full = list(
+            dict.fromkeys(
+                display_columns + [
+                    col for col in export_columns_extra
+                    if col in df.columns
+                ],
+            )
+        )
+
+        if (
+            review_mask is not None
+            and export_columns_full
+        ):
+
+            full_review_df = df[
+                review_mask.fillna(False)
             ].copy()
-            requires_review_export_cols = [
-                col for col in display_columns
-                if col in requires_review_df.columns
+
+            present_cols = [
+                col for col in export_columns_full
+                if col in full_review_df.columns
             ]
-            if requires_review_export_cols:
-                requires_review_csv_data = requires_review_df[
-                    requires_review_export_cols
-                ].to_csv(
-                    index=False,
-                ).encode("utf-8")
+
+            if present_cols:
+                requires_review_csv_data = (
+                    full_review_df[
+                        present_cols
+                    ]
+                    .to_csv(
+                        index=False,
+                    )
+                    .encode(
+                        "utf-8",
+                    )
+                )
 
         dl1, dl2 = st.columns(2)
         with dl1:
             st.download_button(
-                label="Download Review Queue CSV",
+                label="Download priority sample CSV (top 20)",
                 data=csv_data,
                 file_name="priority_review_queue.csv",
                 mime="text/csv",
+                help="Same rows as on-screen Priority Review Queue; for triage snippets.",
             )
+
         with dl2:
             if requires_review_csv_data is not None:
                 st.download_button(
-                    label="Download Full Requires Review CSV",
+                    label="Download full operational review CSV",
                     data=requires_review_csv_data,
                     file_name="requires_review_records.csv",
                     mime="text/csv",
+                    help=(
+                        "Authoritative backlog: all rows flagged for operational review "
+                        f"({review_source})."
+                    ),
                 )
+
+        backlog_rule = (
+            review_source if review_source else "see workflow fields"
+        )
+
+        with st.expander(
+            "Exports: what downloads mean (product)",
+            expanded=False,
+        ):
+            st.markdown(
+                f"""
+Two CSV downloads are supported here:
+
+| File | Role |
+|------|------|
+| `priority_review_queue.csv` | **Triage sample** — same top rows as on-screen (currently up to **20** ordered by composite risk). **Not** your full backlog. |
+| `requires_review_records.csv` | **Operational review backlog** — every row flagged for operational review (**{backlog_rule}**). **Authoritative export** for casework and audits. |
+
+**Former `flagged_records.csv`** is **retired** to avoid contradictory doubles. Scroll **Flagged Compliance Records** to browse that same backlog; use **Download full operational review CSV** once for the identical dataset.
+"""
+            )
 
         focus_row = ranked_df.iloc[
             selected_idx
@@ -660,6 +797,11 @@ Other columns (**fraud**, **rules**, **batch** where shown) use either counts or
             "Flagged Compliance Records"
         )
 
+        st.caption(
+            "Browse the full operational review backlog (same rule as "
+            "**Download full operational review CSV** above)."
+        )
+
         if df.empty:
 
             st.warning(
@@ -676,43 +818,43 @@ Other columns (**fraud**, **rules**, **batch** where shown) use either counts or
             df
         )
 
-        if (
-            "hybrid_risk_label"
-            not in df.columns
-        ):
+        review_mask, review_source = RiskTables.operational_review_mask(
+            df,
+        )
+
+        if review_mask is None:
 
             st.warning(
-                "Risk label column missing."
+                "Cannot determine operational review backlog: dataset needs "
+                "requires_review, severity_level, or hybrid_risk_label."
             )
 
             return
 
         flagged_df = df[
-            df[
-                "hybrid_risk_label"
-            ]
-            .astype(str)
-            .str.lower()
-            .isin(
-                [
-                    "high",
-                    "medium",
-                    "critical",
-                ]
-            )
+            review_mask.fillna(False)
         ]
 
         if flagged_df.empty:
 
             st.success(
-                "No records currently require review."
+                "No records currently require operational review."
             )
 
             return
 
+        st.info(
+            f"Filtered using **{review_source}**. "
+            "Export the backlog as `requires_review_records.csv` "
+            "from Priority Review Queue (no duplicate file here)."
+        )
+
         display_columns = [
             col for col in [
                 "record_id",
+                "requires_review",
+                "severity_level",
+                "review_status",
                 "hybrid_risk_label",
                 "hybrid_score",
                 "rule_flag_count",
@@ -743,18 +885,17 @@ Other columns (**fraud**, **rules**, **batch** where shown) use either counts or
             width="stretch",
         )
 
-        csv_data = flagged_df[
-            display_columns
-        ].to_csv(
-            index=False
-        ).encode("utf-8")
-
-        st.download_button(
-            label="Download Flagged Records CSV",
-            data=csv_data,
-            file_name="flagged_records.csv",
-            mime="text/csv",
+        rows_shown = min(
+            len(flagged_df),
+            MAX_TABLE_ROWS,
         )
+
+        if len(flagged_df) > MAX_TABLE_ROWS:
+
+            st.caption(
+                f"Showing first {rows_shown:,} of {len(flagged_df):,} "
+                "operational-review rows — use the full CSV export for all."
+            )
 
     # =====================================================
     # COMPLIANCE ISSUE BREAKDOWN
