@@ -131,7 +131,7 @@ def render_summary_cards(
 
     with c4:
         st.metric(
-            label="High Severity Cases",
+            label="High severity tier (excl. critical)",
             value=f"{high_risk_records:,}",
         )
 
@@ -183,7 +183,10 @@ def render_summary_cards(
         )
 
     st.caption(
-        f"Exposure is based on full screened results (n={total_records:,})."
+        f"Exposure is based on full screened results (n={total_records:,}). "
+        "“Records Requiring Review” follows operator `requires_review` "
+        "(critical + high + medium severity). “High severity tier” counts only "
+        "`severity_level == high`, not critical or medium."
     )
 
     st.divider()

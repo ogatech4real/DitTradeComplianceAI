@@ -49,13 +49,13 @@ export function DecisionMetricStrip({
       <Metric
         label="Critical lane pressure"
         value={`${Number(o.critical_risk_rate_percent ?? 0).toFixed(1)}%`}
-        hint={`Elevated-critical share of cohort; paired high lane ${Number(o.high_risk_rate_percent ?? 0).toFixed(1)}%.`}
+        hint={`High-only tier share ${Number(o.high_tier_only_rate_percent ?? 0).toFixed(1)}%; critical∪high combined ${Number(o.high_risk_rate_percent ?? 0).toFixed(1)}%.`}
         accent={(o.critical_risk_rate_percent ?? 0) > 8 ? "risk" : "default"}
       />
       <Metric
         label="Hybrid risk centroid"
         value={(o.average_risk_score ?? s.average_risk_score ?? 0).toFixed(3)}
-        hint="Population mean of calibrated hybrid scorepost composition."
+        hint="Population mean of calibrated hybrid score."
       />
       <Metric
         label="Fraud-pressure index"

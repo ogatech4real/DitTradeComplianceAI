@@ -81,6 +81,9 @@ export interface OperationalMetrics {
   review_rate_percent?: number;
   average_risk_score?: number;
   critical_risk_rate_percent?: number;
+  /** Severity `high` only (excludes critical). */
+  high_tier_only_rate_percent?: number;
+  /** Share with severity critical ∪ high (legacy / Streamlit exposure %). */
   high_risk_rate_percent?: number;
   fraud_alerts?: number;
   anomaly_records?: number;

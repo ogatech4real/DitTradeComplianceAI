@@ -37,6 +37,8 @@ class OperatorReportService:
             )
         )
 
+        priority_queue_size = len(priority_queue)
+
         compliance_risks = (
             self.generate_compliance_risks(
                 scored_df
@@ -58,7 +60,8 @@ class OperatorReportService:
 
         executive_summary = (
             self.generate_executive_summary(
-                screening_summary
+                screening_summary,
+                priority_queue_size=priority_queue_size,
             )
         )
 
@@ -385,28 +388,57 @@ class OperatorReportService:
             )
 
         high_risk = 0
+        high_only = 0
+        critical_only = 0
 
         if (
             "severity_level"
             in scored_df.columns
         ):
 
+            sev = (
+                scored_df[
+                    "severity_level"
+                ]
+                .astype(str)
+                .str.strip()
+                .str.lower()
+            )
+
+            critical_only = int((sev == "critical").sum())
+
+            high_only = int((sev == "high").sum())
+
             high_risk = int(
-                (
-                    scored_df[
-                        "severity_level"
+                sev.isin(
+                    [
+                        "critical",
+                        "high",
                     ]
-                    .astype(str)
-                    .isin(
-                        [
-                            "critical",
-                            "high",
-                        ]
-                    )
                 ).sum()
             )
 
         if total_records > 0:
+
+            metrics[
+                "critical_risk_rate_percent"
+            ] = round(
+                (
+                    critical_only
+                    / total_records
+                ) * 100,
+                2,
+            )
+
+            metrics[
+                "high_tier_only_rate_percent"
+            ] = round(
+                (
+                    high_only
+                    / total_records
+                ) * 100,
+                2,
+            )
 
             metrics[
                 "high_risk_rate_percent"
@@ -508,6 +540,7 @@ class OperatorReportService:
     @staticmethod
     def generate_executive_summary(
         screening_summary: Dict[str, Any],
+        priority_queue_size: int = 0,
     ) -> str:
 
         total = screening_summary.get(
@@ -525,14 +558,20 @@ class OperatorReportService:
             0,
         )
 
-        priority = screening_summary.get(
-            "priority_review_records",
+        high_tier = screening_summary.get(
+            "high_risk_records",
+            0,
+        )
+
+        medium_tier = screening_summary.get(
+            "medium_risk_records",
             0,
         )
 
         return (
             f"{flagged} out of {total} uploaded trade records "
-            f"require compliance review. "
-            f"{critical} records were classified as critical risk "
-            f"and {priority} require priority operational assessment."
+            f"require compliance review (severity tiers: "
+            f"{critical} critical, {high_tier} high, {medium_tier} medium). "
+            f"{priority_queue_size} of the highest-risk records are "
+            f"surfaced in the priority review queue."
         )

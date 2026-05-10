@@ -768,39 +768,36 @@ class WorkflowEngine:
             scored_df
         )
 
+        severity_norm = (
+            scored_df[
+                "severity_level"
+            ]
+            .astype(str)
+            .str.strip()
+            .str.lower()
+        )
+
         critical_records = int(
             (
-                scored_df[
-                    "severity_level"
-                ]
-                == "critical"
+                severity_norm == "critical"
             ).sum()
         )
 
         high_risk = int(
             (
-                scored_df[
-                    "severity_level"
-                ]
-                == "high"
+                severity_norm == "high"
             ).sum()
         )
 
         medium_risk = int(
             (
-                scored_df[
-                    "severity_level"
-                ]
-                == "medium"
+                severity_norm == "medium"
             ).sum()
         )
 
         cleared_records = int(
             (
-                scored_df[
-                    "severity_level"
-                ]
-                == "low"
+                severity_norm == "low"
             ).sum()
         )
 
