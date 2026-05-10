@@ -1,6 +1,6 @@
 /**
- * Frontend workflow taxonomy — aligns with frontend_api_contract.md lifecycle §4.
- * Server does not yet expose durable workflow_id; this models UI + future async orchestration.
+ * Frontend workflow taxonomy — mirrors screening lifecycle semantics in `frontend_api_contract.md`.
+ * Durable workflow identifiers may arrive from the API later; this drives UI clarity today.
  */
 
 export const WORKFLOW_PHASES = [
@@ -27,61 +27,61 @@ export interface WorkflowPhaseMeta {
 }
 
 export const WORKFLOW_PHASE_METADATA: WorkflowPhaseMeta[] = [
-  { id: "idle", label: "Idle", description: "Awaiting dataset or operator action." },
+  { id: "idle", label: "Ready", description: "Waiting for a file import or supervised reset." },
   {
     id: "upload_dataset",
-    label: "Upload dataset",
-    description: "Secure intake of declarations / supplementary evidence.",
+    label: "Secure intake",
+    description: "Declaration file accepted, hashed, and bound to this session.",
   },
   {
     id: "schema_intelligence",
-    label: "Schema intelligence",
-    description: "Mapping confidence vs required screening fields.",
+    label: "Field alignment",
+    description: "Column mapping confidence against screening schema expectations.",
   },
   {
     id: "icc_transformation",
-    label: "ICC transformation",
-    description: "ICC-aligned canonical alignment and enrichment.",
+    label: "Trade alignment",
+    description: "Canonical trade alignment and enrichment consistent with ICC trade data practice.",
   },
   {
     id: "data_quality_validation",
-    label: "Data quality validation",
-    description: "Completeness, coercion, consistency signals.",
+    label: "Data fitness",
+    description: "Validation of completeness, types, coercions, and contradiction checks.",
   },
   {
     id: "fraud_analysis",
     label: "Fraud intelligence",
-    description: "Pattern-level fraud indicators per record.",
+    description: "Per-record fraud indicators surfaced for governance overlays.",
   },
   {
     id: "batch_analysis",
-    label: "Batch intelligence",
-    description: "Duplicate, concentration, and cluster anomalies.",
+    label: "Batch analytics",
+    description: "Cohort anomalies such as duplication, clustering, or concentration bursts.",
   },
   {
     id: "hybrid_scoring",
-    label: "Hybrid scoring",
-    description: "ML + rules + interaction composition.",
+    label: "Calibrated scoring",
+    description: "Combined models and deterministic rules converge on a calibrated risk posture.",
   },
   {
     id: "risk_classification",
-    label: "Risk classification",
-    description: "Severity, routing, and recommended actions.",
+    label: "Severity disposition",
+    description: "Final severity tiering and reviewer routing cues.",
   },
   {
     id: "review_queue",
-    label: "Review queue",
-    description: "Prioritised operational triage set.",
+    label: "Review preparation",
+    description: "Work queue hydrated with investigative context for operators.",
   },
   {
     id: "explainability",
-    label: "Explainability",
-    description: "Operator narratives and contributor evidence.",
+    label: "Narratives & rationale",
+    description: "Operator-facing explanations and thematic drivers consolidated.",
   },
   {
     id: "export_audit",
-    label: "Export & audit",
-    description: "Evidence bundles and governance exports.",
+    label: "Release & audit",
+    description: "Outputs exposed to dashboards with trace suitable for escalation packets.",
   },
 ];
 
@@ -94,11 +94,11 @@ export type WorkflowRunStatus =
   | "partial";
 
 export interface WorkflowSessionSnapshot {
-  /** Future: server-issued id */
+  /** Future server-issued orchestration identifier */
   workflowId: string | null;
   status: WorkflowRunStatus;
-  /** Highest completed / active phase for UI rail */
+  /** Highest visible phase for timeline presentation */
   activePhaseId: WorkflowPhaseId;
-  /** Monotonic client tick for animations */
+  /** Client tick driving subtle motion */
   updatedAt: number;
 }

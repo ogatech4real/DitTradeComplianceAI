@@ -11,34 +11,27 @@ export function ExplainabilityDecisionPanel({
   const themes = deriveExplainabilityThemes(payload);
 
   return (
-    <div className="enterprise-surface rounded-xl border p-5">
-      <h3 className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-        Explainability — decision narratives
+    <div className="operational-surface rounded-2xl border border-border/80 p-6">
+      <h3 className="text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
+        Explainability &amp; decision themes
       </h3>
-      <p className="mt-1 text-[11px] text-muted-foreground leading-relaxed">
-        Themes prefer each row&apos;s{" "}
-        <span className="font-mono text-foreground/80">records[].explanation</span> (
-        <span className="font-mono">build_operator_explanation</span>), then Streamlit-aligned
-        risk-driver signals (fraud ≥0.5, batch ≥0.33, rules, anomalies) when the narrative is
-        otherwise generic — same tier logic as queue drill-down copy.
+      <p className="mt-2 text-[12px] leading-relaxed text-muted-foreground">
+        Each theme summarises cohort-level reasoning surfaced from narratives and calibrated risk telemetry — pairing
+        what analysts read with quantitative prevalence.
       </p>
-      <ul className="mt-4 space-y-3">
+      <ul className="mt-5 space-y-3">
         {themes.map((t) => (
           <li
             key={t.theme}
-            className="rounded-lg border border-border/60 bg-background/60 px-3 py-2.5"
+            className="rounded-xl border border-border/65 bg-gradient-to-br from-muted/35 to-transparent px-4 py-3"
           >
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <span className="text-sm font-semibold tracking-tight text-foreground">
-                {t.theme}
-              </span>
-              <span className="font-mono text-xs tabular-nums text-muted-foreground">
-                {t.count} · {t.sharePercent}%
+            <div className="flex flex-wrap items-baseline justify-between gap-3">
+              <span className="text-sm font-semibold tracking-tight text-foreground">{t.theme}</span>
+              <span className="tabular-nums text-[12px] font-medium text-muted-foreground">
+                {t.sharePercent}% of cohort ({t.count} declaration{t.count === 1 ? "" : "s"})
               </span>
             </div>
-            <p className="mt-1.5 text-[11px] leading-relaxed text-muted-foreground">
-              {t.decisionHint}
-            </p>
+            <p className="mt-2 text-[13px] leading-relaxed text-muted-foreground">{t.decisionHint}</p>
           </li>
         ))}
       </ul>

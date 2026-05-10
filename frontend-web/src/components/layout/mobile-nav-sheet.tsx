@@ -39,7 +39,7 @@ export function MobileNavSheet() {
       <SheetContent side="left" className="w-[min(100vw,20rem)] p-0">
         <SheetHeader className="border-b px-4 py-3 text-left">
           <SheetTitle className="text-base font-semibold">
-            Navigation
+            Workspace
           </SheetTitle>
         </SheetHeader>
         <nav className="flex flex-col gap-1 p-3">

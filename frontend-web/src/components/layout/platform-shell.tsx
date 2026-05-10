@@ -11,26 +11,27 @@ interface RouteMeta {
 }
 
 const ROUTES: Record<string, RouteMeta> = {
+  "/": {
+    title: "Operational intelligence workspace",
+    description:
+      "Executive posture, secure import, and immediate navigation into decision-grade surfaces.",
+  },
   "/dashboard": {
-    title: "Operator dashboard",
+    title: "Decision intelligence",
     description:
-      "Cross-signal compliance posture, intelligence cards, and workflow architecture.",
+      "Exposure concentrations, rationale themes, governance quality, and review pressure in one coherent view.",
   },
-  "/upload": {
-    title: "Upload workspace",
+  "/review": {
+    title: "Investigation workspace",
     description:
-      "Dataset intake staging for ICC-aligned transformation and downstream screening.",
-  },
-  "/review-queue": {
-    title: "Review queue",
-    description:
-      "Prioritised operational triage shell — binds to priority_review_queue next.",
+      "Prioritised declarations with severity context, narrative explainability, and disposition guidance.",
   },
 };
 
 const DEFAULT_META: RouteMeta = {
-  title: "Digital Trade Compliance AI",
-  description: "Enterprise compliance intelligence platform.",
+  title: "Digital Trade Compliance",
+  description:
+    "Production trade compliance intelligence for operators, supervisors, and control teams.",
 };
 
 export function PlatformShell({ children }: { children: ReactNode }) {

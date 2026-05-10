@@ -9,7 +9,7 @@ function QRow({ label, value }: { label: string; value: number }) {
     <div className="space-y-1.5">
       <div className="flex items-center justify-between text-xs">
         <span className="text-muted-foreground">{label}</span>
-        <span className="font-mono tabular-nums text-foreground">{pct}%</span>
+        <span className="tabular-nums font-medium text-foreground">{pct}%</span>
       </div>
       <Progress value={pct} className="h-1.5" />
     </div>
@@ -25,41 +25,47 @@ export function IntelligenceQualityRail({
   const dq = payload.processing_metadata.data_quality;
 
   return (
-    <div className="enterprise-surface space-y-4 rounded-xl border p-5">
+    <div className="operational-surface space-y-5 rounded-2xl border border-border/80 p-6">
       <div>
-        <h3 className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-          Extended schema governance
+        <h3 className="text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
+          Workflow &amp; governance depth
         </h3>
-        <p className="mt-1 font-mono text-[10px] leading-relaxed text-muted-foreground">
-          Drill-down on <span className="text-foreground/90">processing_metadata.intelligence_quality</span> /
-          data_quality — complements the Streamlit-aligned &quot;Intelligence Quality&quot; row above (
-          operational_metrics.*).
+        <p className="mt-2 text-[12px] leading-relaxed text-muted-foreground">
+          Extended ingest diagnostics complement the cohort summary scores — cite these when auditors ask whether the
+          engine received trustworthy structure.
         </p>
       </div>
-      <div className="grid gap-4 sm:grid-cols-2">
-        <div className="space-y-3">
+      <div className="grid gap-5 lg:grid-cols-2">
+        <div className="space-y-3 rounded-xl border border-border/65 bg-muted/20 p-4">
+          <p className="text-xs font-semibold text-foreground">Schema &amp; mapping</p>
           <QRow label="Mapping confidence" value={iq?.mapping_confidence ?? 0} />
-          <QRow label="Schema consistency" value={iq?.schema_consistency_score ?? 0} />
+          <QRow label="Structural consistency" value={iq?.schema_consistency_score ?? 0} />
           <QRow label="Completeness" value={iq?.completeness_score ?? 0} />
         </div>
-        <div className="space-y-3">
-          <QRow label="Data quality score" value={iq?.data_quality_score ?? 0} />
+        <div className="space-y-3 rounded-xl border border-border/65 bg-muted/20 p-4">
+          <p className="text-xs font-semibold text-foreground">Dataset transformation</p>
+          <QRow label="Overall dataset fitness" value={iq?.data_quality_score ?? 0} />
           <QRow
-            label="ICC transformation coverage"
+            label="Trade alignment coverage"
             value={iq?.icc_transformation_coverage ?? 0}
           />
-          <div className="rounded-lg border border-border/60 bg-muted/30 px-3 py-2 text-[11px] text-muted-foreground">
-            Matched {payload.processing_metadata.matched_schema_fields ?? "—"} / required{" "}
-            {payload.processing_metadata.required_schema_fields ?? "—"} screening fields · model{" "}
-            <span className="font-mono text-foreground">
-              {payload.processing_metadata.model_version ?? "—"}
-            </span>
+          <div className="rounded-lg border border-border/65 bg-background/70 px-3 py-2.5 text-[12px] text-muted-foreground">
+            Mapped{" "}
+            <span className="font-semibold text-foreground">
+              {payload.processing_metadata.matched_schema_fields ?? "—"}
+            </span>{" "}
+            of{" "}
+            <span className="font-semibold text-foreground">
+              {payload.processing_metadata.required_schema_fields ?? "—"}
+            </span>{" "}
+            mandatory screening headings · model lineage{" "}
+            <span className="font-medium text-foreground">{payload.processing_metadata.model_version ?? "—"}</span>
           </div>
         </div>
       </div>
       {dq ? (
-        <div className="border-t border-border/70 pt-3 text-[11px] text-muted-foreground">
-          DQ · invalid rates {(dq.invalid_values_rate ?? 0) * 100}% · coercion{" "}
+        <div className="border-t border-border/70 pt-4 text-[12px] text-muted-foreground">
+          Invalid value rate {(dq.invalid_values_rate ?? 0) * 100}% · coercion events{" "}
           {(dq.coercion_rate ?? 0) * 100}%
         </div>
       ) : null}

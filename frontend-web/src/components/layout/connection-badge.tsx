@@ -16,14 +16,14 @@ export function ConnectionBadge() {
         {mock ? (
           <Badge
             variant="outline"
-            className="border-amber-500/35 bg-amber-500/[0.08] font-mono text-[10px] uppercase"
+            className="border-[var(--semantic-amber)]/35 bg-[var(--semantic-amber)]/[0.12] text-[10px] font-medium tracking-wide text-[var(--semantic-amber-fg)]"
           >
-            Mock
+            Demo connectivity
           </Badge>
         ) : null}
         <Badge variant="secondary" className="gap-1.5 font-normal">
           <Loader2 className="size-3.5 animate-spin" aria-hidden />
-          API handshake
+          Checking services…
         </Badge>
       </div>
     );
@@ -32,19 +32,19 @@ export function ConnectionBadge() {
   if (q.isError) {
     return (
       <span
-        title="Confirm NEXT_PUBLIC_API_BASE_URL on Vercel matches your FastAPI origin and that CORS allows this host (or enable NEXT_PUBLIC_USE_MOCK_API)."
+        title="Verify the API base URL in your deployment settings and confirm the screening service permits this browser origin."
         className="inline-flex cursor-help flex-wrap items-center gap-2"
       >
         {mock ? (
           <Badge
             variant="outline"
-            className="border-amber-500/35 bg-amber-500/[0.08] font-mono text-[10px] uppercase"
+            className="border-[var(--semantic-amber)]/35 bg-[var(--semantic-amber)]/[0.12] text-[10px] font-medium tracking-wide text-[var(--semantic-amber-fg)]"
           >
-            Mock
+            Demo connectivity
           </Badge>
         ) : null}
         <Badge variant="destructive" className="font-normal">
-          Backend offline
+          Screening service unreachable
         </Badge>
       </span>
     );
@@ -55,16 +55,16 @@ export function ConnectionBadge() {
       {mock ? (
         <Badge
           variant="outline"
-          className="border-amber-500/35 bg-amber-500/[0.08] font-mono text-[10px] uppercase"
+          className="border-[var(--semantic-amber)]/35 bg-[var(--semantic-amber)]/[0.12] text-[10px] font-medium tracking-wide text-[var(--semantic-amber-fg)]"
         >
-          Mock
+          Demo connectivity
         </Badge>
       ) : null}
       <Badge
         variant="outline"
-        className="border-emerald-500/35 bg-emerald-500/[0.12] font-normal text-emerald-200"
+        className="border-[var(--semantic-emerald)]/35 bg-[var(--semantic-emerald-soft)]/80 font-normal text-foreground"
       >
-        API {q.data?.status ?? "ok"}
+        Services {q.data?.status ?? "healthy"}
       </Badge>
     </div>
   );

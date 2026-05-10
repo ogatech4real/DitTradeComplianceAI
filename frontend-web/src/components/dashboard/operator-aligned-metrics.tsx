@@ -3,46 +3,45 @@
 import { cn } from "@/lib/utils";
 import type { ScreeningSuccessResponse } from "@/lib/contracts/screening";
 
-const RISK_UI = {
-  critical: "#B71C1C",
-  high: "#D50000",
-  medium: "#FFD600",
-  low: "#00C853",
-} as const;
-
-function sectionTitle(main: string, source: string) {
-  return (
-    <div>
-      <h3 className="text-sm font-semibold tracking-tight text-foreground">{main}</h3>
-      <p className="mt-1 font-mono text-[10px] leading-relaxed text-muted-foreground">{source}</p>
-    </div>
-  );
-}
-
-function MetricCard(opts: {
+function SurfaceMetric(opts: {
   label: string;
   value: string;
   subtitle?: string;
   className?: string;
+  emphasis?: "neutral" | "pressure" | "positive" | "alert";
 }) {
+  const ring =
+    opts.emphasis === "alert"
+      ? "shadow-[inset_0_0_0_1px_oklch(0_0_0_/0.04)] border-[var(--semantic-critical)]/30"
+      : opts.emphasis === "pressure"
+        ? "border-[var(--semantic-orange)]/28"
+        : opts.emphasis === "positive"
+          ? "border-[var(--semantic-emerald)]/30"
+          : "border-border/70";
+
   return (
-    <div className={cn("enterprise-surface rounded-lg border border-border/80 p-4", opts.className)}>
-      <div className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+    <div
+      className={cn(
+        "operational-surface rounded-xl border p-4 shadow-[0_14px_40px_-30px_oklch(0_0_0_/0.25)] transition-[transform,box-shadow] hover:-translate-y-0.5 hover:shadow-[0_22px_50px_-32px_oklch(0_0_0_/0.3)]",
+        ring,
+        opts.className,
+      )}
+    >
+      <div className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
         {opts.label}
       </div>
-      <div className="mt-2 font-mono text-xl font-semibold tabular-nums tracking-tight text-foreground">
+      <div className="mt-2 font-[family-name:var(--font-heading)] text-2xl font-semibold tabular-nums tracking-tight text-foreground">
         {opts.value}
       </div>
       {opts.subtitle ? (
-        <div className="mt-1 font-mono text-[11px] tabular-nums text-muted-foreground">{opts.subtitle}</div>
+        <div className="mt-2 text-[12px] leading-snug text-muted-foreground">{opts.subtitle}</div>
       ) : null}
     </div>
   );
 }
 
 /**
- * Mirrors Streamlit `summary_cards.render_summary_cards` — same labels and fields
- * from `screening_summary` / `operational_metrics` so operators can cross-read API docs.
+ * Decision-grade summary metrics — aligns with hydrated screening payloads without surfacing schema jargon.
  */
 export function OperatorAlignedMetrics({ payload }: { payload: ScreeningSuccessResponse }) {
   const s = payload.screening_summary;
@@ -64,104 +63,170 @@ export function OperatorAlignedMetrics({ payload }: { payload: ScreeningSuccessR
   const mappingConf = Number(o.mapping_confidence ?? 0);
   const dq = Number(o.data_quality_score ?? 0);
 
-  let overallStatus: keyof typeof RISK_UI = "low";
-  if (criticalRecords > 0) overallStatus = "critical";
-  else if (highRiskOnly > 0) overallStatus = "high";
-  else if (mediumRisk > 0) overallStatus = "medium";
+  type PostureTone = "critical" | "elevated" | "watch" | "stable";
+  let overallTone: PostureTone = "stable";
+  if (criticalRecords > 0) overallTone = "critical";
+  else if (highRiskOnly > 0) overallTone = "elevated";
+  else if (mediumRisk > 0) overallTone = "watch";
 
-  const bannerColour = RISK_UI[overallStatus];
-  const bannerFg = overallStatus === "medium" ? "#111827" : "#ffffff";
+  const postureCopy: Record<
+    PostureTone,
+    { headline: string; body: string }
+  > = {
+    critical: {
+      headline: "Critical escalation posture",
+      body: `${criticalRecords} declaration${criticalRecords === 1 ? "" : "s"} require supervisory intervention before release.`,
+    },
+    elevated: {
+      headline: "High severity concentration",
+      body: `${highRiskOnly} high-tier declaration${highRiskOnly === 1 ? "" : "s"} need expedited investigative coverage.`,
+    },
+    watch: {
+      headline: "Residual medium-tier attention",
+      body: `${mediumRisk} declaration${mediumRisk === 1 ? "" : "s"} remain in measured review lanes.`,
+    },
+    stable: {
+      headline: "Stable compliance posture",
+      body: `No unresolved critical tier in this cohort (${totalRecords.toLocaleString("en-US")} declarations screened).`,
+    },
+  };
 
-  const fmtBig = (n: number) => n.toLocaleString("en-US");
   const pct01 = (x: number) => `${Math.min(999, Math.max(-999, x * 100)).toFixed(1)}%`;
-  const pct02 = (x: number) => `${Math.min(999, Math.max(-999, x * 100)).toFixed(2)}%`;
 
   const avgHybrid = Number(s.average_risk_score ?? o.average_risk_score ?? 0);
   const fraudAlerts = Number(o.fraud_alerts ?? 0);
 
   return (
     <div className="space-y-8">
-      {sectionTitle(
-        "Screening Summary",
-        "fields: screening_summary.total_records | cleared_records | flagged_records | high_risk_records | critical_records",
-      )}
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-        <MetricCard label="Total Shipments" value={fmtBig(totalRecords)} />
-        <MetricCard label="Cleared Records" value={fmtBig(clearedRecords)} />
-        <MetricCard label="Records Requiring Review" value={fmtBig(flaggedRecords)} />
-        <MetricCard label="High severity tier (excl. critical)" value={fmtBig(highRiskOnly)} />
-        <MetricCard label="Critical Cases" value={fmtBig(criticalRecords)} />
+      <div>
+        <h3 className="font-[family-name:var(--font-heading)] text-lg font-semibold tracking-tight text-foreground sm:text-xl">
+          Executive intelligence summary
+        </h3>
+        <p className="mt-2 max-w-3xl text-sm leading-relaxed text-muted-foreground">
+          {postureCopy[overallTone].body}
+        </p>
       </div>
-
-      {sectionTitle(
-        "Operational Exposure",
-        "counts from screening_summary; cohort % from operational_metrics.review_rate_percent & high_risk_rate_percent",
-      )}
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <MetricCard
-          label="Requires Review"
-          value={fmtBig(flaggedRecords)}
-          subtitle={`${reviewRatePct.toFixed(2)}% of cohort`}
-        />
-        <MetricCard
-          label="High Severity"
-          value={fmtBig(highSeverityCount)}
-          subtitle={`${combinedCriticalHighPct.toFixed(2)}% of cohort (severity critical ∪ high)`}
-        />
-        <MetricCard label="Critical Cases" value={fmtBig(criticalRecords)} />
-        <MetricCard label="Cleared" value={fmtBig(clearedRecords)} />
-      </div>
-
-      <p className="text-[11px] leading-relaxed text-muted-foreground">
-        Exposure reflects the screened cohort (n={fmtBig(totalRecords)}). Records Requiring Review follows operator{" "}
-        <span className="font-mono">requires_review</span> semantics (severity critical + high + medium). “High severity
-        tier” counts only severity <span className="font-mono">high</span>, excluding critical or medium — same wording as
-        the Streamlit Results dashboard.
-      </p>
-
-      {sectionTitle(
-        "Intelligence Quality",
-        "fields: operational_metrics.batch_risk_score | mapping_confidence | data_quality_score",
-      )}
-      <div className="grid gap-3 sm:grid-cols-3">
-        <MetricCard label="Batch Risk Score" value={pct01(batchRisk)} />
-        <MetricCard label="Mapping Confidence" value={pct02(mappingConf)} />
-        <MetricCard label="Data Quality Score" value={pct02(dq)} />
-      </div>
-
-      <p className="text-[11px] leading-relaxed text-muted-foreground">
-        Scores are percentages (0–100%) where shown: mapping and data quality encode how confidently the ingest layer
-        understood the file; batch risk summarises cluster-level anomaly pressure (same captions as Streamlit).
-      </p>
 
       <div
-        className="rounded-xl py-4 text-center text-base font-bold shadow-sm"
-        style={{ backgroundColor: bannerColour, color: bannerFg }}
+        className={cn(
+          "rounded-2xl border px-5 py-4 sm:flex sm:items-center sm:justify-between",
+          overallTone === "critical" && "border-[var(--semantic-critical)]/35 bg-[var(--semantic-critical-soft)]/55",
+          overallTone === "elevated" &&
+            "border-[var(--semantic-orange)]/35 bg-[var(--semantic-orange-soft)]/65",
+          overallTone === "watch" &&
+            "border-[var(--semantic-amber)]/35 bg-[var(--semantic-amber)]/[0.08]",
+          overallTone === "stable" &&
+            "border-[var(--semantic-emerald)]/35 bg-[var(--semantic-emerald-soft)]/55",
+        )}
       >
-        Operational Compliance Status: {overallStatus.toUpperCase()}
+        <div>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
+            Operational disposition
+          </p>
+          <p className="mt-2 font-[family-name:var(--font-heading)] text-xl font-semibold text-foreground">
+            {postureCopy[overallTone].headline}
+          </p>
+        </div>
+        <p className="mt-3 font-[family-name:var(--font-heading)] text-3xl font-semibold tabular-nums text-foreground sm:mt-0 sm:text-right">
+          {avgHybrid.toFixed(2)}
+          <span className="block text-[11px] font-normal uppercase tracking-[0.16em] text-muted-foreground">
+            mean calibrated exposure
+          </span>
+        </p>
       </div>
 
-      <p className="font-mono text-[10px] text-muted-foreground leading-relaxed">
-        Supplementary engine reads (not in Streamlit summary row): screening_summary.average_risk_score ={" "}
-        {avgHybrid.toFixed(4)} · operational_metrics.fraud_alerts = {fraudAlerts.toLocaleString("en-US")}
-      </p>
-
-      {(mappingConf > 0 && mappingConf < 0.65) || (dq > 0 && dq < 0.7) ? (
-        <div className="space-y-2 rounded-lg border border-amber-500/35 bg-amber-500/[0.06] p-4 text-[12px] text-foreground">
-          {mappingConf > 0 && mappingConf < 0.65 ? (
-            <p>
-              <span className="font-semibold">Low schema mapping confidence</span> (operational_metrics.
-              mapping_confidence &lt; 0.65) — inconsistent field shapes may attenuate ICC alignment.
-            </p>
-          ) : null}
-          {dq > 0 && dq < 0.7 ? (
-            <p>
-              <span className="font-semibold">Data quality degradation</span> (operational_metrics.data_quality_score
-              &lt; 0.70) — investigate missing tokens, coercion drift, or malformed rows upstream.
-            </p>
-          ) : null}
+      <div>
+        <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+          Cohort coverage
+        </p>
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+          <SurfaceMetric label="Declarations screened" value={totalRecords.toLocaleString("en-US")} />
+          <SurfaceMetric label="Released as compliant" value={clearedRecords.toLocaleString("en-US")} emphasis="positive" />
+          <SurfaceMetric
+            label="Routing to review"
+            value={flaggedRecords.toLocaleString("en-US")}
+            subtitle={`${reviewRatePct.toFixed(1)}% of cohort`}
+            emphasis={reviewRatePct >= 35 ? "pressure" : "neutral"}
+          />
+          <SurfaceMetric
+            label="High severity tier"
+            value={highRiskOnly.toLocaleString("en-US")}
+            emphasis={highRiskOnly > 0 ? "pressure" : "neutral"}
+          />
+          <SurfaceMetric label="Critical tier" value={criticalRecords.toLocaleString("en-US")} emphasis={criticalRecords > 0 ? "alert" : "neutral"} />
         </div>
-      ) : null}
+      </div>
+
+      <div>
+        <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+          Exposure ratios
+        </p>
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <SurfaceMetric
+            label="Share requiring disposition"
+            value={`${reviewRatePct.toFixed(1)}%`}
+            subtitle={`${flaggedRecords.toLocaleString("en-US")} declarations`}
+            emphasis={reviewRatePct >= 35 ? "pressure" : "neutral"}
+          />
+          <SurfaceMetric
+            label="Critical ∪ high prevalence"
+            value={`${combinedCriticalHighPct.toFixed(2)}%`}
+            subtitle={`${highSeverityCount.toLocaleString("en-US")} combined declarations`}
+          />
+          <SurfaceMetric label="Fraud escalation count" value={fraudAlerts.toLocaleString("en-US")} />
+          <SurfaceMetric
+            label="Batch anomaly pressure"
+            value={pct01(batchRisk)}
+            emphasis={batchRisk >= 0.33 ? "pressure" : "neutral"}
+          />
+        </div>
+      </div>
+
+      <div className="grid gap-8 lg:grid-cols-[1.1fr_minmax(0,0.95fr)]">
+        <div>
+          <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+            Intelligence fidelity
+          </p>
+          <div className="grid gap-3 sm:grid-cols-3">
+            <SurfaceMetric label="Batch pressure index" value={pct01(batchRisk)} />
+            <SurfaceMetric label="Schema alignment score" value={pct01(mappingConf)} />
+            <SurfaceMetric label="Dataset fitness score" value={pct01(dq)} />
+          </div>
+          <p className="mt-3 text-[12px] leading-relaxed text-muted-foreground">
+            Mapping and fitness communicate how faithfully the ingestion pass understood your headings and cell
+            completeness. Batch pressure summarises anomalies at the cohort level.
+          </p>
+        </div>
+        <div className="operational-surface rounded-2xl border border-dashed border-border/80 p-4">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+            Analyst note
+          </p>
+          <p className="mt-3 text-sm leading-relaxed text-foreground">
+            Mean cohort exposure sits at{" "}
+            <span className="font-semibold">{avgHybrid.toFixed(4)}</span>. Fraud escalation handlers recorded{" "}
+            <span className="font-semibold">{fraudAlerts.toLocaleString("en-US")}</span>.
+          </p>
+          {(mappingConf > 0 && mappingConf < 0.65) || (dq > 0 && dq < 0.7) ? (
+            <div className="mt-4 space-y-2 rounded-xl border border-[var(--semantic-amber)]/40 bg-[var(--semantic-amber)]/[0.08] px-3 py-2.5 text-[13px] text-foreground">
+              {mappingConf > 0 && mappingConf < 0.65 ? (
+                <p>
+                  Mapping confidence is below the controlled threshold — validate column synonyms before interpreting
+                  jurisdiction signals.
+                </p>
+              ) : null}
+              {dq > 0 && dq < 0.7 ? (
+                <p>
+                  Dataset fitness is degraded — reconcile missing counterparties or malformed dates upstream.
+                </p>
+              ) : null}
+            </div>
+          ) : (
+            <p className="mt-3 text-xs text-muted-foreground">
+              Structured intelligence inputs look healthy enough for escalation packets without ingest caveats.
+            </p>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

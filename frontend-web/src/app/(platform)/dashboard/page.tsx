@@ -10,7 +10,7 @@ export default function DashboardPage() {
         <DashboardDecisionSurface />
       </div>
       <div className="lg:col-span-4 xl:col-span-3">
-        <div className="lg:sticky lg:top-24">
+        <div className="lg:sticky lg:top-[5.5rem]">
           <WorkflowStatusRail />
         </div>
       </div>

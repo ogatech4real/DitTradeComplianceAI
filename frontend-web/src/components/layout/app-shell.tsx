@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 
 import { AppHeader } from "@/components/layout/app-header";
 import { AppSidebar } from "@/components/layout/app-sidebar";
+import { WorkspaceAtmosphere } from "@/components/layout/workspace-atmosphere";
 
 interface AppShellProps {
   title: string;
@@ -15,11 +16,14 @@ export function AppShell({
   children,
 }: AppShellProps) {
   return (
-    <div className="flex min-h-dvh bg-background">
+    <div className="relative flex min-h-dvh overflow-hidden bg-background">
+      <WorkspaceAtmosphere />
       <AppSidebar />
-      <div className="flex min-w-0 flex-1 flex-col">
+      <div className="relative flex min-w-0 flex-1 flex-col">
         <AppHeader title={title} description={description} />
-        <main className="flex-1 px-4 py-6 sm:px-6 lg:px-8">{children}</main>
+        <main className="relative flex-1 px-4 py-6 sm:px-6 lg:px-10 lg:py-10">
+          {children}
+        </main>
       </div>
     </div>
   );

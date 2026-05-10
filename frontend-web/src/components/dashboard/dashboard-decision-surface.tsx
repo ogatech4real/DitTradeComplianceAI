@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { motion } from "framer-motion";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,20 +14,27 @@ import { ExecutiveBriefPanel } from "@/components/dashboard/executive-brief-pane
 import { ExplainabilityDecisionPanel } from "@/components/dashboard/explainability-decision-panel";
 import { FraudGovernancePanel } from "@/components/dashboard/fraud-governance-panel";
 import { IntelligenceQualityRail } from "@/components/dashboard/intelligence-quality-rail";
+import { NarrativeIntelligenceStrip } from "@/components/dashboard/narrative-intelligence-strip";
 import { JurisdictionExposureChart } from "@/components/dashboard/jurisdiction-exposure-chart";
 import { SeverityConcentrationChart } from "@/components/dashboard/severity-concentration-chart";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { buttonVariants } from "@/components/ui/button";
 import { shouldUseMockApi } from "@/lib/api/mock-mode";
 
 function EmptyDecisionState({ message }: { message?: string }) {
   return (
-    <div className="enterprise-surface rounded-xl border border-dashed p-12 text-center">
-      <p className="text-sm font-medium text-foreground">No hydrated intelligence layer</p>
-      <p className="mx-auto mt-2 max-w-md text-xs text-muted-foreground leading-relaxed">
-        {message ??
-          "Run the upload pipeline to populate operational metrics and governance surfaces. Toggle `NEXT_PUBLIC_MOCK_PREFILL_RESULTS` for deterministic demo data."}
+    <div className="operational-surface rounded-2xl border border-dashed border-border/80 p-12 text-center">
+      <p className="font-[family-name:var(--font-heading)] text-lg font-semibold text-foreground">
+        No decision intelligence loaded
       </p>
+      <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-muted-foreground">
+        {message ??
+          "Import a declaration file from the workspace home to hydrate screening outputs. Operators with demo deployments can enable deterministic sample data via environment flags."}
+      </p>
+      <Link href="/" className={buttonVariants({ className: "mt-8" })}>
+        Return to workspace home
+      </Link>
     </div>
   );
 }
@@ -36,9 +44,9 @@ export function DashboardDecisionSurface() {
 
   if (q.isPending) {
     return (
-      <div className="space-y-4">
-        <Skeleton className="h-24 w-full rounded-xl" />
-        <Skeleton className="h-48 w-full rounded-xl" />
+      <div className="space-y-5">
+        <Skeleton className="h-36 w-full rounded-2xl" />
+        <Skeleton className="h-56 w-full rounded-2xl" />
       </div>
     );
   }
@@ -48,7 +56,7 @@ export function DashboardDecisionSurface() {
       <EmptyDecisionState
         message={
           q.isError
-            ? "Latest results unreachable — verify API URL or enable mock transports."
+            ? "We could not reach the screening results service. Confirm connectivity from this browser session."
             : undefined
         }
       />
@@ -56,61 +64,86 @@ export function DashboardDecisionSurface() {
   }
 
   if (!isLatestResultsSuccess(q.data)) {
-    return <EmptyDecisionState message="Unexpected latest-results payload shape." />;
+    return <EmptyDecisionState message="The intelligence response did not match the expected production shape." />;
   }
 
   const payload = q.data as ScreeningSuccessResponse;
 
   return (
     <motion.div
-      className="space-y-8"
+      className="space-y-10"
       initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.28, ease: "easeOut" }}
+      transition={{ duration: 0.3, ease: "easeOut" }}
     >
-      <div className="flex flex-wrap items-center gap-2">
+      <div className="flex flex-wrap items-center gap-3">
         {shouldUseMockApi() ? (
-          <Badge
-            variant="outline"
-            className="border-amber-500/35 bg-amber-500/[0.08] font-mono text-[10px] uppercase tracking-wider"
-          >
-            Mock transport
+          <Badge variant="outline" className="border-[var(--semantic-amber)]/40 bg-[var(--semantic-amber)]/[0.1] font-normal text-[11px] text-[var(--semantic-amber-fg)]">
+            Demo data mode · outcomes are illustrative
           </Badge>
         ) : null}
-        <Badge variant="secondary" className="font-mono text-[10px] uppercase">
-          Decision layer v1
-        </Badge>
+        <span className="text-[13px] text-muted-foreground">
+          Showing the latest hydrated screening cohort for this session.
+        </span>
       </div>
 
+      {/* Section 1 */}
       <OperatorAlignedMetrics payload={payload} />
+
+      {/* Section 2 — signature narrative strip */}
+      <NarrativeIntelligenceStrip payload={payload} />
 
       <ExecutiveBriefPanel payload={payload} />
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <Card className="enterprise-surface border-border/80 shadow-none">
+      {/* Section 3 — asymmetrical operational grid */}
+      <div className="grid gap-6 xl:grid-cols-12">
+        <Card className="operational-surface border-border/80 shadow-none xl:col-span-5">
           <CardHeader className="pb-0">
-            <CardTitle className="text-base font-semibold">Risk topology</CardTitle>
+            <CardTitle className="font-[family-name:var(--font-heading)] text-base font-semibold">
+              Severity concentration
+            </CardTitle>
+            <p className="text-[13px] text-muted-foreground">
+              Disposition tiers across screened declarations — informs reserve capacity planning.
+            </p>
           </CardHeader>
           <CardContent className="pt-4">
             <SeverityConcentrationChart payload={payload} />
           </CardContent>
         </Card>
-        <Card className="enterprise-surface border-border/80 shadow-none">
-          <CardHeader className="pb-0">
-            <CardTitle className="text-base font-semibold">Jurisdiction posture</CardTitle>
-          </CardHeader>
-          <CardContent className="pt-4">
-            <JurisdictionExposureChart payload={payload} />
-          </CardContent>
-        </Card>
+
+        <div className="space-y-6 xl:col-span-7">
+          <Card className="operational-surface border-border/80 shadow-none">
+            <CardHeader className="pb-0">
+              <CardTitle className="font-[family-name:var(--font-heading)] text-base font-semibold">
+                Jurisdiction exposure
+              </CardTitle>
+              <p className="text-[13px] text-muted-foreground">
+                Comparative routing pressure by market corridor — aligns with escalation geography.
+              </p>
+            </CardHeader>
+            <CardContent className="pt-4">
+              <JurisdictionExposureChart payload={payload} />
+            </CardContent>
+          </Card>
+
+          <div className="grid gap-6 lg:grid-cols-2">
+            <FraudGovernancePanel payload={payload} />
+            <ExplainabilityDecisionPanel payload={payload} />
+          </div>
+        </div>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <FraudGovernancePanel payload={payload} />
-        <ExplainabilityDecisionPanel payload={payload} />
-      </div>
-
+      {/* Section 4 */}
       <IntelligenceQualityRail payload={payload} />
+
+      <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-border/80 bg-muted/25 px-5 py-4">
+        <p className="text-sm text-muted-foreground">
+          Move from macro posture to investigative evidence with filters, severity ribbons, and narrative drawers.
+        </p>
+        <Link href="/review" className={buttonVariants({ variant: "secondary" })}>
+          Open investigation workspace
+        </Link>
+      </div>
     </motion.div>
   );
 }
