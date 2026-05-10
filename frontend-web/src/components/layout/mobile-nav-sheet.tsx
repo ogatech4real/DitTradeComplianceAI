@@ -15,6 +15,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { PUBLIC_PLATFORM_LINKS } from "@/components/layout/public-platform-mini-nav";
 import { mainNavItems } from "@/components/layout/nav-config";
 
 export function MobileNavSheet() {
@@ -64,6 +65,32 @@ export function MobileNavSheet() {
               </Link>
             );
           })}
+          <div className="mx-3 my-4 border-t border-[color-mix(in_oklch,var(--brand-secondary)_30%,transparent)] pt-4">
+            <p className="px-3 pb-2 text-[10px] font-bold uppercase tracking-[0.2em] text-primary">
+              Public platform
+            </p>
+            {PUBLIC_PLATFORM_LINKS.map((item) => {
+              const isHome = item.href === "/";
+              const active = isHome
+                ? pathname === "/" || pathname === ""
+                : pathname === item.href || pathname.startsWith(`${item.href}/`);
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={() => setOpen(false)}
+                  className={cn(
+                    "mx-3 flex rounded-lg px-3 py-2.5 text-[13px] font-semibold transition-colors last:mb-2",
+                    active
+                      ? "bg-primary text-primary-foreground"
+                      : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                  )}
+                >
+                  {item.label}
+                </Link>
+              );
+            })}
+          </div>
         </nav>
       </SheetContent>
     </Sheet>

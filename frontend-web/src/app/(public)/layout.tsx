@@ -9,7 +9,7 @@ export default function PublicSiteLayout({
   children: ReactNode;
 }) {
   return (
-    <div className="flex min-h-dvh flex-col bg-[var(--marketing-canvas)] text-foreground">
+    <div className="relative flex min-h-dvh flex-col bg-[color-mix(in_oklch,var(--marketing-canvas)_78%,transparent)] text-foreground backdrop-blur-[2px]">
       <MarketingHeader />
       <main className="flex-1">{children}</main>
       <MarketingFooter />

@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { navSections } from "@/components/layout/nav-config";
 import { isWorkspaceNavActive } from "@/lib/nav-active";
+import { PublicPlatformMiniNav } from "@/components/layout/public-platform-mini-nav";
 
 export function AppSidebar() {
   const pathname = usePathname();
@@ -19,14 +20,15 @@ export function AppSidebar() {
     >
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_130%_90%_at_50%_-20%,oklch(0.55_0.1_264_/_0.12),transparent_55%)]" />
       <div className="relative border-b border-sidebar-border/80 px-5 py-5">
-        <div className="text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
+        <div className="text-[11px] font-semibold uppercase tracking-[0.22em] text-primary/80">
           Digital Trade
         </div>
-        <div className="mt-1.5 font-[family-name:var(--font-heading)] text-[15px] font-semibold leading-tight tracking-tight">
+        <div className="mt-1.5 bg-[linear-gradient(92deg,var(--foreground),color-mix(in_oklch,var(--foreground)_55%,var(--brand-secondary)_45%))] bg-clip-text font-[family-name:var(--font-heading)] text-[15px] font-semibold leading-tight tracking-tight text-transparent">
           Compliance intelligence
         </div>
       </div>
-      <nav className="relative flex flex-1 flex-col gap-6 overflow-y-auto p-3 pb-6">
+      <PublicPlatformMiniNav />
+      <nav className="relative flex flex-1 flex-col gap-6 overflow-y-auto p-3 pb-6 pt-5">
         {navSections.map((section) => (
           <div key={section.heading}>
             <p className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground/90">
@@ -43,8 +45,8 @@ export function AppSidebar() {
                     className={cn(
                       "group flex items-start gap-2.5 rounded-xl px-3 py-2.5 text-[13px] font-medium transition-all duration-200",
                       active
-                        ? "bg-sidebar-accent text-sidebar-accent-foreground shadow-[0_1px_0_oklch(0_0_0_/0.05)] ring-1 ring-sidebar-ring/35"
-                        : "text-muted-foreground hover:bg-sidebar-accent/65 hover:text-sidebar-accent-foreground",
+                        ? "bg-[linear-gradient(110deg,color-mix(in_oklch,var(--sidebar-accent)_94%,transparent),color-mix(in_oklch,var(--brand-secondary-soft)_82%,transparent))] text-sidebar-accent-foreground shadow-md shadow-[color-mix(in_oklch,var(--primary)_18%,transparent)] ring-2 ring-[color-mix(in_oklch,var(--brand-secondary)_45%,transparent)]"
+                        : "text-muted-foreground hover:bg-sidebar-accent/80 hover:text-sidebar-accent-foreground hover:ring-1 hover:ring-primary/20",
                     )}
                   >
                     <Icon

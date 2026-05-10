@@ -80,7 +80,8 @@ export function PublicHomePage() {
     <>
       <HeroExecutiveSurface />
 
-      <section className="mx-auto max-w-6xl px-4 py-24 sm:px-6 lg:px-8">
+      <section className="relative mx-auto max-w-6xl px-4 py-24 sm:px-6 lg:px-8">
+        <div className="pointer-events-none absolute left-8 top-[18%] h-52 w-52 rounded-full bg-[radial-gradient(circle,color-mix(in_oklch,var(--primary)_26%,transparent),transparent_72%)] blur-3xl" />
         <div className="grid gap-12 lg:grid-cols-[1fr_minmax(0,1.15fr)] lg:gap-16">
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
@@ -112,10 +113,10 @@ export function PublicHomePage() {
         </div>
       </section>
 
-      <section className="border-y border-border/50 bg-muted/25">
-        <div className="mx-auto max-w-6xl px-4 py-24 sm:px-6 lg:px-8">
+      <section className="surface-spotlight border-y border-[color-mix(in_oklch,var(--brand-secondary)_32%,var(--border))] bg-[linear-gradient(172deg,color-mix(in_oklch,var(--muted)_92%,transparent),color-mix(in_oklch,var(--accent-intelligence-soft)_45%,transparent))] py-[1px]">
+        <div className="relative z-[1] mx-auto max-w-6xl px-4 py-24 sm:px-6 lg:px-8">
           <div className="max-w-3xl space-y-4">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-primary/90">
               Section 03 · engineered capabilities
             </p>
             <h2 className="font-[family-name:var(--font-heading)] text-2xl font-semibold tracking-tight sm:text-3xl">
@@ -136,10 +137,10 @@ export function PublicHomePage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, margin: "-40px" }}
                   transition={{ duration: 0.35, delay: idx * 0.04 }}
-                  className="group rounded-2xl border border-border/70 bg-card/95 p-5 shadow-[0_22px_50px_-40px_oklch(0_0_0_/0.3)] transition-transform duration-300 hover:-translate-y-1"
+                  className="group rounded-2xl border border-[color-mix(in_oklch,var(--border)_74%,var(--brand-secondary)_26%)] bg-[linear-gradient(160deg,var(--card),color-mix(in_oklch,var(--accent-intelligence-soft)_55%,var(--card)))] p-5 shadow-[0_26px_64px_-40px_color-mix(in_oklch,var(--primary)_42%,transparent)] transition-all duration-300 hover:-translate-y-1.5 hover:border-primary/55 hover:shadow-[0_32px_70px_-36px_color-mix(in_oklch,var(--brand-secondary)_52%,transparent)]"
                 >
                   <Icon
-                    className="size-[22px] text-[color-mix(in_oklch,var(--primary),transparent_35%)] transition-colors group-hover:text-primary"
+                    className="size-[22px] text-[color-mix(in_oklch,var(--brand-secondary)_88%,transparent)] transition-colors group-hover:text-primary"
                     strokeWidth={1.5}
                     aria-hidden
                   />
@@ -172,10 +173,10 @@ export function PublicHomePage() {
             confidence — suitable for stakeholder decks without exposing internal identifiers.
           </p>
         </div>
-        <div className="relative mt-16 border-l border-dashed border-border/80 pl-8 sm:pl-12 lg:max-w-[40rem]">
+        <div className="relative mt-16 rounded-3xl border border-[color-mix(in_oklch,var(--brand-secondary)_28%,var(--border))] bg-[linear-gradient(90deg,color-mix(in_oklch,var(--muted)_82%,transparent),transparent)] px-6 py-8 pl-8 sm:pl-12 lg:max-w-[44rem]">
           {WORKFLOW.map((step, idx) => (
             <div key={step} className="relative pb-14 last:pb-0">
-              <div className="absolute top-1 -left-[41px] flex size-[22px] items-center justify-center rounded-full border-2 border-primary bg-[var(--marketing-canvas)] sm:-left-[49px]" />
+              <div className="absolute top-1 -left-[43px] flex size-[24px] items-center justify-center rounded-full border-2 border-[color-mix(in_oklch,var(--brand-secondary)_75%,transparent)] bg-[linear-gradient(135deg,var(--primary),var(--brand-secondary))] shadow-md shadow-[color-mix(in_oklch,var(--brand-secondary)_40%,transparent)] sm:-left-[51px]" />
               <div className="flex flex-wrap items-baseline gap-3">
                 <ListOrdered className="size-[18px] text-primary" aria-hidden />
                 <span className="font-medium text-muted-foreground">Stage {idx + 1}</span>
@@ -192,7 +193,7 @@ export function PublicHomePage() {
         </div>
       </section>
 
-      <section className="border-t border-border/50 bg-gradient-to-b from-[var(--accent-intelligence-soft)]/55 to-transparent py-24">
+      <section className="relative overflow-hidden border-t border-[color-mix(in_oklch,var(--brand-secondary)_32%,var(--border))] bg-[linear-gradient(168deg,color-mix(in_oklch,var(--accent-intelligence-soft)_70%,transparent),color-mix(in_oklch,var(--brand-tertiary-soft)_38%,transparent),transparent)] py-28">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <div className="grid gap-14 lg:grid-cols-[1fr_minmax(0,1fr)] lg:gap-16">
             <div className="space-y-4">

@@ -8,7 +8,11 @@ import { buttonVariants } from "@/components/ui/button";
 
 function TradeTopologyGraphic() {
   return (
-    <div className="relative aspect-[5/4] min-h-[220px] w-full overflow-hidden rounded-2xl border border-border/50 bg-gradient-to-br from-muted/40 via-card/80 to-[var(--accent-intelligence-soft)]/40 shadow-[inset_0_0_0_1px_oklch(1_0_0_/0.5)]">
+    <motion.div
+      className="relative aspect-[5/4] min-h-[220px] w-full overflow-hidden rounded-[1.75rem] border-2 border-[color-mix(in_oklch,var(--primary)_40%,var(--border))] bg-[linear-gradient(155deg,color-mix(in_oklch,var(--muted)_55%,transparent),color-mix(in_oklch,var(--accent-intelligence-soft)_70%,transparent),color-mix(in_oklch,var(--brand-tertiary-soft)_82%,transparent))] shadow-[0_28px_80px_-44px_color-mix(in_oklch,var(--brand-secondary)_52%,transparent),inset_0_1px_0_color-mix(in_oklch,white_70%,transparent)]"
+      animate={{ rotate: [0, 0.2, 0], scale: [1, 1.01, 1] }}
+      transition={{ duration: 16, repeat: Infinity, ease: "easeInOut" }}
+    >
       <svg
         viewBox="0 0 400 320"
         className="absolute inset-0 size-full opacity-[0.45]"
@@ -18,7 +22,7 @@ function TradeTopologyGraphic() {
       >
         <motion.path
           d="M20 260 C110 210 120 140 210 118 S320 140 382 94"
-          stroke="var(--accent-governance)"
+          stroke="var(--brand-secondary)"
           strokeWidth="1.35"
           strokeLinecap="round"
           strokeDasharray="6 11"
@@ -28,7 +32,7 @@ function TradeTopologyGraphic() {
         />
         <motion.path
           d="M48 92 C136 146 218 164 294 226 S376 274 392 274"
-          stroke="var(--chart-3)"
+          stroke="var(--brand-tertiary)"
           strokeWidth="1.05"
           strokeLinecap="round"
           opacity={0.7}
@@ -38,7 +42,7 @@ function TradeTopologyGraphic() {
         />
         <motion.path
           d="M296 54 C258 132 216 206 174 274"
-          stroke="var(--accent-intelligence)"
+          stroke="var(--primary)"
           strokeWidth={0.9}
           strokeLinecap="round"
           opacity={0.55}
@@ -58,7 +62,7 @@ function TradeTopologyGraphic() {
             cx={cx}
             cy={cy}
             r="4"
-            fill="var(--primary)"
+            fill="color-mix(in oklch, var(--primary) 60%, var(--brand-secondary))"
             initial={{ opacity: 0 }}
             animate={{ opacity: [0, 1, 0.75] }}
             transition={{ duration: 1.2, delay }}
@@ -69,8 +73,8 @@ function TradeTopologyGraphic() {
         className="pointer-events-none absolute inset-0 opacity-[0.14]"
         style={{
           backgroundImage: `
-          linear-gradient(96deg, oklch(0.52 0.12 258 / 42%) 0.5px, transparent 0.5px),
-          linear-gradient(12deg, oklch(0.52 0.1 210 / 32%) 0.5px, transparent 0.5px)`,
+          linear-gradient(96deg, color-mix(in oklch, var(--brand-secondary) 38%, transparent) 0.5px, transparent 0.5px),
+          linear-gradient(12deg, color-mix(in oklch, var(--brand-tertiary) 32%, transparent) 0.5px, transparent 0.5px)`,
           backgroundSize: "32px 32px, 28px 28px",
         }}
       />
@@ -78,14 +82,15 @@ function TradeTopologyGraphic() {
         Abstract trade-flow topology illustrating jurisdiction crossings and supervisory routing — illustrative geometry,
         not live transaction data.
       </p>
-    </div>
+    </motion.div>
   );
 }
 
 export function HeroExecutiveSurface() {
   return (
-    <section className="relative border-b border-border/50 bg-gradient-to-b from-[var(--marketing-canvas)] via-transparent to-muted/15">
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-[28rem] bg-[radial-gradient(ellipse_80%_58%_at_60%_-8%,var(--accent-intelligence)_/_0.11,transparent_58%)]" />
+    <section className="relative overflow-hidden border-b border-[color-mix(in_oklch,var(--brand-secondary)_28%,var(--border))] bg-[linear-gradient(185deg,var(--marketing-canvas),color-mix(in_oklch,var(--muted)_65%,transparent),color-mix(in_oklch,var(--accent-intelligence-soft)_35%,transparent))]">
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-[32rem] bg-[radial-gradient(ellipse_90%_60%_at_72%_-6%,color-mix(in_oklch,var(--brand-secondary)_38%,transparent),transparent_60%)]" />
+      <div className="pointer-events-none absolute -left-[20%] top-28 h-[22rem] w-[22rem] rounded-full bg-[radial-gradient(circle,color-mix(in_oklch,var(--brand-tertiary)_32%,transparent),transparent_62%)] blur-3xl" />
       <div className="relative mx-auto grid max-w-6xl gap-14 px-4 py-20 sm:px-6 lg:grid-cols-12 lg:items-center lg:gap-16 lg:px-8 lg:py-28">
         <motion.div
           className="min-w-0 lg:col-span-6"
@@ -93,11 +98,11 @@ export function HeroExecutiveSurface() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
         >
-          <p className="text-[11px] font-semibold uppercase tracking-[0.26em] text-muted-foreground">
+          <p className="inline-flex rounded-full border border-[color-mix(in_oklch,var(--brand-secondary)_40%,transparent)] bg-[color-mix(in_oklch,var(--primary)_10%,transparent)] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-primary">
             AI-assisted governance · digital trade ecosystems
           </p>
-          <h1 className="mt-5 font-[family-name:var(--font-heading)] text-[clamp(1.95rem,4.4vw,2.95rem)] font-semibold leading-[1.1] tracking-tight text-foreground">
-            AI-Assisted Digital Trade Compliance Intelligence
+          <h1 className="mt-6 font-[family-name:var(--font-heading)] text-[clamp(1.95rem,4.4vw,3.05rem)] font-semibold leading-[1.06] tracking-tight text-[color-mix(in_oklch,var(--foreground)_94%,var(--primary)_6%)]">
+            AI-Assisted Digital Trade <span className="text-gradient-brand">Compliance Intelligence</span>
           </h1>
           <p className="mt-6 max-w-xl text-[1.0625rem] leading-relaxed text-muted-foreground">
             Operational screening, explainable compliance analytics, fraud intelligence, and jurisdiction-aware governance
