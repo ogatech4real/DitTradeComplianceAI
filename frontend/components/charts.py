@@ -1063,12 +1063,18 @@ class Charts:
 
         backlog_count_disp: str
 
-        rr_help = (
-            "Share of screened rows in the operational review backlog "
-            "(requires_review-aligned rule)."
-            if can_quantify_review
-            else "Needs workflow fields that define operational review backlog.",
-        )
+        if can_quantify_review:
+
+            rr_help = (
+                "Share of screened rows in the operational review backlog "
+                "(requires_review-aligned rule)."
+            )
+
+        else:
+
+            rr_help = (
+                "Needs workflow fields that define operational review backlog."
+            )
 
         if (
             backlog_state == "no_mask"
