@@ -5,102 +5,88 @@ import { motion } from "framer-motion";
 
 import { WORKSPACE_ROUTES } from "@/lib/workspace-routes";
 import { HeroIntelligenceTopology } from "@/components/marketing/hero-intelligence-topology";
-import { MarketingCaptionFigure } from "@/components/marketing/marketing-caption-figure";
 import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 export function HeroExecutiveSurface() {
   return (
     <section className="relative overflow-hidden border-b border-border/60">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_85%_60%_at_70%_-8%,color-mix(in_oklch,var(--primary)_18%,transparent),transparent_55%)]" />
-      <div className="relative mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:grid lg:grid-cols-12 lg:items-center lg:gap-x-12 lg:gap-y-10 lg:px-8 lg:py-24">
+      <div className="pointer-events-none absolute inset-0 home-hero-glow" />
+      <div className="relative mx-auto max-w-6xl px-4 py-14 sm:px-6 lg:grid lg:grid-cols-12 lg:items-stretch lg:gap-x-10 lg:px-8 lg:py-20">
         <motion.div
-          className="min-w-0 lg:col-span-6"
-          initial={{ opacity: 0, y: 16 }}
+          className="flex min-w-0 flex-col justify-center lg:col-span-6"
+          initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
         >
-          <p className="public-kicker">Public platform</p>
-          <h1 className="mt-5 font-[family-name:var(--font-heading)] text-[clamp(2rem,4.8vw,3.35rem)] font-semibold leading-[1.06] tracking-tight text-foreground">
-            AI-Assisted Digital Trade{" "}
-            <span className="text-gradient-brand">Compliance Intelligence</span>
+          <p className="public-kicker">Digital trade compliance</p>
+          <h1 className="mt-4 text-[clamp(1.85rem,4.2vw,2.85rem)] font-semibold leading-[1.08] text-foreground">
+            AI-assisted digital trade{" "}
+            <span className="text-gradient-home">compliance intelligence</span>
           </h1>
-          <p className="mt-6 max-w-xl text-[1.0625rem] leading-relaxed text-muted-foreground">
-            Operational screening, explainable compliance analytics, fraud intelligence, and jurisdiction-aware governance for
-            modern digital trade ecosystems.
+          <p className="mt-5 max-w-xl text-muted-foreground">
+            Screening, explainable analytics, fraud and batch signals, and jurisdiction-aware governance — built for teams that
+            adjudicate real filings, not slide decks alone.
           </p>
 
-          <div className="mt-8 rounded-2xl border border-border/80 bg-card/50 p-5 backdrop-blur-sm">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[color-mix(in_oklch,var(--primary)_88%,var(--foreground)_12%)]">
-              Subject under evaluation
+          <div className="mt-7 rounded-xl border border-border/70 bg-card/45 px-4 py-4 backdrop-blur-sm sm:px-5">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[color-mix(in_oklch,var(--home-accent)_82%,var(--foreground)_18%)]">
+              What we evaluate
             </p>
-            <p className="mt-3 text-[15px] font-medium leading-snug text-foreground/95">
-              Cross-border declarations, origin and product attestations, and traceability-aligned evidence — harmonised for
-              hybrid AI-and-rules scoring, then advanced into review-ready explainability and human disposition.
+            <p className="mt-2 text-[15px] leading-snug text-foreground/95">
+              Declarations, attestations, and traceability evidence — scored with hybrid rules and models, then handed to
+              reviewers with explainability and a clear disposition path.
             </p>
           </div>
 
-          <div className="mt-10 flex flex-wrap gap-3">
+          <div className="mt-9 flex flex-wrap gap-3">
             <Link
               href={WORKSPACE_ROUTES.home}
-              className={buttonVariants({ size: "lg", className: "rounded-lg px-7 font-semibold" })}
+              className={cn(buttonVariants({ size: "lg" }), "home-cta-primary rounded-lg px-7 font-semibold")}
             >
               Launch workspace
             </Link>
             <Link
               href="/platform"
-              className={buttonVariants({ variant: "outline", size: "lg", className: "rounded-lg px-7 font-semibold" })}
+              className={cn(
+                buttonVariants({ variant: "outline", size: "lg" }),
+                "home-cta-outline rounded-lg px-7 font-semibold",
+              )}
             >
-              Explore platform
+              Platform
             </Link>
             <Link
               href="/research"
               className={buttonVariants({
                 variant: "ghost",
                 size: "lg",
-                className: "rounded-lg px-5 text-muted-foreground hover:text-foreground",
+                className: "rounded-lg px-4 text-muted-foreground hover:text-foreground",
               })}
             >
-              Research &amp; innovation
+              Research
             </Link>
           </div>
         </motion.div>
 
         <motion.div
-          className="relative mt-14 lg:col-span-6 lg:mt-0"
-          initial={{ opacity: 0, y: 22 }}
+          className="relative mt-12 flex lg:col-span-6 lg:mt-0"
+          initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1], delay: 0.05 }}
+          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1], delay: 0.04 }}
         >
-          <div className="relative overflow-hidden rounded-[1.75rem] border border-border/70 bg-[color-mix(in_oklch,var(--card)_42%,transparent)] shadow-[0_40px_100px_-48px_color-mix(in_oklch,var(--foreground)_35%,transparent)]">
-            <div className="public-site-hero-grid pointer-events-none absolute inset-0 opacity-[0.28]" />
-            <div className="relative px-5 pb-2 pt-8 sm:px-8 sm:pt-10">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
-                Operational intelligence visual
+          <div className="relative flex w-full flex-col justify-center overflow-hidden rounded-2xl border border-border/70 bg-[color-mix(in_oklch,var(--card)_38%,transparent)] p-6 sm:p-8">
+            <div className="public-site-hero-grid pointer-events-none absolute inset-0 opacity-[0.22]" />
+            <div className="relative">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">Flow sketch</p>
+              <p className="mt-2 max-w-sm text-sm text-muted-foreground">
+                Abstract routes and nodes — not live data or proprietary graphs.
               </p>
-              <p className="mt-2 max-w-sm text-sm leading-relaxed text-muted-foreground">
-                Abstract topology — jurisdiction-tinged routes and documentation nodes — not live filings or proprietary graph
-                data.
-              </p>
-              <div className="mt-6">
-                <HeroIntelligenceTopology className="mx-auto h-[min(220px,42vw)] w-full max-w-lg sm:h-[260px]" />
+              <div className="mt-5">
+                <HeroIntelligenceTopology
+                  accent="home"
+                  className="mx-auto h-[min(200px,38vw)] w-full max-w-md sm:h-[240px]"
+                />
               </div>
-            </div>
-            <div className="relative border-t border-border/50 bg-[color-mix(in_oklch,var(--background)_35%,transparent)] p-4 sm:p-5">
-              <MarketingCaptionFigure
-                src="/marketing/hero-trade-evaluation.png"
-                priority
-                alt="Stylised trade-corridor visualisation for narrative context only — not operational telemetry."
-                captionLabel="Caption"
-                caption={
-                  <>
-                    Filings read as an evidence network: corridors, attestations, and supervisory cues converge so stakeholders
-                    immediately recognise{" "}
-                    <span className="text-white">what is being evaluated</span> before opening the workspace.
-                  </>
-                }
-                className="!rounded-2xl !border-2 !border-border/55 shadow-none"
-                aspectClassName="aspect-[16/10] min-h-[180px] w-full"
-              />
             </div>
           </div>
         </motion.div>

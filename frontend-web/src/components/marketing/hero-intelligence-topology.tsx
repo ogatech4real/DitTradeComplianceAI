@@ -1,9 +1,18 @@
 "use client";
 
+import { cn } from "@/lib/utils";
+
 /**
  * Abstract trade-flow / jurisdiction mesh — decorative only, not operational data.
  */
-export function HeroIntelligenceTopology({ className }: { className?: string }) {
+export function HeroIntelligenceTopology({
+  className,
+  accent = "default",
+}: {
+  className?: string;
+  /** `home` picks up `.home-surface` orange topology tint when wrapped on the homepage. */
+  accent?: "default" | "home";
+}) {
   return (
     <div
       className={className}
@@ -11,7 +20,10 @@ export function HeroIntelligenceTopology({ className }: { className?: string }) 
     >
       <svg
         viewBox="0 0 560 420"
-        className="h-full w-full text-[color-mix(in_oklch,var(--primary)_55%,transparent)]"
+        className={cn(
+          "h-full w-full",
+          accent === "home" ? "home-topology-svg" : "text-[color-mix(in_oklch,var(--primary)_55%,transparent)]",
+        )}
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
       >

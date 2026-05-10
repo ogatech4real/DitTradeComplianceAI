@@ -274,6 +274,38 @@
   );
 }
 
+/*
+ * Homepage (/) only — warm orange–gold accent + Inter-first copy for readability.
+ * Scoped under .public-site.dark alongside .home-surface wrapper.
+ */
+.public-site.dark .home-surface {
+  --home-accent: oklch(0.76 0.12 82);
+  --home-accent-deep: oklch(0.6 0.15 58);
+  --home-accent-fg: oklch(0.14 0.03 75);
+  --gradient-home: linear-gradient(
+    118deg,
+    oklch(0.62 0.16 55),
+    oklch(0.8 0.1 92)
+  );
+  --home-topology-fg: color-mix(in oklch, var(--home-accent) 52%, transparent);
+
+  font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  font-size: 15px;
+  line-height: 1.65;
+}
+
+.public-site.dark .home-surface h1,
+.public-site.dark .home-surface h2,
+.public-site.dark .home-surface h3 {
+  font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.public-site.dark .home-surface .public-kicker {
+  color: color-mix(in oklch, var(--home-accent) 68%, var(--muted-foreground) 32%);
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -396,5 +428,54 @@
 
   .public-kicker {
     @apply text-[11px] font-semibold uppercase tracking-[0.28em] text-muted-foreground;
+  }
+
+  .text-gradient-home {
+    background-image: var(--gradient-home);
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+  }
+
+  .public-site.dark .home-surface .home-hero-glow {
+    background: radial-gradient(
+      ellipse 85% 60% at 72% -8%,
+      color-mix(in oklch, var(--home-accent) 20%, transparent),
+      transparent 58%
+    );
+  }
+
+  .public-site.dark .home-surface .home-cta-primary {
+    border-color: transparent !important;
+    background-image: linear-gradient(
+      134deg,
+      var(--home-accent-deep),
+      color-mix(in oklch, var(--home-accent) 92%, white 8%)
+    ) !important;
+    color: var(--home-accent-fg) !important;
+    box-shadow: 0 14px 40px -18px color-mix(in oklch, var(--home-accent) 45%, transparent);
+  }
+
+  .public-site.dark .home-surface .home-cta-primary:hover {
+    filter: brightness(1.06);
+  }
+
+  .public-site.dark .home-surface .home-cta-outline {
+    border-color: color-mix(in oklch, var(--home-accent) 48%, var(--border)) !important;
+    background-color: color-mix(in oklch, var(--home-accent) 9%, var(--background)) !important;
+    color: var(--foreground) !important;
+  }
+
+  .public-site.dark .home-surface .home-cta-outline:hover {
+    border-color: color-mix(in oklch, var(--home-accent) 62%, var(--border)) !important;
+    background-color: color-mix(in oklch, var(--home-accent) 14%, var(--background)) !important;
+  }
+
+  .public-site.dark .home-surface .home-rule {
+    background-color: color-mix(in oklch, var(--home-accent) 55%, transparent);
+  }
+
+  .public-site.dark .home-surface .home-topology-svg {
+    color: var(--home-topology-fg);
   }
 }
