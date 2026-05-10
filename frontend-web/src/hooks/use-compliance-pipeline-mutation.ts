@@ -9,9 +9,16 @@ import { parseTradeFileToRecords } from "@/lib/file-ingest/parse-trade-file";
 import type { ScreeningSuccessResponse } from "@/lib/contracts/screening";
 import { useWorkflowUiStore } from "@/stores/workflow-ui-store";
 
+function delayMs(ms: number): Promise<void> {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}
+
 /**
- * Upload → ingest acknowledgment → screening → TanStack cache hydration.
- * Mirrors backend orchestration stages for operator transparency (not a second engine).
+ * Upload → ingest acknowledgment → scoring → client-side materialisation stages
+ * (review queue hydration, explainability surfaces, export-ready envelope).
+ * Mirrors backend orchestration for operator transparency (not a second engine).
  */
 export function useCompliancePipelineMutation() {
   const queryClient = useQueryClient();
@@ -38,11 +45,19 @@ export function useCompliancePipelineMutation() {
       const result = await runScreening({ records });
 
       sf.setActivePhase("review_queue");
-      sf.setPipelineMessage("Hydrating decision intelligence cache…");
+      sf.setPipelineMessage("Hydrating review queue and latest-results envelope…");
       // Authoritative screening response — do not invalidate/refetch `/results/latest`
       // here: refetch loses data on transient errors, empty server memory across
       // workers, or focus/stale churn and clears the hydrated dashboard briefly.
       queryClient.setQueryData(queryKeys.latestResults(), result);
+
+      sf.setActivePhase("explainability");
+      sf.setPipelineMessage("Binding explainability themes and operator narratives to the cohort…");
+      await delayMs(140);
+
+      sf.setActivePhase("export_audit");
+      sf.setPipelineMessage("Results ready for dashboard, triage, and governance export actions…");
+      await delayMs(140);
 
       sf.setPipelineMessage(null);
       sf.setStatus("succeeded");

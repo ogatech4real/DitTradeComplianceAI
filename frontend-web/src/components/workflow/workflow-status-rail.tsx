@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import {
   WORKFLOW_PHASE_METADATA,
   type WorkflowPhaseId,
+  type WorkflowRunStatus,
 } from "@/lib/contracts/workflow";
 import { useWorkflowUiStore } from "@/stores/workflow-ui-store";
 import { Badge } from "@/components/ui/badge";
@@ -16,8 +17,9 @@ function phaseIndex(id: WorkflowPhaseId): number {
   return Math.max(0, ORDER.indexOf(id));
 }
 
-function workflowProgressPercent(phaseId: WorkflowPhaseId, isRunning: boolean): number {
-  if (!isRunning) return 0;
+function workflowProgressPercent(phaseId: WorkflowPhaseId, status: WorkflowRunStatus): number {
+  if (status === "succeeded") return 100;
+  if (status !== "running") return 0;
   const idx = ORDER.indexOf(phaseId);
   if (idx < 0) return 8;
   return Math.round((idx / Math.max(ORDER.length - 1, 1)) * 100);
@@ -35,10 +37,7 @@ export function WorkflowStatusRail() {
   const reset = useWorkflowUiStore((s) => s.reset);
 
   const activeIdx = phaseIndex(activePhaseId);
-  const runningProgress = workflowProgressPercent(
-    activePhaseId,
-    status === "running",
-  );
+  const runningProgress = workflowProgressPercent(activePhaseId, status);
 
   return (
     <div className="enterprise-surface rounded-xl border border-border/80 p-4">
@@ -53,11 +52,11 @@ export function WorkflowStatusRail() {
               {pipelineMessage}
             </p>
           ) : null}
-          {status === "running" ? (
+          {status === "running" || status === "succeeded" ? (
             <div className="mt-3 space-y-1">
               <Progress value={runningProgress} className="h-1" />
               <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
-                Live pipeline {runningProgress}%
+                {status === "succeeded" ? "Pipeline complete" : "Live pipeline"} {runningProgress}%
               </span>
             </div>
           ) : null}
@@ -73,8 +72,11 @@ export function WorkflowStatusRail() {
       </div>
       <ol className="mt-4 max-h-[24rem] space-y-2 overflow-y-auto pr-1 text-sm">
         {WORKFLOW_PHASE_METADATA.map((phase, i) => {
-          const done = i < activeIdx;
-          const current = i === activeIdx;
+          const allComplete = status === "succeeded";
+          const idleRow = phase.id === "idle";
+          const done =
+            (!idleRow && allComplete) || (!allComplete && !idleRow && i < activeIdx);
+          const current = !allComplete && i === activeIdx;
           return (
             <li key={phase.id}>
               <button
