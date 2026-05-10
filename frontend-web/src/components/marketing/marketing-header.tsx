@@ -74,10 +74,13 @@ export function MarketingHeader() {
         <div className="flex items-center gap-2">
           <Link
             href={WORKSPACE_ROUTES.home}
-            className={buttonVariants({
-              size: "sm",
-              className: "hidden rounded-lg px-4 font-semibold shadow-none sm:inline-flex",
-            })}
+            className={cn(
+              buttonVariants({
+                size: "sm",
+                className: "hidden rounded-lg px-4 font-semibold shadow-none sm:inline-flex",
+              }),
+              "home-cta-primary",
+            )}
           >
             Launch workspace
           </Link>
@@ -130,6 +133,7 @@ export function MarketingHeader() {
                       size: "default",
                       className: "w-full justify-center rounded-lg font-semibold",
                     }),
+                    "home-cta-primary",
                   )}
                 >
                   Launch workspace

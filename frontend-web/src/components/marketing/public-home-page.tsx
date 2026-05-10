@@ -2,49 +2,13 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { BarChart3, Brain, Cpu, FileSearch, Layers, Map, Radar, Shield } from "lucide-react";
 
 import { WORKSPACE_ROUTES } from "@/lib/workspace-routes";
+import { PUBLIC_PLATFORM_MODULES } from "@/lib/public-platform-modules";
 import { HeroExecutiveSurface } from "@/components/marketing/hero-executive-surface";
 import { WorkspaceIntelligencePreview } from "@/components/marketing/workspace-intelligence-preview";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-
-/** Six modules — each line states one job, no overlap with hero. */
-const CAPABILITIES = [
-  {
-    title: "ICC-aligned trade data",
-    body: "Declarations and proofs normalised to interoperable expectations — fidelity operators can see.",
-    icon: Layers,
-  },
-  {
-    title: "Hybrid compliance scoring",
-    body: "Rules and models together, with explicit bands so nothing bypasses human checkpoints.",
-    icon: Cpu,
-  },
-  {
-    title: "Fraud & batch intelligence",
-    body: "Record-level risk next to cohort anomalies — duplication, corridors, bursts — before they spread.",
-    icon: Radar,
-    secondaryIcon: BarChart3,
-  },
-  {
-    title: "Explainable analytics",
-    body: "Narratives and drivers that turn scores into review packets, not black-box totals.",
-    icon: Brain,
-  },
-  {
-    title: "Jurisdiction & review queues",
-    body: "Routing context for triage plus severity-aware queues and disposition language.",
-    icon: Map,
-    secondaryIcon: FileSearch,
-  },
-  {
-    title: "Operational risk posture",
-    body: "Cadence, data fitness, and audit-friendly artefacts for diligence conversations.",
-    icon: Shield,
-  },
-] as const;
 
 const WORKFLOW = [
   "Upload trade data",
@@ -59,10 +23,9 @@ const WORKFLOW = [
 
 export function PublicHomePage() {
   return (
-    <div className="home-surface">
+    <>
       <HeroExecutiveSurface />
 
-      {/* 1 — Problem + approach (single narrative block) */}
       <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
         <div className="max-w-3xl">
           <p className="public-kicker">Context</p>
@@ -86,7 +49,6 @@ export function PublicHomePage() {
         </div>
       </section>
 
-      {/* 2 — Capabilities */}
       <section className="border-y border-border/70 bg-[color-mix(in_oklch,var(--card)_32%,var(--background))]">
         <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
           <div className="max-w-2xl">
@@ -95,7 +57,7 @@ export function PublicHomePage() {
               What the <span className="text-gradient-home">workspace</span> delivers
             </h2>
             <p className="mt-4 text-muted-foreground">
-              Six modules, deployed together. Detail lives on{" "}
+              Six modules, deployed together. More context on{" "}
               <Link href="/platform" className="font-medium text-foreground underline-offset-4 hover:underline">
                 Platform
               </Link>
@@ -103,9 +65,9 @@ export function PublicHomePage() {
             </p>
           </div>
           <div className="mt-12 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {CAPABILITIES.map((c, idx) => {
+            {PUBLIC_PLATFORM_MODULES.map((c, idx) => {
               const Primary = c.icon;
-              const Secondary = "secondaryIcon" in c ? c.secondaryIcon : null;
+              const Secondary = c.secondaryIcon;
               return (
                 <motion.div
                   key={c.title}
@@ -132,13 +94,12 @@ export function PublicHomePage() {
               href="/platform"
               className={cn(buttonVariants({ variant: "outline", size: "lg" }), "home-cta-outline rounded-lg px-6")}
             >
-              Full capability outline
+              Platform detail
             </Link>
           </div>
         </div>
       </section>
 
-      {/* 3 — Workflow */}
       <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
         <div className="max-w-2xl">
           <p className="public-kicker">Pipeline</p>
@@ -146,8 +107,7 @@ export function PublicHomePage() {
             From file to <span className="text-gradient-home">disposition</span>
           </h2>
           <p className="mt-4 text-muted-foreground">
-            Eight stages, readable for non-engineers. Run it end-to-end in the workspace — this list is the map, not the product
-            demo.
+            Eight stages. Run end-to-end in the workspace — this is the map, not a demo dataset.
           </p>
         </div>
         <div className="mt-10 max-w-3xl rounded-xl border border-border/70 bg-card/30 p-6 sm:p-8">
@@ -166,42 +126,33 @@ export function PublicHomePage() {
           </ol>
           <Link
             href={WORKSPACE_ROUTES.home}
-            className={cn(buttonVariants({ variant: "link" }), "!px-0 mt-2 text-sm font-semibold text-[color-mix(in_oklch,var(--home-accent)_75%,var(--foreground)_25%)]")}
+            className={cn(
+              buttonVariants({ variant: "link" }),
+              "!px-0 mt-2 text-sm font-semibold text-[color-mix(in_oklch,var(--home-accent)_75%,var(--foreground)_25%)]",
+            )}
           >
             Start in the workspace →
           </Link>
         </div>
       </section>
 
-      {/* 4 — Research (one band, no duplicate quote) */}
       <section className="border-t border-border/70 bg-[color-mix(in_oklch,var(--card)_24%,var(--background))]">
         <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
           <div className="max-w-3xl">
             <p className="public-kicker">Research</p>
             <h2 className="mt-3 text-2xl font-semibold sm:text-[1.75rem]">
-              Disclosure that <span className="text-gradient-home">holds up</span> under scrutiny
+              Claims you can <span className="text-gradient-home">verify</span>
             </h2>
             <p className="mt-4 text-muted-foreground">
-              ICC interoperability, hybrid orchestration, and sustainability-aware screening context — articulated for partners
-              and funders, without claiming autonomous regulation or legal advice.
+              Deeper narrative on the{" "}
+              <Link href="/research" className="font-medium text-foreground underline-offset-4 hover:underline">
+                Research
+              </Link>{" "}
+              page — bounded by artefacts, not marketing metrics.
             </p>
-            <ul className="mt-8 space-y-3 text-foreground/95">
-              <li className="flex gap-2">
-                <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-[color-mix(in_oklch,var(--home-accent)_70%,transparent)]" aria-hidden />
-                <span>Explainability aligned to reviewer duty-of-care, not vanity metrics.</span>
-              </li>
-              <li className="flex gap-2">
-                <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-[color-mix(in_oklch,var(--home-accent)_70%,transparent)]" aria-hidden />
-                <span>Contracts and UI disclosures kept in sync for institutional diligence.</span>
-              </li>
-              <li className="flex gap-2">
-                <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-[color-mix(in_oklch,var(--home-accent)_70%,transparent)]" aria-hidden />
-                <span>Claims bounded by artefacts — repository and publications, not marketing uplift.</span>
-              </li>
-            </ul>
             <div className="mt-10 flex flex-wrap gap-3">
               <Link href="/research" className={cn(buttonVariants({ size: "lg" }), "home-cta-primary rounded-lg px-6")}>
-                Research &amp; evaluation
+                Research
               </Link>
               <Link
                 href="https://github.com/ogatech4real/DitTradeComplianceAI"
@@ -218,28 +169,28 @@ export function PublicHomePage() {
 
       <WorkspaceIntelligencePreview home />
 
-      {/* 5 — Stewardship (single strip) */}
       <section className="border-t border-border/70">
         <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6 lg:px-8 lg:py-16">
           <div className="flex flex-col gap-6 rounded-xl border border-border/70 bg-card/25 px-6 py-6 sm:flex-row sm:items-center sm:justify-between sm:px-8">
             <div className="max-w-2xl">
-              <p className="public-kicker">Stewardship</p>
+              <p className="public-kicker">People &amp; context</p>
               <p className="mt-2 text-foreground">
-                Principal lead, collaborators, and industrial context — described through artefacts, not speculative bios.
+                Lead, collaborators, and philosophy — on{" "}
+                <Link href="/about" className="font-medium underline-offset-4 hover:underline">
+                  About
+                </Link>
+                .
               </p>
             </div>
             <Link
               href="/about"
-              className={cn(
-                buttonVariants({ variant: "outline", size: "lg" }),
-                "home-cta-outline shrink-0 rounded-lg px-6",
-              )}
+              className={cn(buttonVariants({ variant: "outline", size: "lg" }), "home-cta-outline shrink-0 rounded-lg px-6")}
             >
               About
             </Link>
           </div>
         </div>
       </section>
-    </div>
+    </>
   );
 }

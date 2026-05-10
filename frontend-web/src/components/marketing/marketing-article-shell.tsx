@@ -34,7 +34,7 @@ export function MarketingArticleShell({
   return (
     <article className={cn("relative", className)}>
       <div
-        className="pointer-events-none absolute inset-x-0 top-0 h-px bg-[linear-gradient(90deg,transparent,color-mix(in_oklch,var(--primary)_55%,transparent),transparent)]"
+        className="pointer-events-none absolute inset-x-0 top-0 h-px bg-[linear-gradient(90deg,transparent,color-mix(in_oklch,var(--home-accent)_45%,transparent),transparent)]"
         aria-hidden
       />
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
@@ -47,7 +47,7 @@ export function MarketingArticleShell({
           >
             <div className={cn(headerAside ? "lg:col-span-7 xl:col-span-8" : "max-w-3xl")}>
               <p className="public-kicker">{kicker}</p>
-              <h1 className="mt-4 font-[family-name:var(--font-heading)] text-[clamp(1.85rem,3.8vw,2.75rem)] font-semibold leading-[1.08] tracking-tight text-foreground">
+              <h1 className="mt-4 text-[clamp(1.85rem,3.8vw,2.75rem)] font-semibold leading-[1.08] tracking-tight text-foreground">
                 {title}
               </h1>
               {description ? (

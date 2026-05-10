@@ -8,110 +8,91 @@ import {
 } from "@/components/marketing/marketing-article-shell";
 import { WORKSPACE_ROUTES } from "@/lib/workspace-routes";
 import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
   title: "Research & innovation",
   description:
-    "Explainable trade governance research themes: ICC interoperability, hybrid intelligence orchestration, sustainability-adjacent compliance analytics, and operator-centred disclosures.",
+    "Explainable trade governance, ICC interoperability, hybrid orchestration, and bounded claims — aligned with the platform roadmap.",
 };
 
 const PILLARS = [
   {
-    title: "Explainable governance for digitally native trade filings",
-    body: "The programme emphasises supervisory narratives alongside quantitative composites so reviewers can reconcile model behaviour with escalation obligations.",
+    title: "Explainable governance & disclosure",
+    body: "Supervisory narratives sit beside scores so reviewers can justify escalation; model roles, limits, and overrides stay visible.",
   },
   {
-    title: "ICC interoperability & toolkit alignment",
-    body: "Data harmonisation hypotheses track ICC Digital Toolkit semantics — stressing auditability rather than asserting universal certification parity.",
+    title: "ICC-aligned interoperability",
+    body: "Harmonisation tracks Digital Trade Toolkit semantics — auditability first, not blanket certification claims.",
   },
   {
-    title: "Hybrid intelligence orchestration",
-    body: "Deterministic guards and probabilistic estimation interlock with explicit escalation thresholds, resisting both brittle rule-only regimes and unchecked scoring automation.",
+    title: "Hybrid intelligence in operation",
+    body: "Rules and estimation interlock with explicit thresholds — avoiding both brittle rule-only stacks and ungoverned scoring.",
   },
   {
-    title: "Operational compliance analytics",
-    body: "Cohort posture, anomaly pressure, and mapping fidelity articulate system health indicators that auditors and partners can scrutinise collaboratively.",
-  },
-  {
-    title: "Carbon & traceability-informed screening context",
-    body: "Documentary expectations tied to evolving border carbon regimes and sustainability reporting inform feature design — without substituting specialised environmental counsel.",
-  },
-  {
-    title: "Responsible AI disclosures",
-    body: "Model lineage, thematic explainability artefacts, and review boundaries are surfaced as artefacts suitable for diligence interviews and funding checkpoints.",
+    title: "Sustainability context, bounded scope",
+    body: "Carbon and traceability expectations inform screening context; specialised environmental or legal advice stays out of scope.",
   },
 ] as const;
 
 export default function ResearchInnovationPage() {
   return (
     <MarketingArticleShell
-      kicker="Research legitimacy"
+      kicker="Research"
       title={
         <>
-          Narratives that underpin the engineered <span className="text-gradient-brand">workspace</span>
+          How we <span className="text-gradient-home">frame</span> rigour
         </>
       }
-      description={
-        <>
-          Institutional stakeholders should expect traceable rationales bridging academic contribution, interoperability pilots,
-          and responsibly scoped operational analytics — not unsubstantiated production claims or marketing uplift statistics.
-        </>
-      }
+      description="Academic and engineering discipline meets deployable software: traceable artefacts, partner pilots, and claims bounded by what the repository and publications actually show."
       headerAside={
-        <div className="space-y-5">
-          <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">Evaluation posture</p>
-            <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-              Controlled experiments complement partner pilots. Published outputs and repository artefacts remain the authoritative
-              venue for quantitative efficacy statements.
-            </p>
-          </div>
+        <div className="space-y-4">
+          <p className="text-sm text-muted-foreground">
+            Quantitative efficacy belongs in controlled studies and papers — not on this marketing surface.
+          </p>
           <Link
             href="https://github.com/ogatech4real/DitTradeComplianceAI"
-            className={buttonVariants({ variant: "outline", className: "w-full rounded-lg sm:w-auto" })}
+            className={cn(buttonVariants({ variant: "outline" }), "home-cta-outline w-full rounded-lg sm:w-auto")}
             target="_blank"
             rel="noopener noreferrer"
           >
-            Review implementation artefacts
+            Repository
           </Link>
         </div>
       }
       contentClassName="space-y-0"
     >
-      <div className="grid gap-12 lg:grid-cols-12 lg:items-start lg:gap-14">
-        <aside className="order-2 rounded-2xl border border-border/70 bg-[color-mix(in_oklch,var(--card)_35%,var(--background))] p-8 lg:order-1 lg:col-span-4 lg:sticky lg:top-28">
-          <h2 className="font-[family-name:var(--font-heading)] text-lg font-semibold">Disclosure commitments</h2>
-          <div className="mt-6 space-y-4 text-sm leading-relaxed text-muted-foreground">
-            <p>Transparency on model roles, failure modes, and human override paths.</p>
-            <p>Traceable ingestion diagnostics for mapping and cohort fitness narratives.</p>
-            <p>Documentation aligning API contracts with supervisory UI disclosures.</p>
-          </div>
+      <div className="grid gap-10 lg:grid-cols-12 lg:gap-12">
+        <aside className="order-2 rounded-xl border border-border/70 bg-[color-mix(in_oklch,var(--card)_35%,var(--background))] p-6 lg:order-1 lg:col-span-4 lg:sticky lg:top-28">
+          <h2 className="text-base font-semibold">What we disclose</h2>
+          <ul className="mt-4 space-y-3 text-sm text-muted-foreground">
+            <li>Model roles, failure modes, and human override paths.</li>
+            <li>Ingestion and mapping diagnostics for cohort narratives.</li>
+            <li>API contracts aligned with UI behaviour.</li>
+          </ul>
         </aside>
-        <div className="order-1 space-y-12 lg:order-2 lg:col-span-8">
+        <div className="order-1 space-y-10 lg:order-2 lg:col-span-8">
           {PILLARS.map((pillar) => (
             <section
               key={pillar.title}
-              className="border-l-2 border-[color-mix(in_oklch,var(--primary)_55%,transparent)] pl-6 lg:pl-8"
+              className="border-l-2 border-[color-mix(in_oklch,var(--home-accent)_58%,transparent)] pl-5 lg:pl-7"
             >
-              <h2 className="font-[family-name:var(--font-heading)] text-xl font-semibold leading-snug">{pillar.title}</h2>
-              <p className="mt-4 text-[15px] leading-relaxed text-muted-foreground">{pillar.body}</p>
+              <h2 className="text-lg font-semibold leading-snug">{pillar.title}</h2>
+              <p className="mt-3 text-[15px] leading-relaxed text-muted-foreground">{pillar.body}</p>
             </section>
           ))}
         </div>
       </div>
 
-      <div className="mt-20">
+      <div className="mt-16">
         <MarketingArticleCtaBand
-          body={
-            <>
-              Launch the operational workspace to correlate these research themes with tactile flows — ingestion, cohort
-              intelligence, explainability narratives, investigations, and export readiness — under your organisation&apos;s
-              controls.
-            </>
-          }
+          body="Open the workspace to align these themes with intake, queues, explainability, and investigations under your controls."
           actions={
-            <Link href={WORKSPACE_ROUTES.home} className={buttonVariants({ size: "lg", className: "rounded-lg px-8" })}>
-              Open operational workspace
+            <Link
+              href={WORKSPACE_ROUTES.home}
+              className={cn(buttonVariants({ size: "lg" }), "home-cta-primary rounded-lg px-8")}
+            >
+              Workspace
             </Link>
           }
         />

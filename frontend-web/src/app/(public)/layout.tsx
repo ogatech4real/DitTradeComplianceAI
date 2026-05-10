@@ -10,7 +10,7 @@ export default function PublicSiteLayout({
 }) {
   return (
     <div
-      className="public-site dark relative isolate flex min-h-dvh flex-col bg-background text-foreground"
+      className="public-site dark marketing-warm relative isolate flex min-h-dvh flex-col bg-background text-foreground"
       style={{
         backgroundImage: "var(--mesh-b), var(--mesh-c), var(--mesh-a)",
         backgroundAttachment: "fixed",

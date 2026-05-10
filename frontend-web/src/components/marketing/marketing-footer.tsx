@@ -28,13 +28,12 @@ export function MarketingFooter() {
       <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:px-8">
         <div className="grid gap-12 lg:grid-cols-12 lg:gap-10">
           <div className="lg:col-span-5">
-            <p className="font-[family-name:var(--font-heading)] text-lg font-semibold tracking-tight text-foreground">
-              Digital Trade Compliance AI
+            <p className="text-lg font-semibold tracking-tight text-foreground">
+              Digital Trade <span className="text-gradient-home">Compliance AI</span>
             </p>
             <p className="mt-4 max-w-md text-sm leading-relaxed text-muted-foreground">
-              A public institutional front for a research-grounded, AI-assisted operational intelligence workspace — built for
-              explainable trade governance, partner diligence, and funding-ready disclosure without substituting legal or
-              jurisdictional advice.
+              Public site for a research-grounded operational intelligence workspace — explainable trade screening, partner
+              diligence, and bounded claims. Not legal or jurisdictional advice.
             </p>
             <p className="mt-6 text-xs leading-relaxed text-muted-foreground">
               Contact and collaboration paths are described on{" "}
