@@ -48,8 +48,7 @@ from frontend.components.risk_tables import (
 )
 
 from frontend.components.charts import (
-    render_risk_distribution_chart,
-    render_risk_breakdown_chart,
+    render_operational_review_insights,
 )
 
 # =============================================================================
@@ -86,26 +85,6 @@ export_service = ExportService()
 # =============================================================================
 
 MAX_DISPLAY_ROWS = 1000
-MAX_CHART_ROWS = 5000
-
-
-def sample_dataframe_for_charts(
-    df: pd.DataFrame,
-) -> pd.DataFrame:
-    """
-    Same row cap for charts on Upload and Results pages (avoids heavy plots).
-    """
-
-    if len(df) > MAX_CHART_ROWS:
-
-        return df.sample(
-            MAX_CHART_ROWS,
-            random_state=42,
-        )
-
-    return df.copy()
-
-
 def get_api_base_url() -> str:
     """
     FastAPI public base URL (no trailing slash).
@@ -640,10 +619,6 @@ elif selected_page == "Upload & Screening":
                         results_df
                     )
 
-                    chart_df = sample_dataframe_for_charts(
-                        results_df
-                    )
-
                     # =================================================
                     # STORE SESSION DATA
                     # =================================================
@@ -798,10 +773,6 @@ Compliance Screening Results
             results_df
         )
 
-        chart_df = sample_dataframe_for_charts(
-            results_df
-        )
-
         if processing_metadata:
             st.subheader(
                 "Workflow Processing Metadata"
@@ -941,19 +912,9 @@ Compliance Screening Results
         # CHARTS (last section for operator scan top-to-bottom)
         # =====================================================
 
-        col_chart1, col_chart2 = st.columns(2)
-
-        with col_chart1:
-
-            render_risk_distribution_chart(
-                chart_df
-            )
-
-        with col_chart2:
-
-            render_risk_breakdown_chart(
-                chart_df
-            )
+        render_operational_review_insights(
+            results_df,
+        )
 
 # =============================================================================
 # EXPORT RESULTS
