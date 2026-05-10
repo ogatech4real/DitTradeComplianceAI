@@ -10,19 +10,12 @@ export class TradeFileParseError extends Error {
 
 function normalizeCell(value: unknown): unknown {
   if (value === null || value === undefined) return "";
-  if (typeof value === "number") return value;
   if (typeof value === "boolean") return value;
-  const s = String(value).trim();
-  if (s === "") return "";
-  const n = Number(s);
-  if (
-    !Number.isNaN(n) &&
-    s !== "" &&
-    /^-?\d+(\.\d+)?([eE][+-]?\d+)?$/.test(s)
-  ) {
-    return n;
-  }
-  return s;
+  // Native numbers from Excel readers → JSON numbers (aligned with pandas float columns).
+  if (typeof value === "number") return Number.isFinite(value) ? value : "";
+  // CSV values are strings: avoid coercing numeric-looking text client-side — that can
+  // drift from pandas/Streamlit (mixed dtypes stay object/strings in sanitised payloads).
+  return String(value).trim();
 }
 
 function normalizeRow(row: Record<string, unknown>): Record<string, unknown> {
