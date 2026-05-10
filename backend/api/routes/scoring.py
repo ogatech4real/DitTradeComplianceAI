@@ -33,6 +33,10 @@ from backend.api.routes.results import (
     store_latest_results,
 )
 
+from backend.services.scoring_input_normalize import (
+    normalize_scoring_request_dataframe,
+)
+
 router = APIRouter()
 
 logger = logging.getLogger(__name__)
@@ -123,8 +127,10 @@ async def run_scoring(
         # INPUT DATAFRAME
         # =================================================
 
-        input_df = pd.DataFrame(
-            request.records
+        input_df = normalize_scoring_request_dataframe(
+            pd.DataFrame(
+                request.records
+            )
         )
 
         if input_df.empty:

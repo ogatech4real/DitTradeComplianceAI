@@ -58,6 +58,10 @@ from frontend.components.charts import (
 
 from backend.services.export_service import ExportService
 
+from backend.services.scoring_input_normalize import (
+    sanitise_dataframe_for_scoring as sanitise_dataframe,
+)
+
 # =============================================================================
 # PAGE CONFIGURATION
 # =============================================================================
@@ -152,87 +156,6 @@ def check_backend_health() -> bool:
     except Exception:
 
         return False
-
-def sanitise_dataframe(
-    df: pd.DataFrame,
-) -> pd.DataFrame:
-    """
-    Ensure dataframe is safe for
-    API transfer and rendering.
-
-    Pandas 2+/3 Arrow string dtypes reject ``fillna(0)`` on string columns — use
-    per-dtype fills (aligned with backend scoring sanitisation).
-    """
-
-    out = df.copy()
-
-    out = out.loc[
-        :,
-        ~out.columns.duplicated(),
-    ]
-
-    numeric_cols = out.select_dtypes(
-        include=[np.number],
-    ).columns
-
-    if len(numeric_cols) > 0:
-
-        out[numeric_cols] = (
-            out[numeric_cols]
-            .replace(
-                [np.inf, -np.inf],
-                np.nan,
-            )
-            .apply(
-                pd.to_numeric,
-                errors="coerce",
-            )
-            .fillna(0)
-        )
-
-    bool_cols = out.select_dtypes(
-        include=["bool", "boolean"],
-    ).columns
-
-    if len(bool_cols) > 0:
-
-        out[bool_cols] = (
-            out[bool_cols]
-            .fillna(False)
-        )
-
-    other_cols = (
-        out.columns
-        .difference(numeric_cols)
-        .difference(bool_cols)
-    )
-
-    if len(other_cols) > 0:
-
-        for col in other_cols:
-
-            series = out[col]
-
-            if pd.api.types.is_datetime64_any_dtype(
-                series,
-            ):
-
-                out[col] = np.where(
-                    series.isna(),
-                    "",
-                    series.dt.strftime("%Y-%m-%d"),
-                )
-
-            else:
-
-                out[col] = series.map(
-                    lambda cell: ""
-                    if pd.isna(cell)
-                    else str(cell),
-                )
-
-    return out
-
 
 def get_scoring_request_timeout_sec() -> float:
     """
