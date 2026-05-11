@@ -5,6 +5,7 @@ import type {
 } from "@/lib/contracts/screening";
 
 import { MOCK_DECISION_RECORDS } from "@/lib/mocks/screening-records.partial";
+import { enrichDemoIntakeDims } from "@/lib/mocks/intake-demo-enrichment";
 
 function toNumber(v: unknown): number {
   const n = Number(v);
@@ -46,6 +47,7 @@ function buildPriorityQueue(records: Record<string, unknown>[], topK: number): P
 export function createMockScreeningResponse(
   records: Record<string, unknown>[] = MOCK_DECISION_RECORDS,
 ): ScreeningSuccessResponse {
+  records = enrichDemoIntakeDims(records);
   const total = records.length;
   const sev = severityBreakdown(records);
   const critical = sev.critical ?? 0;

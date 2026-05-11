@@ -23,6 +23,9 @@ import { buttonVariants } from "@/components/ui/button";
 import { WORKSPACE_ROUTES } from "@/lib/workspace-routes";
 import { shouldUseMockApi } from "@/lib/api/mock-mode";
 import { EmptyDecisionState } from "@/components/dashboard/empty-decision-state";
+import { DashboardCsvDownloads } from "@/components/dashboard/dashboard-csv-downloads";
+import { OperationalReviewAnalyticsCharts } from "@/components/dashboard/operational-review-analytics-charts";
+import { IntakeSnapshotCharts } from "@/components/dashboard/intake-snapshot-charts";
 
 export function DashboardDecisionSurface() {
   const q = useLatestResultsQuery(true);
@@ -61,15 +64,18 @@ export function DashboardDecisionSurface() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, ease: "easeOut" }}
     >
-      <div className="flex flex-wrap items-center gap-3">
-        {shouldUseMockApi() ? (
-          <Badge variant="outline" className="border-[var(--semantic-amber)]/40 bg-[var(--semantic-amber)]/[0.1] font-normal text-[11px] text-[var(--semantic-amber-fg)]">
-            Demo data mode · outcomes are illustrative
-          </Badge>
-        ) : null}
-        <span className="text-[13px] text-muted-foreground">
-          Latest screened cohort loaded in this browser session.
-        </span>
+      <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+        <div className="flex min-w-0 flex-wrap items-center gap-3">
+          {shouldUseMockApi() ? (
+            <Badge variant="outline" className="border-[var(--semantic-amber)]/40 bg-[var(--semantic-amber)]/[0.1] font-normal text-[11px] text-[var(--semantic-amber-fg)]">
+              Demo data mode · outcomes are illustrative
+            </Badge>
+          ) : null}
+          <span className="text-[13px] text-muted-foreground">
+            Latest screened cohort loaded in this browser session.
+          </span>
+        </div>
+        <DashboardCsvDownloads payload={payload} />
       </div>
 
       {/* 1 — KPIs */}
@@ -80,6 +86,10 @@ export function DashboardDecisionSurface() {
 
       {/* 3 — thematic signals (no synopsis repeat; brief sits above) */}
       <NarrativeIntelligenceStrip payload={payload} />
+
+      {/* 3b — operational analytics + intake ranked columns (from records + compliance_risks) */}
+      <OperationalReviewAnalyticsCharts payload={payload} />
+      <IntakeSnapshotCharts payload={payload} />
 
       {/* 4 — asymmetrical chart grid */}
       <div className="grid gap-6 xl:grid-cols-12">
