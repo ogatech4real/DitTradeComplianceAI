@@ -38,12 +38,12 @@ export function PublicHomePage() {
               Checking fields in isolation stops working at volume.
             </p>
             <p>
-              This platform front-loads intelligence: hybrid scoring suggests posture, explainability supports escalation, and
-              reviewers stay in charge. The live system of record is the{" "}
+              The product front-loads intelligence: hybrid scoring surfaces posture, explainability supports escalation, and
+              reviewers retain authority. The live system of record is the{" "}
               <Link href={WORKSPACE_ROUTES.home} className="font-medium text-foreground underline-offset-4 hover:underline">
                 workspace
               </Link>
-              ; this page is the concise public story.
+              ; this page is the executive overview.
             </p>
           </div>
         </div>
@@ -57,7 +57,7 @@ export function PublicHomePage() {
               What the <span className="text-gradient-home">workspace</span> delivers
             </h2>
             <p className="mt-4 text-muted-foreground">
-              Six modules, deployed together. More context on{" "}
+              Six production modules, delivered as one stack. Full capability breakdown on{" "}
               <Link href="/platform" className="font-medium text-foreground underline-offset-4 hover:underline">
                 Platform
               </Link>
@@ -107,7 +107,7 @@ export function PublicHomePage() {
             From file to <span className="text-gradient-home">disposition</span>
           </h2>
           <p className="mt-4 text-muted-foreground">
-            Eight stages. Run end-to-end in the workspace — this is the map, not a demo dataset.
+            Eight production stages from intake through disposition — executed end-to-end in the workspace.
           </p>
         </div>
         <div className="mt-10 max-w-3xl rounded-xl border border-border/70 bg-card/30 p-6 sm:p-8">
@@ -141,14 +141,14 @@ export function PublicHomePage() {
           <div className="max-w-3xl">
             <p className="public-kicker">Research</p>
             <h2 className="mt-3 text-2xl font-semibold sm:text-[1.75rem]">
-              Claims you can <span className="text-gradient-home">verify</span>
+              Research &amp; <span className="text-gradient-home">assurance</span>
             </h2>
             <p className="mt-4 text-muted-foreground">
-              Deeper narrative on the{" "}
+              Methodology, interoperability stance, and governance disclosures are documented on{" "}
               <Link href="/research" className="font-medium text-foreground underline-offset-4 hover:underline">
                 Research
               </Link>{" "}
-              page — bounded by artefacts, not marketing metrics.
+              and in release materials — aligned with what the shipped product does today.
             </p>
             <div className="mt-10 flex flex-wrap gap-3">
               <Link href="/research" className={cn(buttonVariants({ size: "lg" }), "home-cta-primary rounded-lg px-6")}>

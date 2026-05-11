@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
 export const metadata: Metadata = {
   title: "Platform capabilities",
   description:
-    "Six capability modules: ICC-aligned data, hybrid scoring, fraud and batch intelligence, explainability, jurisdiction-aware review, and operational risk posture.",
+    "Production capability modules for digital trade compliance: ICC-aligned data, hybrid scoring, fraud and batch intelligence, explainability, jurisdiction-aware review, and operational risk posture.",
 };
 
 export default function PlatformCapabilitiesPage() {
@@ -19,17 +19,17 @@ export default function PlatformCapabilitiesPage() {
       kicker="Platform"
       title={
         <>
-          Six modules — same map as the homepage, with <span className="text-gradient-home">workspace</span> depth
+          Six integrated modules — <span className="text-gradient-home">production</span> capability surface
         </>
       }
-      description="AI-assisted operational intelligence for digital trade governance: hybrid rules and models, fraud and batch signals, explainability, and human-led disposition — not certification or autonomous regulation."
+      description="Each module ships in the live workspace: hybrid rules and models, fraud and cohort intelligence, explainable outputs, and human-led disposition. The platform assists compliance operations; it does not issue certificates or replace legal or regulatory judgment."
       actions={
         <>
           <Link
             href={WORKSPACE_ROUTES.home}
             className={cn(buttonVariants({ size: "lg" }), "home-cta-primary rounded-lg px-8")}
           >
-            Launch workspace
+            Open workspace
           </Link>
           <Link
             href="/research"
@@ -41,10 +41,10 @@ export default function PlatformCapabilitiesPage() {
       }
       headerAside={
         <div className="space-y-5">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">Scope</p>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">Operating model</p>
           <p className="text-sm leading-relaxed text-muted-foreground">
-            ICC Digital Trade Toolkit alignment, transparent review UX, and API-backed behaviour — validated in your own
-            environment.
+            ICC Digital Trade Toolkit–aligned semantics, auditable review surfaces, and versioned API contracts — deployed and
+            operated under your organisation&apos;s controls and data residency choices.
           </p>
           <ul className="space-y-2 border-t border-border/50 pt-5 text-[13px] text-foreground/90">
             <li className="flex gap-2">
@@ -57,13 +57,18 @@ export default function PlatformCapabilitiesPage() {
               <span className="text-[color-mix(in_oklch,var(--home-accent)_85%,transparent)]" aria-hidden>
                 ·
               </span>
-              Evidence-forward, not black-box automation
+              Evidence-forward analytics, not black-box automation
             </li>
           </ul>
         </div>
       }
       contentClassName="space-y-0"
     >
+      <p className="mb-8 max-w-3xl text-[15px] leading-relaxed text-muted-foreground">
+        The six modules below are the same capability set summarised on the home page — here with full labels for procurement,
+        risk, and engineering stakeholders reviewing what is already running in the product.
+      </p>
+
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {PUBLIC_PLATFORM_MODULES.map((c) => {
           const Icon = c.icon;
@@ -86,8 +91,9 @@ export default function PlatformCapabilitiesPage() {
         })}
       </div>
 
-      <p className="mt-12 max-w-2xl text-sm text-muted-foreground">
-        Implementation detail and contracts live in the repository and API documentation — not inferred from this page.
+      <p className="mt-12 max-w-2xl text-sm leading-relaxed text-muted-foreground">
+        Technical specifications, integration guides, and API contracts are maintained in the repository and product documentation
+        alongside each release.
       </p>
     </MarketingArticleShell>
   );

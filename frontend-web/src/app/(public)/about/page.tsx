@@ -54,7 +54,7 @@ export default function AboutPage() {
           Digital Trade <span className="text-gradient-home">Compliance intelligence</span>
         </>
       }
-      description="An AI-assisted operational intelligence system for digital trade governance — explainable screening, fraud and batch signals, and jurisdiction-aware triage. The workspace is where operations run; this page states who builds it and why."
+      description="AI-assisted operational intelligence for digital trade governance — explainable screening, fraud and batch signals, and jurisdiction-aware triage. Operations run in the workspace; this page introduces the programme, leadership, and design principles."
       actions={
         <>
           <Link
@@ -99,7 +99,7 @@ export default function AboutPage() {
           visibility — with humans in the loop.
         </p>
         <p>
-          It aligns with ICC Digital Trade Toolkit ideas and explores explainable AI in compliance orchestration, sustainability
+          It aligns with ICC Digital Trade Toolkit semantics and applies explainable AI in compliance orchestration, sustainability
           context, and trade decision support — without replacing legal judgment or jurisdictional advice.
         </p>
       </section>
@@ -190,9 +190,8 @@ export default function AboutPage() {
       <section className="max-w-3xl">
         <h2 className="text-lg font-semibold text-foreground">Research direction</h2>
         <p className="mt-3 text-muted-foreground">
-          The programme extends toward a broader operational compliance intelligence framework. Long-term aim: more transparent,
-          scalable digital trade governance that supports operational and regulatory decision-making — with clarity on scope and
-          limits. Narrative detail lives on{" "}
+          The programme addresses enterprise operational compliance intelligence: transparent, scalable digital trade governance
+          that supports operational and supervisory decision-making — with explicit scope boundaries. Full disclosure narrative on{" "}
           <Link href="/research" className="font-medium text-foreground underline-offset-4 hover:underline">
             Research
           </Link>
@@ -226,9 +225,9 @@ export default function AboutPage() {
 
       <section className="max-w-3xl border-t border-border/60 pt-12 text-sm text-muted-foreground">
         <p>
-          <span className="font-medium text-foreground">Further collaborators &amp; industry:</span> additional names appear when
-          publications, pilots, or mutual disclosures allow. Industrial partners validate integration paths through governed
-          pilots — not speculative logos on this page.
+          <span className="font-medium text-foreground">Further collaborators &amp; industry:</span> additional names are listed
+          when publications, partner programmes, or mutual disclosures permit. Industrial validation follows agreed integration
+          and documentation checkpoints — not speculative branding on this page.
         </p>
       </section>
     </MarketingArticleShell>

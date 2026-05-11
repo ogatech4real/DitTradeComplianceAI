@@ -32,8 +32,8 @@ export function MarketingFooter() {
               Digital Trade <span className="text-gradient-home">Compliance intelligence</span>
             </p>
             <p className="mt-4 max-w-md text-sm leading-relaxed text-muted-foreground">
-              Public site for a research-grounded operational intelligence workspace — explainable trade screening, partner
-              diligence, and bounded claims. Not legal or jurisdictional advice.
+              Public site for Digital Trade Compliance Intelligence — production workspace for explainable trade screening,
+              partner diligence, and documented product claims. Not legal or jurisdictional advice.
             </p>
             <p className="mt-6 text-xs leading-relaxed text-muted-foreground">
               Contact and collaboration paths are described on{" "}

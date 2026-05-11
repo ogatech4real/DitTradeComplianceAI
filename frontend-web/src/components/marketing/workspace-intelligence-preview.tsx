@@ -15,20 +15,20 @@ export function WorkspaceIntelligencePreview({ home = false }: { home?: boolean 
       <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
         <div className="flex flex-col gap-5 border-b border-border/60 pb-8 lg:flex-row lg:items-end lg:justify-between">
           <div className="max-w-2xl space-y-3">
-            <p className="public-kicker">Workspace preview</p>
+            <p className="public-kicker">Workspace</p>
             <h2 className="text-2xl font-semibold tracking-tight text-foreground sm:text-[1.75rem]">
               {home ? (
                 <>
-                  Real UI — <span className="text-gradient-home">empty</span> until you load data
+                  Production UI — <span className="text-gradient-home">live</span> components
                 </>
               ) : (
-                "The same surfaces operators use — shown in structural context"
+                "The same surfaces operators use in production"
               )}
             </h2>
             <p className="text-muted-foreground">
               {home
-                ? "Production components in pre-hydration states. No fabricated metrics on this page."
-                : "Components below are reused from the live workspace chrome. States mirror freshly opened sessions prior to data hydration — credible preview, not fabricated metrics."}
+                ? "The chrome below is taken from the shipping workspace. This marketing view omits customer data; behaviour matches a signed-in session before a cohort is selected."
+                : "The chrome below is taken from the shipping workspace. States reflect a signed-in session without a loaded cohort — identical patterns to production, without customer data on this page."}
             </p>
           </div>
           <Link
@@ -52,7 +52,7 @@ export function WorkspaceIntelligencePreview({ home = false }: { home?: boolean 
             <div>
               <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">Decision surface</p>
               <EmptyDecisionState
-                message="Shown before screened data loads — the same structural prompt analysts see in a fresh session."
+                message="Standard idle state when no screened cohort is loaded — the same prompt analysts see in production after sign-in."
                 ctaLabel="Workspace home"
                 ctaHref={WORKSPACE_ROUTES.home}
               />
