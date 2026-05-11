@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 export const metadata: Metadata = {
   title: "About",
   description:
-    "Digital Trade Compliance Intelligence — platform purpose, research & technical lead Adewale O., research direction, and philosophy.",
+    "Digital Trade Compliance Intelligence — platform purpose, research & technical lead Adewale O., supervisor Michael Short, research direction, and philosophy.",
 };
 
 const RESEARCH_DIRECTION = [
@@ -34,6 +34,15 @@ const FOCUS_AREAS = [
     label: "Analytics & energy",
     items: ["Sustainable operational analytics", "Energy optimisation and sustainability systems"],
   },
+] as const;
+
+const MICHAEL_INTERESTS = [
+  "Intelligent operational systems",
+  "AI-driven analytics",
+  "Digital trade ecosystems",
+  "Applied machine learning",
+  "Industrial informatics",
+  "Governance-oriented intelligent technologies",
 ] as const;
 
 export default function AboutPage() {
@@ -134,6 +143,49 @@ export default function AboutPage() {
         </div>
       </section>
 
+      {/* Academic supervisor & collaborator */}
+      <section className="grid gap-10 border-t border-border/60 pt-16 lg:grid-cols-12 lg:gap-12 lg:pt-20">
+        <div className="flex justify-center lg:col-span-4 lg:justify-start">
+          <div
+            className="relative flex aspect-[3/4] w-full max-w-[240px] flex-col items-center justify-center gap-2 overflow-hidden rounded-xl border border-dashed border-[color-mix(in_oklch,var(--home-accent)_35%,var(--border))] bg-[color-mix(in_oklch,var(--muted)_55%,var(--card))] px-4 text-center"
+            aria-label="Portrait placeholder for Michael Short"
+          >
+            <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">Portrait</span>
+            <span className="text-sm font-medium text-foreground/80">Michael Short</span>
+            <span className="max-w-[11rem] text-xs leading-relaxed text-muted-foreground">Photo forthcoming</span>
+          </div>
+        </div>
+        <div className="lg:col-span-8">
+          <h2 className="text-lg font-semibold text-foreground">Research supervisor &amp; academic collaborator</h2>
+          <p className="mt-3 text-xl font-semibold text-foreground">Michael Short</p>
+          <div className="mt-5 space-y-4 text-muted-foreground">
+            <p>
+              Academic researcher and supervisor working across intelligent systems, digital trade technologies, operational
+              analytics, and applied artificial intelligence in complex industrial and governance settings.
+            </p>
+            <p>
+              His research and supervisory input have helped shape the Digital Trade Compliance Intelligence platform toward
+              explainable operational intelligence, ICC-aligned digital trade interoperability, and AI-assisted compliance
+              governance.
+            </p>
+          </div>
+          <h3 className="mt-8 text-sm font-semibold uppercase tracking-[0.16em] text-[color-mix(in_oklch,var(--home-accent)_75%,var(--muted-foreground)_25%)]">
+            Broader academic interests
+          </h3>
+          <ul className="mt-4 space-y-2 text-[15px] text-foreground/95">
+            {MICHAEL_INTERESTS.map((item) => (
+              <li key={item} className="flex gap-2">
+                <span
+                  className="mt-2 size-1.5 shrink-0 rounded-full bg-[color-mix(in_oklch,var(--home-accent)_70%,transparent)]"
+                  aria-hidden
+                />
+                {item}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
       {/* Direction — bullets from brief; link to research for narrative */}
       <section className="max-w-3xl">
         <h2 className="text-lg font-semibold text-foreground">Research direction</h2>
@@ -172,12 +224,11 @@ export default function AboutPage() {
         </p>
       </section>
 
-      {/* Light-touch collaborators — no duplicate cards */}
       <section className="max-w-3xl border-t border-border/60 pt-12 text-sm text-muted-foreground">
         <p>
-          <span className="font-medium text-foreground">Collaborators &amp; industry:</span> named where publications, pilots, or
-          mutual disclosures allow. Industrial partners validate integration and documentation paths through governed pilots —
-          not speculative logos on this page.
+          <span className="font-medium text-foreground">Further collaborators &amp; industry:</span> additional names appear when
+          publications, pilots, or mutual disclosures allow. Industrial partners validate integration paths through governed
+          pilots — not speculative logos on this page.
         </p>
       </section>
     </MarketingArticleShell>
