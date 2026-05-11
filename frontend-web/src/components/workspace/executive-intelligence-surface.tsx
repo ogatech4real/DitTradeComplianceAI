@@ -32,8 +32,8 @@ function postureFromPayload(payload: ScreeningSuccessResponse | undefined): {
 } {
   if (!payload) {
     return {
-      headline: "Awaiting a screened cohort",
-      sub: "Import a declaration file to populate operational posture.",
+      headline: "No cohort loaded yet",
+      sub: "Import a declarations file below to populate posture for this session.",
       tier: "low",
     };
   }
@@ -42,29 +42,29 @@ function postureFromPayload(payload: ScreeningSuccessResponse | undefined): {
   const high = Number(s.high_risk_records ?? 0);
   if (critical > 0) {
     return {
-      headline: "Critical exposure present",
-      sub: `${fmt(critical)} declaration${critical === 1 ? "" : "s"} warrant immediate escalation review.`,
+      headline: "Critical items in this cohort",
+      sub: `${fmt(critical)} declaration${critical === 1 ? "" : "s"} need immediate supervisory review.`,
       tier: "critical",
     };
   }
   if (high > 0) {
     return {
-      headline: "Elevated tier concentration",
-      sub: `${fmt(high)} high-severity declaration${high === 1 ? "" : "s"} deserve priority disposition.`,
+      headline: "High severity concentration",
+      sub: `${fmt(high)} declaration${high === 1 ? "" : "s"} at elevated severity — prioritize in the queue.`,
       tier: "high",
     };
   }
   const med = Number(s.medium_risk_records ?? 0);
   if (med > 0) {
     return {
-      headline: "Controlled residual risk",
-      sub: `${fmt(med)} medium-severity items remain in workflow — governance trace is intact.`,
+      headline: "Residual medium-tier items",
+      sub: `${fmt(med)} at medium severity still in workflow; traceability is intact for audit.`,
       tier: "medium",
     };
   }
   return {
-    headline: "Stable operational posture",
-    sub: "No acute severity concentration in the latest screened cohort.",
+    headline: "Stable posture for this cohort",
+    sub: "No critical or high-severity spike in the latest screened file.",
     tier: "low",
   };
 }
@@ -175,14 +175,14 @@ export function ExecutiveIntelligenceSurface() {
         <div className="min-w-0 space-y-6">
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-              Digital Trade Compliance
+              This session
             </p>
-            <h1 className="mt-2 font-[family-name:var(--font-heading)] text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
-              Operational intelligence workspace
-            </h1>
+            <h2 className="mt-2 font-[family-name:var(--font-heading)] text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
+              Posture and what to do next
+            </h2>
             <p className="mt-3 max-w-xl text-sm leading-relaxed text-muted-foreground">
-              A single place to import trade data, monitor screening posture, and move from signal to
-              substantiated decision — with governance context kept visible at every step.
+              Declarations you screen here appear on the results dashboard and in the review queue. Upload
+              when you are ready; metrics below refresh after each completed run.
             </p>
           </div>
 
@@ -193,7 +193,7 @@ export function ExecutiveIntelligenceSurface() {
             )}
           >
             <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-              Live operational posture
+              Live posture snapshot
             </p>
             <p className="mt-2 font-[family-name:var(--font-heading)] text-lg font-semibold text-foreground">
               {posture.headline}
@@ -203,16 +203,16 @@ export function ExecutiveIntelligenceSurface() {
 
           <div className="flex flex-wrap gap-3">
             <a href="#import-screen" className={buttonVariants({ size: "default" })}>
-              Upload declarations
+              Upload file
             </a>
             <Link href={WORKSPACE_ROUTES.dashboard} className={buttonVariants({ variant: "secondary", size: "default" })}>
-              Open decision intelligence
+              Open results dashboard
             </Link>
             <Link
               href={WORKSPACE_ROUTES.review}
               className={buttonVariants({ variant: "outline", size: "default" })}
             >
-              Investigation workspace
+              Review queue
             </Link>
           </div>
 
@@ -225,7 +225,7 @@ export function ExecutiveIntelligenceSurface() {
             </span>
             {q.isError ? (
               <span className="text-[var(--semantic-critical)]">
-                Latest intelligence snapshot unavailable.
+                Latest screening summary could not be loaded.
               </span>
             ) : null}
           </div>
@@ -234,39 +234,39 @@ export function ExecutiveIntelligenceSurface() {
         <div className="grid min-w-0 gap-3 sm:grid-cols-2">
           <PostureTile
             icon={ClipboardCheck}
-            label="Review pressure"
+            label="Queued for review"
             value={reviewQueue != null ? fmt(reviewQueue) : "—"}
             hint={
               reviewQueue != null
-                ? "Declarations routed for analyst review in this cohort."
-                : "Visible after a completed screening run."
+                ? "Records flagged or routed into the analyst queue from this cohort."
+                : "Appears after a completed screening run."
             }
             className="sm:col-span-2"
           />
           <PostureTile
             icon={Gauge}
-            label="Schema alignment"
+            label="Column mapping fit"
             value={mappingConfPct != null ? `${mappingConfPct}%` : "—"}
-            hint="How confidently column mappings reflect your declared schema."
+            hint="Confidence between your file headings and how we interpreted them."
           />
           <PostureTile
             icon={BarChart3}
-            label="Dataset fitness"
+            label="Data completeness"
             value={dqPct != null ? `${dqPct}%` : "—"}
-            hint="Completeness and consistency of source values after validation."
+            hint="Consistency and completeness of values after parsing and validation."
           />
           <PostureTile
             icon={Sparkles}
-            label="Intelligence confidence"
+            label="Run confidence (blend)"
             value={mappingConfPct != null && dqPct != null ? `${Math.round((mappingConfPct + dqPct) / 2)}%` : "—"}
-            hint="Blended view of mapping and data fitness for this run."
+            hint="Approximate midpoint of mapping fit and completeness for this cohort."
             className="sm:col-span-2"
           />
           <PostureTile
             icon={Shield}
-            label="Governance"
-            value={payload ? "Trace retained" : "Idle"}
-            hint="Screening outputs remain bound to the active session for audit."
+            label="Audit trail"
+            value={payload ? "Retained for session" : "Idle"}
+            hint="Outputs for this cohort stay tied to this session for traceability."
             className="sm:col-span-2"
           />
         </div>

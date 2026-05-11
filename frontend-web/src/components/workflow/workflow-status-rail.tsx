@@ -83,11 +83,11 @@ export function WorkflowStatusRail() {
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
           <h2 className="font-[family-name:var(--font-heading)] text-sm font-semibold tracking-tight">
-            Screening workflow
+            Screening phases
           </h2>
           <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-            Each stage mirrors the screening lifecycle you run from import — step through below to brief
-            operators or replay what happened during the last cohort.
+            Mirrors the lifecycle from your last run. Step through stages to narrate timing or onboard someone new —
+            selecting a phase does not re-run screening.
           </p>
           {pipelineMessage ? (
             <p className="mt-3 rounded-lg border border-border/70 bg-muted/40 px-3 py-2 text-[12px] leading-relaxed text-foreground">
@@ -138,12 +138,12 @@ export function WorkflowStatusRail() {
       </div>
       {activePhaseId === "review_queue" ? (
         <p className="mt-3 text-[11px] leading-relaxed text-muted-foreground">
-          At this stage, prioritised investigations are surfaced in the workspace.{" "}
+          Screening output is routed into the analyst queue here.{" "}
           <Link
             href={WORKSPACE_ROUTES.review}
             className="font-medium text-primary underline-offset-4 hover:underline"
           >
-            Open investigations
+            Open review queue
           </Link>
         </p>
       ) : null}

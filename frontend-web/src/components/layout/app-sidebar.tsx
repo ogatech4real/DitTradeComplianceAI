@@ -6,7 +6,6 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { navSections } from "@/components/layout/nav-config";
 import { isWorkspaceNavActive } from "@/lib/nav-active";
-import { PublicPlatformMiniNav } from "@/components/layout/public-platform-mini-nav";
 
 export function AppSidebar() {
   const pathname = usePathname();
@@ -27,8 +26,7 @@ export function AppSidebar() {
           <span className="text-gradient-home">Compliance intelligence</span>
         </div>
       </div>
-      <PublicPlatformMiniNav />
-      <nav className="relative flex flex-1 flex-col gap-6 overflow-y-auto p-3 pb-6 pt-5">
+      <nav className="relative flex flex-1 flex-col gap-6 overflow-y-auto p-3 pb-6 pt-4">
         {navSections.map((section) => (
           <div key={section.heading}>
             <p className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground/90">
@@ -71,14 +69,8 @@ export function AppSidebar() {
           </div>
         ))}
       </nav>
-      <div className="relative space-y-3 border-t border-sidebar-border/70 p-4 text-[11px] leading-relaxed text-muted-foreground">
-        <p>Outputs are session-scoped. Use the links above for the live run; public pages explain positioning only.</p>
-        <Link
-          href="/"
-          className="inline-flex font-medium text-[color-mix(in_oklch,var(--home-accent)_78%,var(--foreground)_22%)] underline-offset-4 hover:underline"
-        >
-          Public site →
-        </Link>
+      <div className="relative border-t border-sidebar-border/70 p-4 text-[11px] leading-relaxed text-muted-foreground">
+        <p>Screening outputs and dashboard views apply to this browser session only unless your deployment wires persistent storage.</p>
       </div>
     </aside>
   );

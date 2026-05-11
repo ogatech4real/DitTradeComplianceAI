@@ -14,8 +14,8 @@ function Chip({ children }: { children: ReactNode }) {
 }
 
 /**
- * Editorial intelligence strip derived from hydrated screening outcome — narrative-first,
- * avoids chart-heavy treatment.
+ * Chips and bullet signals derived from hydrated screening outcomes (no synopsis excerpt;
+ * synopsis lives on ExecutiveBriefPanel).
  */
 export function NarrativeIntelligenceStrip({
   payload,
@@ -52,8 +52,6 @@ export function NarrativeIntelligenceStrip({
   if (Number(anomalies) > 0) {
     lines.push(`${anomalies} cohort anomaly spike${Number(anomalies) === 1 ? "" : "s"} outside normal density.`);
   }
-  const summarySnippet = payload.executive_summary?.slice(0, 220)?.trim();
-
   return (
     <motion.div
       className="operational-surface relative overflow-hidden rounded-2xl border border-border/80 p-5 sm:p-6"
@@ -69,15 +67,11 @@ export function NarrativeIntelligenceStrip({
       </div>
       <div className="mt-5">
         <h3 className="text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
-          Narrative intelligence
+          Thematic signals
         </h3>
-        {summarySnippet ? (
-          <p className="mt-3 border-l-2 border-[var(--accent-intelligence)]/45 pl-4 text-sm leading-relaxed text-foreground">
-            <span className="text-muted-foreground">Executive synopsis · </span>
-            {summarySnippet}
-            {(payload.executive_summary?.length ?? 0) > 220 ? " …" : ""}
-          </p>
-        ) : null}
+        <p className="mt-3 text-[13px] leading-relaxed text-muted-foreground">
+          Automated pulls from cohort metrics — cross-check against the synopsis panel above before escalation packs.
+        </p>
       </div>
       {lines.length ? (
         <ul className="mt-5 space-y-2.5 text-[13px] leading-relaxed text-muted-foreground">

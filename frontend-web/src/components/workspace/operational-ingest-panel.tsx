@@ -90,12 +90,11 @@ export function OperationalIngestPanel() {
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
               <CardTitle className="font-[family-name:var(--font-heading)] text-lg font-semibold tracking-tight">
-                Import &amp; screen
+                Import and screen
               </CardTitle>
               <CardDescription className="mt-1.5 max-w-2xl text-sm leading-relaxed">
-                Upload trade declarations in CSV or Excel. We parse the file locally, send a
-                secure intake confirmation, then run the full compliance screening pass. Results flow
-                to decision intelligence and the investigation workspace automatically.
+                Upload CSV or Excel trade declarations: we validate locally, run screening, then push outcomes to the
+                results dashboard and review queue.
               </CardDescription>
             </div>
             {shouldUseMockApi() ? (
@@ -135,8 +134,8 @@ export function OperationalIngestPanel() {
               Drop a file here, or browse below
             </p>
             <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
-              The first worksheet or CSV row should use clear column headings that match your
-              declaration schema. Stronger headings improve mapping confidence in later steps.
+              Use readable column headings that match how you declare the schema — it improves mapping fit on the
+              overview tiles.
             </p>
           </div>
 
@@ -193,15 +192,15 @@ export function OperationalIngestPanel() {
               <div className="flex gap-3 text-sm text-foreground">
                 <CheckCircle2 className="size-5 shrink-0 text-[var(--semantic-emerald)]" aria-hidden />
                 <span>
-                  Screening finished. Decision intelligence is updated — open the surface to review
-                  exposure, rationale, and next actions.
+                  Screening finished. Open the results dashboard for charts and synopsis, then use the review queue for
+                  case-level detail.
                 </span>
               </div>
               <Link
                 href={WORKSPACE_ROUTES.dashboard}
                 className={buttonVariants({ size: "sm" })}
               >
-                View decision intelligence
+                Open results dashboard
               </Link>
             </div>
           ) : null}

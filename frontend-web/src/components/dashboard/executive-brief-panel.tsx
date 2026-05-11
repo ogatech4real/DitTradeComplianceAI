@@ -14,10 +14,10 @@ export function ExecutiveBriefPanel({
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_120%_-10%,var(--accent-intelligence)_/_0.11,transparent_52%)]" />
       <div className="relative">
         <h3 className="text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
-          Executive synopsis
+          Briefing synopsis
         </h3>
         <p className="mt-1 text-[12px] leading-relaxed text-muted-foreground">
-          Plain-language rollup for briefings — cross-check headline metrics above when preparing escalation packets.
+          Plain-language rollup from your latest run; reconcile with KPIs above.
         </p>
         <p className="mt-4 text-[15px] leading-relaxed text-foreground">{payload.executive_summary}</p>
         <dl className="mt-6 grid gap-4 text-sm sm:grid-cols-3">

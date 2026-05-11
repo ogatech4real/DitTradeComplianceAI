@@ -68,27 +68,28 @@ export function DashboardDecisionSurface() {
           </Badge>
         ) : null}
         <span className="text-[13px] text-muted-foreground">
-          Showing the latest hydrated screening cohort for this session.
+          Latest screened cohort loaded in this browser session.
         </span>
       </div>
 
-      {/* Section 1 */}
+      {/* 1 — KPIs */}
       <OperatorAlignedMetrics payload={payload} />
 
-      {/* Section 2 — signature narrative strip */}
-      <NarrativeIntelligenceStrip payload={payload} />
-
+      {/* 2 — executive rollup (synopsis + breakout facts) */}
       <ExecutiveBriefPanel payload={payload} />
 
-      {/* Section 3 — asymmetrical operational grid */}
+      {/* 3 — thematic signals (no synopsis repeat; brief sits above) */}
+      <NarrativeIntelligenceStrip payload={payload} />
+
+      {/* 4 — asymmetrical chart grid */}
       <div className="grid gap-6 xl:grid-cols-12">
         <Card className="operational-surface border-border/80 shadow-none xl:col-span-5">
           <CardHeader className="pb-0">
             <CardTitle className="font-[family-name:var(--font-heading)] text-base font-semibold">
-              Severity concentration
+              Severity mix
             </CardTitle>
             <p className="text-[13px] text-muted-foreground">
-              Disposition tiers across screened declarations — informs reserve capacity planning.
+              How screened records distribute across tiers — prioritise staffing against the tallest bars.
             </p>
           </CardHeader>
           <CardContent className="pt-4">
@@ -118,15 +119,15 @@ export function DashboardDecisionSurface() {
         </div>
       </div>
 
-      {/* Section 4 */}
+      {/* 5 — data and model quality cues */}
       <IntelligenceQualityRail payload={payload} />
 
       <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-border/80 bg-muted/25 px-5 py-4">
         <p className="text-sm text-muted-foreground">
-          Move from macro posture to investigative evidence with filters, severity ribbons, and narrative drawers.
+          Continue in the queue to sort by severity, read rationale, and open per-declaration sheets.
         </p>
         <Link href={WORKSPACE_ROUTES.review} className={buttonVariants({ variant: "secondary" })}>
-          Open investigation workspace
+          Go to review queue
         </Link>
       </div>
     </motion.div>

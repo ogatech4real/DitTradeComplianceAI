@@ -16,21 +16,21 @@ export interface NavSection {
   items: NavItem[];
 }
 
-/** Workspace routes grouped by job: run the pipeline vs triage review. */
+/** Workspace routes: run intake and view results vs work the queue. */
 export const navSections: NavSection[] = [
   {
-    heading: "Workspace",
+    heading: "Operate",
     items: [
       {
         href: WORKSPACE_ROUTES.home,
         label: "Overview & import",
-        hint: "Executive surface, workflow, intake",
+        hint: "Posture, screening, file upload",
         icon: Layers,
       },
       {
         href: WORKSPACE_ROUTES.dashboard,
-        label: "Decision dashboard",
-        hint: "Posture, themes, exposure",
+        label: "Results dashboard",
+        hint: "Cohort charts and executive synopsis",
         icon: LayoutDashboard,
       },
     ],
@@ -41,7 +41,7 @@ export const navSections: NavSection[] = [
       {
         href: WORKSPACE_ROUTES.review,
         label: "Review queue",
-        hint: "Prioritised cases & explainability",
+        hint: "Sort, filter, and open case sheets",
         icon: ListChecks,
       },
     ],

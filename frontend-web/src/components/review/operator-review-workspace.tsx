@@ -229,7 +229,7 @@ export function OperatorReviewWorkspace() {
             onClick={() => setBriefingRow(row.original)}
           >
             <FileText className="mr-1.5 size-3.5" aria-hidden />
-            Investigation sheet
+            Case sheet
           </Button>
         ),
       }),
@@ -260,8 +260,8 @@ export function OperatorReviewWorkspace() {
     return (
       <Card className="operational-surface border-destructive/30">
         <CardContent className="py-12 text-center text-sm text-destructive">
-          Investigation workspace needs a successful screening run. Confirm service availability, then import from the
-          workspace home.
+          No reviewable cohort is available yet. Confirm the API is reachable, then import a file from the workspace
+          overview page.
         </CardContent>
       </Card>
     );
@@ -273,7 +273,7 @@ export function OperatorReviewWorkspace() {
         <SheetContent className="w-[min(100vw,30rem)] border-l border-border/70 bg-background/98 p-0 sm:max-w-lg">
           <SheetHeader className="border-b border-border/60 px-6 py-5 text-left">
             <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-              Investigation sheet
+              Case sheet
             </p>
             <SheetTitle className="font-[family-name:var(--font-heading)] text-lg font-semibold">
               {briefingRow?.record_id ?? "Declaration"}
@@ -334,11 +334,11 @@ export function OperatorReviewWorkspace() {
               </div>
               <div>
                 <h4 className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                  Telemetry snapshot
+                  Model and rule signals
                 </h4>
                 <ul className="mt-3 space-y-2 text-[13px]">
                   {signalLines.length === 0 ? (
-                    <li className="text-muted-foreground">No secondary telemetry bundled for operators.</li>
+                    <li className="text-muted-foreground">No supplementary scores were attached for this row.</li>
                   ) : (
                     signalLines.map((line) => (
                       <li key={line} className="rounded-lg border border-dashed border-border/70 px-3 py-2 text-foreground">
@@ -358,11 +358,11 @@ export function OperatorReviewWorkspace() {
           <CardHeader className="flex flex-col gap-5 border-b border-border/65 bg-muted/[0.2] pb-5 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <CardTitle className="font-[family-name:var(--font-heading)] text-lg font-semibold">
-                Investigation console
+                Review queue
               </CardTitle>
               <p className="mt-2 max-w-2xl text-[13px] leading-relaxed text-muted-foreground">
-                Prioritised declarations with severity ribbons, calibrated scores, and expandable evidence sheets — built
-                for supervisors managing disposition, not spreadsheet scanning.
+                Sort declarations, scan severity ribbons, then open evidence for each row. Suited for desk review ahead of
+                disposition.
               </p>
             </div>
             <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
