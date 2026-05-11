@@ -2,6 +2,8 @@
 
 import { Progress } from "@/components/ui/progress";
 import type { ScreeningSuccessResponse } from "@/lib/contracts/screening";
+import { TechnicalMetricsGlossarySelect } from "@/components/dashboard/technical-metrics-glossary-select";
+import { IccTechnicalPayloadSheet } from "@/components/dashboard/icc-technical-payload-sheet";
 
 function QRow({ label, value }: { label: string; value: number }) {
   const pct = Math.round(Math.min(1, Math.max(0, value)) * 1000) / 10;
@@ -63,6 +65,19 @@ export function IntelligenceQualityRail({
           </div>
         </div>
       </div>
+
+      <div className="flex flex-col gap-6 border-t border-border/70 pt-6 lg:flex-row lg:items-start lg:justify-between lg:gap-10">
+        <div className="min-w-0 flex-1 lg:max-w-md">
+          <TechnicalMetricsGlossarySelect />
+        </div>
+        <div className="flex shrink-0 flex-col gap-3 lg:items-end">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground lg:text-right">
+            Raw orchestration artefacts
+          </p>
+          <IccTechnicalPayloadSheet payload={payload} />
+        </div>
+      </div>
+
       {dq ? (
         <div className="border-t border-border/70 pt-4 text-[12px] text-muted-foreground">
           Invalid value rate {(dq.invalid_values_rate ?? 0) * 100}% · coercion events{" "}

@@ -24,6 +24,11 @@ export interface DecisionRecordSignals {
 export const MOCK_DECISION_RECORDS: Record<string, unknown>[] = [
   {
     record_id: "REC-DE-CBAM-9821",
+    icc: {
+      trade_body: "sample-icc-shipment",
+      nesting: { origin_attestation: "third_party", customs_form: "EU_C88" },
+      materials_declared: [{ code: "steel", share: 0.71 }],
+    },
     destination_market: "EU",
     destination_country: "DE",
     declared_origin_country: "VN",
