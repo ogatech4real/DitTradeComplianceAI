@@ -38,7 +38,10 @@ export function MobileNavSheet() {
       >
         <Menu className="size-5" />
       </SheetTrigger>
-      <SheetContent side="left" className="w-[min(100vw,20rem)] p-0">
+      <SheetContent
+        side="left"
+        className="workspace-app public-site dark marketing-warm w-[min(100vw,20rem)] border-border/60 bg-background p-0 text-foreground"
+      >
         <SheetHeader className="border-b border-border/60 px-4 py-3 text-left">
           <SheetTitle className="text-sm font-semibold uppercase tracking-[0.18em] text-muted-foreground">
             Digital Trade

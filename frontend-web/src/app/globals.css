@@ -205,7 +205,8 @@
 
 /*
  * Public marketing shell — premium dark institutional fintech (OKX-adjacent layout discipline:
- * calm surfaces, strong type, restrained motion). Scoped so /workspace keeps :root light theme.
+ * calm surfaces, strong type, restrained motion). Scoped to route roots so marketing and
+ * /workspace share the same token cascade without toggling html.dark.
  */
 .public-site.dark {
   --brand-secondary: oklch(0.62 0.1 200);
@@ -272,6 +273,15 @@
     oklch(0.66 0.1 200) 48%,
     oklch(0.62 0.09 165) 100%
   );
+
+  --sidebar: oklch(0.16 0.026 264);
+  --sidebar-foreground: oklch(0.97 0.008 264);
+  --sidebar-primary: oklch(0.66 0.13 264);
+  --sidebar-primary-foreground: oklch(0.14 0.03 264);
+  --sidebar-accent: oklch(0.26 0.04 264);
+  --sidebar-accent-foreground: oklch(0.96 0.01 264);
+  --sidebar-border: oklch(1 0 0 / 9%);
+  --sidebar-ring: oklch(0.62 0.12 264);
 }
 
 /*
@@ -306,19 +316,10 @@
 }
 
 /*
- * Operational workspace (/workspace) — light UI with same warm accent family + Inter-first type.
+ * Operational workspace (/workspace) — Inter-first type; surface + warm accent come from
+ * .public-site.dark.marketing-warm on the same root (AppShell).
  */
 .workspace-app {
-  --home-accent: oklch(0.54 0.155 58);
-  --home-accent-deep: oklch(0.47 0.17 52);
-  --home-accent-fg: oklch(0.99 0.008 90);
-  --gradient-home: linear-gradient(
-    118deg,
-    oklch(0.5 0.165 55),
-    oklch(0.63 0.13 72)
-  );
-  --home-topology-fg: color-mix(in oklch, var(--home-accent) 48%, var(--foreground) 52%);
-
   font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   font-size: 15px;
   line-height: 1.6;
