@@ -29,7 +29,21 @@ function workflowProgressPercent(phaseId: WorkflowPhaseId, status: WorkflowRunSt
   return Math.round((idx / Math.max(ORDER.length - 1, 1)) * 100);
 }
 
-function statusTone(status: WorkflowRunStatus): string {
+function statusTone(status: WorkflowRunStatus, sidebar: boolean): string {
+  if (sidebar) {
+    switch (status) {
+      case "running":
+        return "border-[color-mix(in_oklch,var(--home-accent)_30%,transparent)] bg-[color-mix(in_oklch,var(--home-accent)_14%,var(--sidebar))] text-foreground";
+      case "succeeded":
+        return "border-[var(--semantic-emerald)]/40 bg-[var(--semantic-emerald-soft)]/[0.35] text-foreground";
+      case "failed":
+        return "border-destructive/35 bg-destructive/12 text-destructive";
+      case "partial":
+        return "border-[var(--semantic-amber)]/35 bg-[var(--semantic-amber)]/[0.12] text-foreground";
+      default:
+        return "border-sidebar-border bg-sidebar-accent/50 text-muted-foreground";
+    }
+  }
   switch (status) {
     case "running":
       return "border-[var(--accent-intelligence)]/35 bg-[var(--accent-intelligence-soft)] text-foreground";
@@ -37,6 +51,8 @@ function statusTone(status: WorkflowRunStatus): string {
       return "border-[var(--semantic-emerald)]/35 bg-[var(--semantic-emerald-soft)] text-foreground";
     case "failed":
       return "border-destructive/35 bg-destructive/10 text-destructive";
+    case "partial":
+      return "border-[var(--semantic-amber)]/40 bg-[var(--semantic-amber)]/[0.12] text-foreground";
     default:
       return "border-border/70 bg-muted/40 text-muted-foreground";
   }
@@ -61,10 +77,17 @@ function statusVerb(status: WorkflowRunStatus): string {
   }
 }
 
+export type WorkflowRailPlacement = "page" | "sidebar";
+
+interface WorkflowStatusRailProps {
+  placement?: WorkflowRailPlacement;
+}
+
 /**
- * Operational workflow rail — step through lifecycle stages without mutating archived results.
+ * Operational workflow — step through lifecycle stages without re-running screening.
  */
-export function WorkflowStatusRail() {
+export function WorkflowStatusRail({ placement = "page" }: WorkflowStatusRailProps) {
+  const sidebar = placement === "sidebar";
   const status = useWorkflowUiStore((s) => s.status);
   const activePhaseId = useWorkflowUiStore((s) => s.activePhaseId);
   const pipelineMessage = useWorkflowUiStore((s) => s.pipelineMessage);
@@ -79,76 +102,109 @@ export function WorkflowStatusRail() {
   const atEnd = activeIdx >= ORDER.length - 1;
 
   return (
-    <div className="operational-surface rounded-2xl border border-border/80 p-5">
-      <div className="flex flex-wrap items-start justify-between gap-3">
+    <div
+      className={cn(
+        sidebar
+          ? "rounded-xl border border-sidebar-border/85 bg-sidebar-accent/[0.35] px-3 py-3 shadow-sm"
+          : "operational-surface rounded-2xl border border-border/80 p-5",
+      )}
+    >
+      <div className={cn("flex flex-wrap gap-3", sidebar ? "items-center justify-between" : "items-start justify-between")}>
         <div className="min-w-0 flex-1">
-          <h2 className="font-[family-name:var(--font-heading)] text-sm font-semibold tracking-tight">
-            Screening phases
+          <h2
+            className={cn(
+              "font-[family-name:var(--font-heading)] font-semibold tracking-tight",
+              sidebar ? "text-[11px]" : "text-sm",
+            )}
+          >
+            {sidebar ? "Screening workflow" : "Screening phases"}
           </h2>
-          <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-            Mirrors the lifecycle from your last run. Step through stages to narrate timing or onboard someone new —
-            selecting a phase does not re-run screening.
-          </p>
+          {!sidebar ? (
+            <p className="mt-1 text-xs text-muted-foreground">Twelve stages, read-only (does not re-run screening).</p>
+          ) : null}
           {pipelineMessage ? (
-            <p className="mt-3 rounded-lg border border-border/70 bg-muted/40 px-3 py-2 text-[12px] leading-relaxed text-foreground">
+            <p
+              className={cn(
+                "line-clamp-2 text-foreground",
+                sidebar ? "mt-2 rounded-md border border-sidebar-border bg-sidebar/90 px-2 py-1.5 text-[10px] leading-snug" : "mt-3 rounded-lg border border-border/70 bg-muted/40 px-3 py-2 text-[12px] leading-relaxed",
+              )}
+              title={pipelineMessage}
+            >
               {pipelineMessage}
             </p>
           ) : null}
           {status === "running" || status === "succeeded" ? (
-            <div className="mt-3 space-y-1">
-              <Progress value={runningProgress} className="h-1" />
-              <span className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
-                Timeline {runningProgress}% · {status === "succeeded" ? "Settled run" : "Active run"}
+            <div className={sidebar ? "mt-2 space-y-0.5" : "mt-3 space-y-1"}>
+              <Progress value={runningProgress} className={sidebar ? "h-0.5" : "h-1"} />
+              <span
+                className={cn(
+                  "uppercase tracking-[0.12em] text-muted-foreground",
+                  sidebar ? "text-[9px]" : "text-[10px]",
+                )}
+              >
+                {runningProgress}% · {status === "succeeded" ? "Settled" : "Active"}
               </span>
             </div>
           ) : null}
         </div>
-        <div className="flex flex-col items-end gap-2">
-          <Badge variant="outline" className={cn("font-normal", statusTone(status))}>
+        <div className={cn("flex shrink-0 flex-col items-end gap-1.5", sidebar && "-mt-px")}>
+          <Badge variant="outline" className={cn("font-normal", statusTone(status, sidebar), sidebar && "border px-2 py-0 text-[10px]")}>
             {statusVerb(status)}
           </Badge>
-          <Button type="button" size="xs" variant="ghost" className="h-7 text-[11px]" onClick={() => reset()}>
-            Reset timeline
+          <Button type="button" variant="ghost" size="xs" className={cn(sidebar ? "h-6 text-[10px]" : "h-7 text-[11px]")} onClick={() => reset()}>
+            Reset
           </Button>
         </div>
       </div>
 
-      <div className="mt-4 flex flex-wrap gap-2">
+      <div className={cn("flex gap-2", sidebar ? "mt-2.5 justify-center border-t border-sidebar-border/60 pt-2.5" : "mt-4 flex-wrap")}>
         <Button
           type="button"
           variant="outline"
           size="sm"
           disabled={atStart}
-          className="gap-1 text-xs"
+          className={cn("gap-0.5", sidebar ? "h-8 flex-1 border-sidebar-border px-2 text-[10px]" : "gap-1 text-xs")}
           onClick={() => stepPhaseBackward()}
         >
-          <ChevronLeft className="size-3.5" aria-hidden />
-          Previous stage
+          <ChevronLeft className={cn(sidebar ? "size-3" : "size-3.5")} aria-hidden />
+          {!sidebar ? "Previous stage" : "Prev"}
         </Button>
         <Button
           type="button"
           size="sm"
           disabled={atEnd}
-          className="gap-1 bg-primary text-primary-foreground text-xs hover:bg-primary/92"
+          className={cn(
+            !sidebar ? "gap-1 bg-primary text-xs text-primary-foreground hover:bg-primary/92" : "h-8 flex-1 gap-0.5 bg-primary px-2 text-[10px] text-primary-foreground hover:bg-primary/92",
+          )}
           onClick={() => stepPhaseForward()}
         >
-          Next stage
-          <ChevronRight className="size-3.5" aria-hidden />
+          {!sidebar ? "Next stage" : "Next"}
+          <ChevronRight className={cn(sidebar ? "size-3" : "size-3.5")} aria-hidden />
         </Button>
       </div>
-      {activePhaseId === "review_queue" ? (
-        <p className="mt-3 text-[11px] leading-relaxed text-muted-foreground">
-          Screening output is routed into the analyst queue here.{" "}
-          <Link
-            href={WORKSPACE_ROUTES.review}
-            className="font-medium text-primary underline-offset-4 hover:underline"
-          >
-            Open review queue
+      {!sidebar && activePhaseId === "review_queue" ? (
+        <p className="mt-3 text-[11px] text-muted-foreground">
+          Routed to analyst queue —{" "}
+          <Link href={WORKSPACE_ROUTES.review} className="font-medium text-primary underline-offset-4 hover:underline">
+            Review queue
           </Link>
         </p>
       ) : null}
+      {sidebar && activePhaseId === "review_queue" ? (
+        <Link
+          href={WORKSPACE_ROUTES.review}
+          className="mt-2 block rounded-md px-2 py-1 text-center text-[10px] font-medium text-primary underline-offset-4 hover:bg-sidebar-accent hover:underline"
+        >
+          Open review queue
+        </Link>
+      ) : null}
 
-      <ol className="mt-4 max-h-[26rem] space-y-1.5 overflow-y-auto pr-1 text-sm">
+      <ol
+        className={cn(
+          "space-y-1 overflow-y-auto pr-0.5",
+          sidebar ? "mt-2.5 max-h-[min(38vh,17rem)]" : "mt-4 max-h-[26rem]",
+        )}
+      >
         {WORKFLOW_PHASE_METADATA.map((phase, i) => {
           const allComplete = status === "succeeded";
           const idleRow = phase.id === "idle";
@@ -159,37 +215,46 @@ export function WorkflowStatusRail() {
             <li key={phase.id}>
               <button
                 type="button"
+                title={phase.description}
+                aria-label={`${phase.label}: ${phase.description}`}
                 onClick={() => setActivePhase(phase.id)}
                 className={cn(
-                  "flex w-full items-start gap-3 rounded-xl border px-3 py-2.5 text-left transition-all duration-200",
-                  done && "border-[var(--semantic-emerald)]/28 bg-[var(--semantic-emerald-soft)]/[0.45]",
-                  current &&
+                  "flex w-full items-start gap-2 rounded-lg border px-2 py-1.5 text-left transition-colors",
+                  sidebar ? "gap-2 border-sidebar-border bg-sidebar/70 hover:bg-sidebar-accent" : "rounded-xl px-3 py-2.5",
+                  !sidebar &&
+                    done &&
+                    "border-[var(--semantic-emerald)]/28 bg-[var(--semantic-emerald-soft)]/[0.45]",
+                  !sidebar &&
+                    current &&
                     "border-[var(--accent-governance)]/45 bg-[var(--accent-governance)]/[0.08] shadow-[inset_0_0_0_1px_oklch(0_0_0_/0.04)]",
-                  !done &&
-                    !current &&
-                    "border-border/70 bg-muted/15 hover:border-border hover:bg-muted/40",
+                  !sidebar && !done && !current && "border-border/70 bg-muted/15 hover:border-border hover:bg-muted/40",
+                  sidebar && done && "border-[var(--semantic-emerald)]/35 bg-[var(--semantic-emerald-soft)]/[0.25]",
+                  sidebar && current &&
+                    "border-[color-mix(in_oklch,var(--home-accent)_45%,transparent)] bg-[color-mix(in_oklch,var(--home-accent)_12%,transparent)] ring-1 ring-[color-mix(in_oklch,var(--home-accent)_22%,transparent)]",
+                  sidebar && !done && !current && "border-sidebar-border",
                 )}
               >
                 <span
                   className={cn(
-                    "mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full border text-[11px] font-semibold",
+                    "mt-0.5 flex shrink-0 items-center justify-center rounded-full border font-semibold",
+                    sidebar ? "size-5 text-[10px]" : "size-6 text-[11px]",
                     done &&
                       "border-[var(--semantic-emerald)]/55 bg-[var(--semantic-emerald-soft)]/[0.7] text-[var(--semantic-emerald)]",
-                    current &&
+                    current && !sidebar &&
                       "border-primary bg-primary text-primary-foreground shadow-sm",
+                    current &&
+                      sidebar &&
+                      "border-primary bg-primary text-primary-foreground",
                     !done &&
                       !current &&
-                      "border-muted-foreground/35 text-muted-foreground",
+                      (sidebar ? "border-muted-foreground/30 text-muted-foreground" : "border-muted-foreground/35 text-muted-foreground"),
                   )}
                   aria-hidden
                 >
                   {i + 1}
                 </span>
-                <span className="min-w-0">
-                  <span className="block font-medium leading-snug">{phase.label}</span>
-                  <span className="text-xs leading-relaxed text-muted-foreground">
-                    {phase.description}
-                  </span>
+                <span className={cn("block min-w-0 font-medium leading-snug", sidebar ? "text-[11px]" : "text-sm")}>
+                  {phase.label}
                 </span>
               </button>
             </li>

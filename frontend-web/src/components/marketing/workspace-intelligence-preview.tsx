@@ -43,7 +43,7 @@ export function WorkspaceIntelligencePreview({ home = false }: { home?: boolean 
         </div>
         <div className="mt-10 grid gap-8 xl:grid-cols-12">
           <div className="xl:col-span-4">
-            <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">Lifecycle rail</p>
+            <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">Workflow</p>
             <div className="max-h-[min(26rem,68vh)] origin-top overflow-hidden rounded-xl border border-border/70 bg-[color-mix(in_oklch,var(--background)_45%,var(--card))] xl:scale-[0.93] xl:[transform-origin:top_left] xl:justify-self-start">
               <WorkflowStatusRail />
             </div>

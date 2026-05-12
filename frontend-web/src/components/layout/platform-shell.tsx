@@ -18,7 +18,7 @@ const ROUTES: Record<string, RouteMeta> = {
   },
   [WORKSPACE_ROUTES.dashboard]: {
     title: "Results dashboard",
-    description: "Latest cohort charts, synopsis, quality signals, and a shortcut into review.",
+    description: "Cohort summaries, charts, and review handoff.",
   },
   [WORKSPACE_ROUTES.review]: {
     title: "Review queue",

@@ -23,66 +23,23 @@ export type WorkflowPhaseId = (typeof WORKFLOW_PHASES)[number];
 export interface WorkflowPhaseMeta {
   id: WorkflowPhaseId;
   label: string;
+  /** Short context for hover / screen readers — keep minimal */
   description: string;
 }
 
 export const WORKFLOW_PHASE_METADATA: WorkflowPhaseMeta[] = [
-  { id: "idle", label: "Ready", description: "Waiting for a file import or supervised reset." },
-  {
-    id: "upload_dataset",
-    label: "Secure intake",
-    description: "Declaration file accepted, hashed, and bound to this session.",
-  },
-  {
-    id: "schema_intelligence",
-    label: "Field alignment",
-    description: "Column mapping confidence against screening schema expectations.",
-  },
-  {
-    id: "icc_transformation",
-    label: "Trade alignment",
-    description: "Canonical trade alignment and enrichment consistent with ICC trade data practice.",
-  },
-  {
-    id: "data_quality_validation",
-    label: "Data fitness",
-    description: "Validation of completeness, types, coercions, and contradiction checks.",
-  },
-  {
-    id: "fraud_analysis",
-    label: "Fraud intelligence",
-    description: "Per-record fraud indicators surfaced for governance overlays.",
-  },
-  {
-    id: "batch_analysis",
-    label: "Batch analytics",
-    description: "Cohort anomalies such as duplication, clustering, or concentration bursts.",
-  },
-  {
-    id: "hybrid_scoring",
-    label: "Calibrated scoring",
-    description: "Combined models and deterministic rules converge on a calibrated risk posture.",
-  },
-  {
-    id: "risk_classification",
-    label: "Severity disposition",
-    description: "Final severity tiering and reviewer routing cues.",
-  },
-  {
-    id: "review_queue",
-    label: "Review preparation",
-    description: "Work queue hydrated with investigative context for operators.",
-  },
-  {
-    id: "explainability",
-    label: "Narratives & rationale",
-    description: "Operator-facing explanations and thematic drivers consolidated.",
-  },
-  {
-    id: "export_audit",
-    label: "Release & audit",
-    description: "Outputs exposed to dashboards with trace suitable for escalation packets.",
-  },
+  { id: "idle", label: "Ready", description: "Awaiting import or reset." },
+  { id: "upload_dataset", label: "Secure intake", description: "File accepted and bound to session." },
+  { id: "schema_intelligence", label: "Field alignment", description: "Column mapping vs schema expectations." },
+  { id: "icc_transformation", label: "Trade alignment", description: "ICC-canonical enrichment." },
+  { id: "data_quality_validation", label: "Data fitness", description: "Types, completeness, contradictions." },
+  { id: "fraud_analysis", label: "Fraud intelligence", description: "Per-record fraud overlays." },
+  { id: "batch_analysis", label: "Batch analytics", description: "Cohort anomalies and concentration." },
+  { id: "hybrid_scoring", label: "Calibrated scoring", description: "Models and rules converge." },
+  { id: "risk_classification", label: "Severity disposition", description: "Tiers and routing cues." },
+  { id: "review_queue", label: "Review preparation", description: "Queue hydrated for operators." },
+  { id: "explainability", label: "Narratives & rationale", description: "Consolidated explanations." },
+  { id: "export_audit", label: "Release & audit", description: "Dashboards and escalation trace." },
 ];
 
 export type WorkflowRunStatus =

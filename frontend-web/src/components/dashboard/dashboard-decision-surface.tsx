@@ -71,9 +71,7 @@ export function DashboardDecisionSurface() {
               Demo data mode · outcomes are illustrative
             </Badge>
           ) : null}
-          <span className="text-[13px] text-muted-foreground">
-            Latest screened cohort loaded in this browser session.
-          </span>
+          <span className="text-[13px] text-muted-foreground">Latest cohort · this browser session.</span>
         </div>
         <DashboardCsvDownloads payload={payload} />
       </div>
@@ -98,9 +96,7 @@ export function DashboardDecisionSurface() {
             <CardTitle className="font-[family-name:var(--font-heading)] text-base font-semibold">
               Severity mix
             </CardTitle>
-            <p className="text-[13px] text-muted-foreground">
-              How screened records distribute across tiers — prioritise staffing against the tallest bars.
-            </p>
+            <p className="text-[13px] text-muted-foreground">Share of cohort by severity tier.</p>
           </CardHeader>
           <CardContent className="pt-4">
             <SeverityConcentrationChart payload={payload} />
@@ -113,9 +109,7 @@ export function DashboardDecisionSurface() {
               <CardTitle className="font-[family-name:var(--font-heading)] text-base font-semibold">
                 Jurisdiction exposure
               </CardTitle>
-              <p className="text-[13px] text-muted-foreground">
-                Comparative routing pressure by market corridor — aligns with escalation geography.
-              </p>
+              <p className="text-[13px] text-muted-foreground">Exposure by corridor / geography.</p>
             </CardHeader>
             <CardContent className="pt-4">
               <JurisdictionExposureChart payload={payload} />
@@ -133,9 +127,7 @@ export function DashboardDecisionSurface() {
       <IntelligenceQualityRail payload={payload} />
 
       <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-border/80 bg-muted/25 px-5 py-4">
-        <p className="text-sm text-muted-foreground">
-          Continue in the queue to sort by severity, read rationale, and open per-declaration sheets.
-        </p>
+        <p className="text-sm text-muted-foreground">Open the queue for severity, rationale, and case sheets.</p>
         <Link href={WORKSPACE_ROUTES.review} className={buttonVariants({ variant: "secondary" })}>
           Go to review queue
         </Link>

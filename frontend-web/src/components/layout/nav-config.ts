@@ -16,7 +16,7 @@ export interface NavSection {
   items: NavItem[];
 }
 
-/** Workspace routes: run intake and view results vs work the queue. */
+/** Workspace routes: intake, results, queue. */
 export const navSections: NavSection[] = [
   {
     heading: "Operate",
@@ -24,13 +24,13 @@ export const navSections: NavSection[] = [
       {
         href: WORKSPACE_ROUTES.home,
         label: "Overview & import",
-        hint: "Posture, screening, file upload",
+        hint: "Upload and run screening",
         icon: Layers,
       },
       {
         href: WORKSPACE_ROUTES.dashboard,
         label: "Results dashboard",
-        hint: "Cohort charts and executive synopsis",
+        hint: "Charts and synopsis",
         icon: LayoutDashboard,
       },
     ],
@@ -41,7 +41,7 @@ export const navSections: NavSection[] = [
       {
         href: WORKSPACE_ROUTES.review,
         label: "Review queue",
-        hint: "Sort, filter, and open case sheets",
+        hint: "Prioritised cases",
         icon: ListChecks,
       },
     ],
