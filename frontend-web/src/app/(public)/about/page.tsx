@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 
 import { MarketingArticleShell } from "@/components/marketing/marketing-article-shell";
@@ -44,6 +45,31 @@ const MICHAEL_INTERESTS = [
   "Industrial informatics",
   "Governance-oriented intelligent technologies",
 ] as const;
+
+function PortraitFrame({
+  src,
+  alt,
+  priority,
+}: {
+  src: string;
+  alt: string;
+  priority?: boolean;
+}) {
+  return (
+    <figure className="relative mx-auto w-full max-w-[280px] shrink-0 lg:mx-0">
+      <div className="relative aspect-[3/4] overflow-hidden rounded-2xl bg-muted shadow-[0_22px_56px_-28px_rgba(0,0,0,0.45)] ring-1 ring-border/55">
+        <Image
+          src={src}
+          alt={alt}
+          fill
+          priority={priority}
+          sizes="(max-width: 1024px) min(90vw, 280px), 280px"
+          className="object-cover object-[center_12%]"
+        />
+      </div>
+    </figure>
+  );
+}
 
 export default function AboutPage() {
   return (
@@ -104,86 +130,102 @@ export default function AboutPage() {
         </p>
       </section>
 
-      {/* Lead */}
-      <section className="grid gap-10 lg:grid-cols-12 lg:gap-12">
-        <div className="lg:col-span-7">
-          <h2 className="text-lg font-semibold text-foreground">Research &amp; technical lead</h2>
-          <p className="mt-2 text-xl font-semibold text-foreground">Adewale O.</p>
-          <div className="mt-5 space-y-4 text-muted-foreground">
-            <p>
-              Interdisciplinary researcher and engineer across applied AI, operational intelligence, instrumentation and control,
-              energy systems, and intelligent software. Over a decade in industry — instrumentation, control, automation, and
-              operational infrastructure — with a focus today on deployable systems that combine explainability, governance, and
-              scalable architecture.
-            </p>
-            <p>
-              This platform is part of a wider direction: trustworthy, explainable, operationally deployable governance in
-              modern digital ecosystems.
-            </p>
-          </div>
+      {/* Leadership — alternating portrait layout */}
+      <section className="space-y-14 border-t border-border/60 pt-14 lg:space-y-20 lg:pt-20">
+        <div className="max-w-3xl">
+          <h2 className="text-lg font-semibold text-foreground">Leadership</h2>
+          <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+            Platform engineering sits alongside academic supervision and collaboration that inform the programme&apos;s direction
+            and review posture.
+          </p>
         </div>
-        <div className="lg:col-span-5">
-          <div className="rounded-xl border border-border/70 bg-[color-mix(in_oklch,var(--card)_32%,var(--background))] p-6">
-            <h3 className="text-sm font-semibold uppercase tracking-[0.18em] text-muted-foreground">Focus areas</h3>
-            <ul className="mt-5 space-y-6">
-              {FOCUS_AREAS.map((block) => (
-                <li key={block.label}>
-                  <p className="text-sm font-semibold text-[color-mix(in_oklch,var(--home-accent)_82%,var(--foreground)_18%)]">
-                    {block.label}
-                  </p>
-                  <ul className="mt-2 space-y-1.5 text-sm text-muted-foreground">
-                    {block.items.map((item) => (
-                      <li key={item}>· {item}</li>
-                    ))}
-                  </ul>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      </section>
 
-      {/* Academic supervisor & collaborator */}
-      <section className="grid gap-10 border-t border-border/60 pt-16 lg:grid-cols-12 lg:gap-12 lg:pt-20">
-        <div className="flex justify-center lg:col-span-4 lg:justify-start">
-          <div
-            className="relative flex aspect-[3/4] w-full max-w-[240px] flex-col items-center justify-center gap-2 overflow-hidden rounded-xl border border-dashed border-[color-mix(in_oklch,var(--home-accent)_35%,var(--border))] bg-[color-mix(in_oklch,var(--muted)_55%,var(--card))] px-4 text-center"
-            aria-label="Portrait placeholder for Michael Short"
-          >
-            <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">Portrait</span>
-            <span className="text-sm font-medium text-foreground/80">Michael Short</span>
-            <span className="max-w-[11rem] text-xs leading-relaxed text-muted-foreground">Photo forthcoming</span>
+        <article className="grid gap-10 lg:grid-cols-[minmax(0,280px)_minmax(0,1fr)] lg:items-start lg:gap-12">
+          <PortraitFrame
+            src="/about/adewale.png"
+            alt="Adewale O., research and technical lead for Digital Trade Compliance Intelligence"
+            priority
+          />
+          <div className="min-w-0 space-y-6">
+            <header>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[color-mix(in_oklch,var(--home-accent)_72%,var(--muted-foreground)_28%)]">
+                Research &amp; technical lead
+              </p>
+              <h3 className="mt-2 text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">Adewale O.</h3>
+            </header>
+            <div className="space-y-4 text-muted-foreground">
+              <p>
+                Interdisciplinary researcher and engineer across applied AI, operational intelligence, instrumentation and control,
+                energy systems, and intelligent software. Over a decade in industry — instrumentation, control, automation, and
+                operational infrastructure — with a focus today on deployable systems that combine explainability, governance, and
+                scalable architecture.
+              </p>
+              <p>
+                This platform is part of a wider direction: trustworthy, explainable, operationally deployable governance in modern
+                digital ecosystems.
+              </p>
+            </div>
+            <div className="rounded-xl border border-border/70 bg-[color-mix(in_oklch,var(--card)_32%,var(--background))] p-5 sm:p-6">
+              <h4 className="text-sm font-semibold uppercase tracking-[0.18em] text-muted-foreground">Focus areas</h4>
+              <ul className="mt-4 space-y-5">
+                {FOCUS_AREAS.map((block) => (
+                  <li key={block.label}>
+                    <p className="text-sm font-semibold text-[color-mix(in_oklch,var(--home-accent)_82%,var(--foreground)_18%)]">
+                      {block.label}
+                    </p>
+                    <ul className="mt-2 space-y-1.5 text-sm text-muted-foreground">
+                      {block.items.map((item) => (
+                        <li key={item}>· {item}</li>
+                      ))}
+                    </ul>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
-        </div>
-        <div className="lg:col-span-8">
-          <h2 className="text-lg font-semibold text-foreground">Research supervisor &amp; academic collaborator</h2>
-          <p className="mt-3 text-xl font-semibold text-foreground">Michael Short</p>
-          <div className="mt-5 space-y-4 text-muted-foreground">
-            <p>
-              Academic researcher and supervisor working across intelligent systems, digital trade technologies, operational
-              analytics, and applied artificial intelligence in complex industrial and governance settings.
-            </p>
-            <p>
-              His research and supervisory input have helped shape the Digital Trade Compliance Intelligence platform toward
-              explainable operational intelligence, ICC-aligned digital trade interoperability, and AI-assisted compliance
-              governance.
-            </p>
+        </article>
+
+        <article className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,280px)] lg:items-start lg:gap-12">
+          <div className="min-w-0 space-y-6 lg:order-1">
+            <header>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[color-mix(in_oklch,var(--home-accent)_72%,var(--muted-foreground)_28%)]">
+                Research supervisor &amp; academic collaborator
+              </p>
+              <h3 className="mt-2 text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">Michael Short</h3>
+            </header>
+            <div className="space-y-4 text-muted-foreground">
+              <p>
+                Academic researcher and supervisor working across intelligent systems, digital trade technologies, operational
+                analytics, and applied artificial intelligence in complex industrial and governance settings.
+              </p>
+              <p>
+                His research and supervisory input have helped shape the Digital Trade Compliance Intelligence platform toward
+                explainable operational intelligence, ICC-aligned digital trade interoperability, and AI-assisted compliance
+                governance.
+              </p>
+            </div>
+            <div>
+              <h4 className="text-sm font-semibold uppercase tracking-[0.16em] text-[color-mix(in_oklch,var(--home-accent)_75%,var(--muted-foreground)_25%)]">
+                Broader academic interests
+              </h4>
+              <ul className="mt-4 space-y-2 text-[15px] text-foreground/95">
+                {MICHAEL_INTERESTS.map((item) => (
+                  <li key={item} className="flex gap-2">
+                    <span
+                      className="mt-2 size-1.5 shrink-0 rounded-full bg-[color-mix(in_oklch,var(--home-accent)_70%,transparent)]"
+                      aria-hidden
+                    />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
-          <h3 className="mt-8 text-sm font-semibold uppercase tracking-[0.16em] text-[color-mix(in_oklch,var(--home-accent)_75%,var(--muted-foreground)_25%)]">
-            Broader academic interests
-          </h3>
-          <ul className="mt-4 space-y-2 text-[15px] text-foreground/95">
-            {MICHAEL_INTERESTS.map((item) => (
-              <li key={item} className="flex gap-2">
-                <span
-                  className="mt-2 size-1.5 shrink-0 rounded-full bg-[color-mix(in_oklch,var(--home-accent)_70%,transparent)]"
-                  aria-hidden
-                />
-                {item}
-              </li>
-            ))}
-          </ul>
-        </div>
+          <PortraitFrame
+            src="/about/michael.png"
+            alt="Michael Short, research supervisor and academic collaborator"
+          />
+        </article>
       </section>
 
       {/* Direction — bullets from brief; link to research for narrative */}
@@ -214,20 +256,20 @@ export default function AboutPage() {
       <section className="max-w-3xl rounded-xl border border-border/70 bg-[color-mix(in_oklch,var(--card)_28%,var(--background))] p-6 sm:p-8">
         <h2 className="text-lg font-semibold text-foreground">Platform philosophy</h2>
         <p className="mt-4 text-[1.05rem] leading-relaxed text-foreground/95">
-          AI that supports governance and compliance should favour transparency, explainability, operational usability, and
-          human oversight — not opaque automation.
+          AI that supports governance and compliance should favour transparency, explainability, operational usability, and human
+          oversight — not opaque automation.
         </p>
         <p className="mt-4 text-muted-foreground">
-          The emphasis is predictive and evidential: visible reasoning, clear workflows, and review support operators can act on
-          — alongside model outputs, not hidden behind them.
+          The emphasis is predictive and evidential: visible reasoning, clear workflows, and review support operators can act on —
+          alongside model outputs, not hidden behind them.
         </p>
       </section>
 
       <section className="max-w-3xl border-t border-border/60 pt-12 text-sm text-muted-foreground">
         <p>
           <span className="font-medium text-foreground">Further collaborators &amp; industry:</span> additional names are listed
-          when publications, partner programmes, or mutual disclosures permit. Industrial validation follows agreed integration
-          and documentation checkpoints — not speculative branding on this page.
+          when publications, partner programmes, or mutual disclosures permit. Industrial validation follows agreed integration and
+          documentation checkpoints — not speculative branding on this page.
         </p>
       </section>
     </MarketingArticleShell>
