@@ -6,8 +6,8 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { navSections } from "@/components/layout/nav-config";
 import { isWorkspaceNavActive } from "@/lib/nav-active";
+import { WORKSPACE_APP_VERSION_LABEL } from "@/lib/workspace-chrome";
 import { WORKSPACE_ROUTES } from "@/lib/workspace-routes";
-import { WORKSPACE_PRODUCT_VERSION } from "@/lib/workspace-chrome";
 import { WorkflowStatusRail } from "@/components/workflow/workflow-status-rail";
 
 export function AppSidebar() {
@@ -86,8 +86,13 @@ export function AppSidebar() {
           </section>
         ) : null}
       </div>
-      <div className="relative shrink-0 border-t border-sidebar-border/60 px-5 py-2.5">
-        <p className="text-[10px] font-medium tracking-wide text-muted-foreground/85">{WORKSPACE_PRODUCT_VERSION}</p>
+      <div className="relative shrink-0 border-t border-sidebar-border/70 px-5 py-3">
+        <p
+          className="border-l-2 border-[color-mix(in_oklch,var(--home-accent)_42%,transparent)] pl-3 text-[10px] font-medium leading-snug tracking-wide text-muted-foreground"
+          aria-label="Software version"
+        >
+          {WORKSPACE_APP_VERSION_LABEL}
+        </p>
       </div>
     </aside>
   );

@@ -1,6 +1,10 @@
-/** Shown in workspace sidebar (replaces former session disclaimer). */
-export const WORKSPACE_PRODUCT_VERSION = "Digital Trade Intelligence v0.2";
+/**
+ * Shared workspace UI copy — sidebar version strip and main-column copyright.
+ */
 
-/** Workspace main-area footer — /workspace, /workspace/dashboard, /workspace/review. */
+/** Inset version line at the bottom of the workspace sidebar. */
+export const WORKSPACE_APP_VERSION_LABEL = "Digital Trade Intelligence V0.2";
+
+/** Footer under workspace main content (/workspace, /workspace/dashboard, /workspace/review). */
 export const WORKSPACE_COPYRIGHT_FOOTER =
-  "© Adewale et al., 2026 · Digital Trade Intelligence. All rights reserved.";
+  "© Adewale et al., 2026. Digital Trade Compliance Intelligence.";
