@@ -71,7 +71,7 @@ export function DashboardDecisionSurface() {
               Demo data mode · outcomes are illustrative
             </Badge>
           ) : null}
-          <span className="text-[13px] text-muted-foreground">Latest cohort · this browser session.</span>
+          <span className="text-[13px] text-muted-foreground">Latest completed screening · this browser session.</span>
         </div>
         <DashboardCsvDownloads payload={payload} />
       </div>

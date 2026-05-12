@@ -90,11 +90,12 @@ export function OperationalIngestPanel() {
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
               <CardTitle className="font-[family-name:var(--font-heading)] text-lg font-semibold tracking-tight">
-                Import and screen
+                Upload your file
               </CardTitle>
               <CardDescription className="mt-1.5 max-w-2xl text-sm leading-relaxed">
-                Upload CSV or Excel trade declarations: we validate locally, run screening, then push outcomes to the
-                results dashboard and review queue.
+                CSV or Excel. We check the file, run screening, then save outcomes for this browser session. When it
+                finishes, use <span className="font-medium text-foreground">Results dashboard</span> for charts and{" "}
+                <span className="font-medium text-foreground">Review queue</span> for line-by-line work.
               </CardDescription>
             </div>
             {shouldUseMockApi() ? (
@@ -134,8 +135,8 @@ export function OperationalIngestPanel() {
               Drop a file here, or browse below
             </p>
             <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
-              Use readable column headings that match how you declare the schema — it improves mapping fit on the
-              overview tiles.
+              Clear column headings help the system read your file. File-quality scores appear on the Results dashboard
+              after screening.
             </p>
           </div>
 
@@ -192,8 +193,8 @@ export function OperationalIngestPanel() {
               <div className="flex gap-3 text-sm text-foreground">
                 <CheckCircle2 className="size-5 shrink-0 text-[var(--semantic-emerald)]" aria-hidden />
                 <span>
-                  Screening finished. Open the results dashboard for charts and synopsis, then use the review queue for
-                  case-level detail.
+                  Screening finished. Open Results dashboard for charts and summaries, or Review queue to work individual
+                  cases.
                 </span>
               </div>
               <Link

@@ -2,14 +2,7 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import {
-  Activity,
-  BarChart3,
-  ClipboardCheck,
-  Gauge,
-  Shield,
-  Sparkles,
-} from "lucide-react";
+import { ArrowRight, FileSpreadsheet, LayoutDashboard, ListChecks } from "lucide-react";
 
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -18,22 +11,21 @@ import { isLatestResultsSuccess } from "@/lib/api/services/results";
 import { isEmptyEnvelope } from "@/lib/contracts/envelope";
 import type { ScreeningSuccessResponse } from "@/lib/contracts/screening";
 import { useWorkflowUiStore } from "@/stores/workflow-ui-store";
-import { WORKFLOW_PHASE_METADATA } from "@/lib/contracts/workflow";
 import { WORKSPACE_ROUTES } from "@/lib/workspace-routes";
 
 function fmt(n: number) {
   return n.toLocaleString("en-US");
 }
 
-function postureFromPayload(payload: ScreeningSuccessResponse | undefined): {
+function summaryFromPayload(payload: ScreeningSuccessResponse | undefined): {
   headline: string;
   sub: string;
   tier: "critical" | "high" | "medium" | "low";
 } {
   if (!payload) {
     return {
-      headline: "No cohort loaded yet",
-      sub: "Import a declarations file below to populate posture for this session.",
+      headline: "No results yet",
+      sub: "Upload a declarations file below. When screening finishes, open Results for charts and summaries, or Review queue to work cases one by one.",
       tier: "low",
     };
   }
@@ -42,29 +34,29 @@ function postureFromPayload(payload: ScreeningSuccessResponse | undefined): {
   const high = Number(s.high_risk_records ?? 0);
   if (critical > 0) {
     return {
-      headline: "Critical items in this cohort",
-      sub: `${fmt(critical)} declaration${critical === 1 ? "" : "s"} need immediate supervisory review.`,
+      headline: "Urgent items need attention",
+      sub: `${fmt(critical)} declaration${critical === 1 ? "" : "s"} from your latest file should be reviewed without delay.`,
       tier: "critical",
     };
   }
   if (high > 0) {
     return {
-      headline: "High severity concentration",
-      sub: `${fmt(high)} declaration${high === 1 ? "" : "s"} at elevated severity — prioritize in the queue.`,
+      headline: "High-priority review suggested",
+      sub: `${fmt(high)} declaration${high === 1 ? "" : "s"} are marked high severity — use the review queue to work through them.`,
       tier: "high",
     };
   }
   const med = Number(s.medium_risk_records ?? 0);
   if (med > 0) {
     return {
-      headline: "Residual medium-tier items",
-      sub: `${fmt(med)} at medium severity still in workflow; traceability is intact for audit.`,
+      headline: "Some items still in review",
+      sub: `${fmt(med)} declaration${med === 1 ? "" : "s"} are medium severity. Nothing critical is waiting, but follow your usual process.`,
       tier: "medium",
     };
   }
   return {
-    headline: "Stable posture for this cohort",
-    sub: "No critical or high-severity spike in the latest screened file.",
+    headline: "Latest file looks calm",
+    sub: "No critical or high-severity flags on your most recent screening. You can still open Results for the full picture.",
     tier: "low",
   };
 }
@@ -79,51 +71,25 @@ const tierAccent: Record<
   low: "border-l-[var(--semantic-emerald)]",
 };
 
-interface PostureTileProps {
-  icon: typeof Shield;
-  label: string;
-  value: string;
-  hint?: string;
-  className?: string;
-}
-
-function PostureTile({ icon: Icon, label, value, hint, className }: PostureTileProps) {
-  return (
-    <div
-      className={cn(
-        "operational-surface flex flex-col justify-between rounded-xl border border-border/80 p-4 shadow-[0_1px_0_oklch(0_0_0_/0.04)]",
-        className,
-      )}
-    >
-      <div className="flex items-start justify-between gap-2">
-        <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-          {label}
-        </span>
-        <Icon className="size-4 shrink-0 text-muted-foreground/70" aria-hidden />
-      </div>
-      <p className="mt-3 font-[family-name:var(--font-heading)] text-xl font-semibold tabular-nums tracking-tight text-foreground">
-        {value}
-      </p>
-      {hint ? <p className="mt-2 text-[11px] leading-relaxed text-muted-foreground">{hint}</p> : null}
-    </div>
-  );
-}
-
 export function ExecutiveIntelligenceSurface() {
   const q = useLatestResultsQuery(true);
   const status = useWorkflowUiStore((s) => s.status);
-  const phaseId = useWorkflowUiStore((s) => s.activePhaseId);
 
   const payload =
     q.data && !q.isError && !isEmptyEnvelope(q.data) && isLatestResultsSuccess(q.data)
       ? q.data
       : undefined;
 
-  const posture = postureFromPayload(payload);
-  const workflowLabel =
-    WORKFLOW_PHASE_METADATA.find((p) => p.id === phaseId)?.label ?? "Idle";
+  const summary = summaryFromPayload(payload);
 
-  const reviewQueue =
+  const totalRows =
+    payload != null
+      ? Number(
+          payload.screening_summary.total_records ?? payload.records?.length ?? 0,
+        )
+      : null;
+
+  const forReview =
     payload != null
       ? Number(
           payload.screening_summary.records_requiring_review ??
@@ -132,28 +98,14 @@ export function ExecutiveIntelligenceSurface() {
         )
       : null;
 
-  const mappingConfPct =
-    payload != null
-      ? Math.round(
-          Math.min(1, Math.max(0, payload.operational_metrics.mapping_confidence ?? 0)) * 100,
-        )
-      : null;
-
-  const dqPct =
-    payload != null
-      ? Math.round(
-          Math.min(1, Math.max(0, payload.operational_metrics.data_quality_score ?? 0)) * 100,
-        )
-      : null;
-
-  const workflowStatusPhrase =
+  const activityLine =
     status === "running"
-      ? "Screening pipeline active"
+      ? "Screening is running. Watch the steps in the sidebar on the left."
       : status === "succeeded"
-        ? "Last run completed"
+        ? "Your last screening finished. Open Results for charts or Review queue for case detail."
         : status === "failed"
-          ? "Last run halted"
-          : "Ready for import";
+          ? "The last run did not finish. Try uploading again or check the message in the upload area."
+          : "Upload a file below when you are ready.";
 
   return (
     <motion.section
@@ -171,104 +123,80 @@ export function ExecutiveIntelligenceSurface() {
         aria-hidden
       />
 
-      <div className="relative grid gap-8 lg:grid-cols-[1.15fr_minmax(0,1fr)] lg:items-start">
-        <div className="min-w-0 space-y-6">
-          <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-              This session
-            </p>
-            <h2 className="mt-2 font-[family-name:var(--font-heading)] text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
-              Posture and what to do next
-            </h2>
-            <p className="mt-3 max-w-xl text-sm leading-relaxed text-muted-foreground">
-              Declarations you screen here appear on the results dashboard and in the review queue. Upload
-              when you are ready; metrics below refresh after each completed run.
-            </p>
-          </div>
-
-          <div
-            className={cn(
-              "rounded-xl border border-border/60 border-l-4 bg-muted/[0.25] p-4",
-              tierAccent[posture.tier],
-            )}
-          >
-            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-              Live posture snapshot
-            </p>
-            <p className="mt-2 font-[family-name:var(--font-heading)] text-lg font-semibold text-foreground">
-              {posture.headline}
-            </p>
-            <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{posture.sub}</p>
-          </div>
-
-          <div className="flex flex-wrap gap-3">
-            <a href="#import-screen" className={buttonVariants({ size: "default" })}>
-              Upload file
-            </a>
-            <Link href={WORKSPACE_ROUTES.dashboard} className={buttonVariants({ variant: "secondary", size: "default" })}>
-              Open results dashboard
+      <div className="relative max-w-3xl space-y-6">
+        <div>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+            Overview
+          </p>
+          <h2 className="mt-2 font-[family-name:var(--font-heading)] text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
+            Start with a file upload
+          </h2>
+          <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+            This page is for importing your declarations and running screening. Charts, breakdowns, and file-quality
+            scores live on the{" "}
+            <Link href={WORKSPACE_ROUTES.dashboard} className="font-medium text-primary underline-offset-4 hover:underline">
+              Results dashboard
             </Link>
-            <Link
-              href={WORKSPACE_ROUTES.review}
-              className={buttonVariants({ variant: "outline", size: "default" })}
-            >
-              Review queue
-            </Link>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-border/60 pt-5 text-xs text-muted-foreground">
-            <span className="inline-flex items-center gap-1.5">
-              <Activity className="size-3.5 text-[var(--accent-intelligence)]" aria-hidden />
-              <span className="font-medium text-foreground">{workflowStatusPhrase}</span>
-              <span className="text-muted-foreground">·</span>
-              <span>Stage: {workflowLabel}</span>
-            </span>
-            {q.isError ? (
-              <span className="text-[var(--semantic-critical)]">
-                Latest screening summary could not be loaded.
-              </span>
-            ) : null}
-          </div>
+            — open it after a run completes.
+          </p>
         </div>
 
-        <div className="grid min-w-0 gap-3 sm:grid-cols-2">
-          <PostureTile
-            icon={ClipboardCheck}
-            label="Queued for review"
-            value={reviewQueue != null ? fmt(reviewQueue) : "—"}
-            hint={
-              reviewQueue != null
-                ? "Records flagged or routed into the analyst queue from this cohort."
-                : "Appears after a completed screening run."
-            }
-            className="sm:col-span-2"
-          />
-          <PostureTile
-            icon={Gauge}
-            label="Column mapping fit"
-            value={mappingConfPct != null ? `${mappingConfPct}%` : "—"}
-            hint="Confidence between your file headings and how we interpreted them."
-          />
-          <PostureTile
-            icon={BarChart3}
-            label="Data completeness"
-            value={dqPct != null ? `${dqPct}%` : "—"}
-            hint="Consistency and completeness of values after parsing and validation."
-          />
-          <PostureTile
-            icon={Sparkles}
-            label="Run confidence (blend)"
-            value={mappingConfPct != null && dqPct != null ? `${Math.round((mappingConfPct + dqPct) / 2)}%` : "—"}
-            hint="Approximate midpoint of mapping fit and completeness for this cohort."
-            className="sm:col-span-2"
-          />
-          <PostureTile
-            icon={Shield}
-            label="Audit trail"
-            value={payload ? "Retained for session" : "Idle"}
-            hint="Outputs for this cohort stay tied to this session for traceability."
-            className="sm:col-span-2"
-          />
+        <div
+          className={cn(
+            "rounded-xl border border-border/60 border-l-4 bg-muted/[0.25] p-4",
+            tierAccent[summary.tier],
+          )}
+        >
+          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+            Where things stand
+          </p>
+          <p className="mt-2 font-[family-name:var(--font-heading)] text-lg font-semibold text-foreground">
+            {summary.headline}
+          </p>
+          <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{summary.sub}</p>
+        </div>
+
+        {payload && totalRows != null && totalRows > 0 ? (
+          <div className="flex flex-wrap gap-4 rounded-xl border border-border/70 bg-card/80 px-4 py-3 text-sm">
+            <div>
+              <p className="text-[11px] font-medium uppercase tracking-[0.12em] text-muted-foreground">Latest file</p>
+              <p className="mt-1 font-semibold tabular-nums text-foreground">{fmt(totalRows)} declarations</p>
+            </div>
+            <div className="hidden h-10 w-px bg-border/80 sm:block" aria-hidden />
+            <div>
+              <p className="text-[11px] font-medium uppercase tracking-[0.12em] text-muted-foreground">Marked for review</p>
+              <p className="mt-1 font-semibold tabular-nums text-foreground">
+                {forReview != null ? fmt(forReview) : "—"}
+              </p>
+            </div>
+          </div>
+        ) : null}
+
+        <div className="flex flex-wrap gap-3">
+          <a href="#import-screen" className={buttonVariants({ size: "default" })}>
+            <FileSpreadsheet className="size-4" aria-hidden />
+            Go to upload
+          </a>
+          <Link
+            href={WORKSPACE_ROUTES.dashboard}
+            className={buttonVariants({ variant: "secondary", size: "default" })}
+          >
+            <LayoutDashboard className="size-4" aria-hidden />
+            Results dashboard
+            <ArrowRight className="size-3.5 opacity-70" aria-hidden />
+          </Link>
+          <Link href={WORKSPACE_ROUTES.review} className={buttonVariants({ variant: "outline", size: "default" })}>
+            <ListChecks className="size-4" aria-hidden />
+            Review queue
+          </Link>
+        </div>
+
+        <div className="border-t border-border/60 pt-4 text-sm text-muted-foreground">
+          {q.isError ? (
+            <p className="text-[var(--semantic-critical)]">We could not load your latest results. Check the connection badge above.</p>
+          ) : (
+            <p>{activityLine}</p>
+          )}
         </div>
       </div>
     </motion.section>

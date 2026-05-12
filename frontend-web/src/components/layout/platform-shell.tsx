@@ -14,15 +14,15 @@ interface RouteMeta {
 const ROUTES: Record<string, RouteMeta> = {
   [WORKSPACE_ROUTES.home]: {
     title: "Overview & import",
-    description: "Current screening posture and where to upload the next declarations file.",
+    description: "Upload your declarations file here. Open Results after screening for charts and summaries.",
   },
   [WORKSPACE_ROUTES.dashboard]: {
     title: "Results dashboard",
-    description: "Cohort summaries, charts, and review handoff.",
+    description: "Summaries, charts, and quality signals from your latest completed screening.",
   },
   [WORKSPACE_ROUTES.review]: {
     title: "Review queue",
-    description: "Prioritised declarations with severity, rationale, and per-record detail.",
+    description: "Declarations that need a closer look, with severity and notes.",
   },
 };
 

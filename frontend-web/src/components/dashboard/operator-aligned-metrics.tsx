@@ -87,7 +87,7 @@ export function OperatorAlignedMetrics({ payload }: { payload: ScreeningSuccessR
     },
     stable: {
       headline: "Stable compliance posture",
-      body: `No unresolved critical tier in this cohort (${totalRecords.toLocaleString("en-US")} declarations screened).`,
+      body: `No unresolved critical tier in this run (${totalRecords.toLocaleString("en-US")} declarations screened).`,
     },
   };
 
@@ -100,7 +100,7 @@ export function OperatorAlignedMetrics({ payload }: { payload: ScreeningSuccessR
     <div className="space-y-8">
       <div>
         <h3 className="font-[family-name:var(--font-heading)] text-lg font-semibold tracking-tight text-foreground sm:text-xl">
-          Executive intelligence summary
+          Summary
         </h3>
         <p className="mt-2 max-w-3xl text-sm leading-relaxed text-muted-foreground">
           {postureCopy[overallTone].body}
@@ -121,7 +121,7 @@ export function OperatorAlignedMetrics({ payload }: { payload: ScreeningSuccessR
       >
         <div>
           <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
-            Operational disposition
+            Overall status
           </p>
           <p className="mt-2 font-[family-name:var(--font-heading)] text-xl font-semibold text-foreground">
             {postureCopy[overallTone].headline}
@@ -130,14 +130,14 @@ export function OperatorAlignedMetrics({ payload }: { payload: ScreeningSuccessR
         <p className="mt-3 font-[family-name:var(--font-heading)] text-3xl font-semibold tabular-nums text-foreground sm:mt-0 sm:text-right">
           {avgHybrid.toFixed(2)}
           <span className="block text-[11px] font-normal uppercase tracking-[0.16em] text-muted-foreground">
-            mean calibrated exposure
+            average risk score
           </span>
         </p>
       </div>
 
       <div>
         <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-          Cohort coverage
+          This screening run
         </p>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
           <SurfaceMetric label="Declarations screened" value={totalRecords.toLocaleString("en-US")} />
@@ -145,7 +145,7 @@ export function OperatorAlignedMetrics({ payload }: { payload: ScreeningSuccessR
           <SurfaceMetric
             label="Routing to review"
             value={flaggedRecords.toLocaleString("en-US")}
-            subtitle={`${reviewRatePct.toFixed(1)}% of cohort`}
+            subtitle={`${reviewRatePct.toFixed(1)}% of declarations`}
             emphasis={reviewRatePct >= 35 ? "pressure" : "neutral"}
           />
           <SurfaceMetric
@@ -159,23 +159,23 @@ export function OperatorAlignedMetrics({ payload }: { payload: ScreeningSuccessR
 
       <div>
         <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-          Exposure ratios
+          Risk spread
         </p>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <SurfaceMetric
-            label="Share requiring disposition"
+            label="Share needing review"
             value={`${reviewRatePct.toFixed(1)}%`}
             subtitle={`${flaggedRecords.toLocaleString("en-US")} declarations`}
             emphasis={reviewRatePct >= 35 ? "pressure" : "neutral"}
           />
           <SurfaceMetric
-            label="Critical ∪ high prevalence"
+            label="Critical or high share"
             value={`${combinedCriticalHighPct.toFixed(2)}%`}
-            subtitle={`${highSeverityCount.toLocaleString("en-US")} combined declarations`}
+            subtitle={`${highSeverityCount.toLocaleString("en-US")} declarations`}
           />
-          <SurfaceMetric label="Fraud escalation count" value={fraudAlerts.toLocaleString("en-US")} />
+          <SurfaceMetric label="Fraud flags" value={fraudAlerts.toLocaleString("en-US")} />
           <SurfaceMetric
-            label="Batch anomaly pressure"
+            label="Batch pattern stress"
             value={pct01(batchRisk)}
             emphasis={batchRisk >= 0.33 ? "pressure" : "neutral"}
           />
@@ -185,16 +185,28 @@ export function OperatorAlignedMetrics({ payload }: { payload: ScreeningSuccessR
       <div className="grid gap-8 lg:grid-cols-[1.1fr_minmax(0,0.95fr)]">
         <div>
           <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-            Intelligence fidelity
+            File quality & batch signals
           </p>
           <div className="grid gap-3 sm:grid-cols-3">
-            <SurfaceMetric label="Batch pressure index" value={pct01(batchRisk)} />
-            <SurfaceMetric label="Schema alignment score" value={pct01(mappingConf)} />
-            <SurfaceMetric label="Dataset fitness score" value={pct01(dq)} />
+            <SurfaceMetric
+              label="Unusual batch patterns"
+              value={pct01(batchRisk)}
+              subtitle="Higher when the file looks uneven as a group."
+            />
+            <SurfaceMetric
+              label="Column match"
+              value={pct01(mappingConf)}
+              subtitle="How well headings matched what we expected."
+            />
+            <SurfaceMetric
+              label="Data completeness"
+              value={pct01(dq)}
+              subtitle="Filled-in, consistent values after checks."
+            />
           </div>
           <p className="mt-3 text-[12px] leading-relaxed text-muted-foreground">
-            Mapping and fitness communicate how faithfully the ingestion pass understood your headings and cell
-            completeness. Batch pressure summarises anomalies at the cohort level.
+            These scores explain how well the upload was read. They sit here on Results so the Overview page stays
+            focused on importing your file.
           </p>
         </div>
         <div className="operational-surface rounded-2xl border border-dashed border-border/80 p-4">
@@ -202,27 +214,27 @@ export function OperatorAlignedMetrics({ payload }: { payload: ScreeningSuccessR
             Analyst note
           </p>
           <p className="mt-3 text-sm leading-relaxed text-foreground">
-            Mean cohort exposure sits at{" "}
-            <span className="font-semibold">{avgHybrid.toFixed(4)}</span>. Fraud escalation handlers recorded{" "}
+            Average risk score for this run is{" "}
+            <span className="font-semibold">{avgHybrid.toFixed(4)}</span>. Fraud-related flags:{" "}
             <span className="font-semibold">{fraudAlerts.toLocaleString("en-US")}</span>.
           </p>
           {(mappingConf > 0 && mappingConf < 0.65) || (dq > 0 && dq < 0.7) ? (
             <div className="mt-4 space-y-2 rounded-xl border border-[var(--semantic-amber)]/40 bg-[var(--semantic-amber)]/[0.08] px-3 py-2.5 text-[13px] text-foreground">
               {mappingConf > 0 && mappingConf < 0.65 ? (
                 <p>
-                  Mapping confidence is below the controlled threshold — validate column synonyms before interpreting
-                  jurisdiction signals.
+                  Column match is low — check that your headings line up with the expected layout before trusting
+                  geography or party fields.
                 </p>
               ) : null}
               {dq > 0 && dq < 0.7 ? (
                 <p>
-                  Dataset fitness is degraded — reconcile missing counterparties or malformed dates upstream.
+                  Data completeness is weak — fix missing parties or bad dates in the source file, then upload again.
                 </p>
               ) : null}
             </div>
           ) : (
             <p className="mt-3 text-xs text-muted-foreground">
-              Structured intelligence inputs look healthy enough for escalation packets without ingest caveats.
+              File read and completeness look strong enough to rely on for routine escalation packs.
             </p>
           )}
         </div>

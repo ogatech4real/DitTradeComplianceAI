@@ -24,13 +24,13 @@ export const navSections: NavSection[] = [
       {
         href: WORKSPACE_ROUTES.home,
         label: "Overview & import",
-        hint: "Upload and run screening",
+        hint: "Upload your file first",
         icon: Layers,
       },
       {
         href: WORKSPACE_ROUTES.dashboard,
         label: "Results dashboard",
-        hint: "Charts and synopsis",
+        hint: "After a run: charts & scores",
         icon: LayoutDashboard,
       },
     ],

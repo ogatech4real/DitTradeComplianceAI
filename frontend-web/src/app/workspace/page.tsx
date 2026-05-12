@@ -4,7 +4,7 @@ import { OperationalIngestPanel } from "@/components/workspace/operational-inges
 export default function OperationalWorkspaceHomePage() {
   return (
     <div className="mx-auto max-w-[1460px] space-y-12 pb-12">
-      <section aria-label="Overview and posture" className="space-y-0">
+      <section aria-label="Overview and next steps" className="space-y-0">
         <ExecutiveIntelligenceSurface />
       </section>
       <section
