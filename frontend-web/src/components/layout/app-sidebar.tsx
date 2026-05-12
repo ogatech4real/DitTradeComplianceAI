@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { navSections } from "@/components/layout/nav-config";
 import { isWorkspaceNavActive } from "@/lib/nav-active";
 import { WORKSPACE_ROUTES } from "@/lib/workspace-routes";
+import { WORKSPACE_PRODUCT_VERSION } from "@/lib/workspace-chrome";
 import { WorkflowStatusRail } from "@/components/workflow/workflow-status-rail";
 
 export function AppSidebar() {
@@ -85,8 +86,8 @@ export function AppSidebar() {
           </section>
         ) : null}
       </div>
-      <div className="relative shrink-0 border-t border-sidebar-border/70 px-4 py-3 text-[11px] leading-snug text-muted-foreground">
-        <p>Session-local unless persistent storage is enabled in deployment.</p>
+      <div className="relative shrink-0 border-t border-sidebar-border/60 px-5 py-2.5">
+        <p className="text-[10px] font-medium tracking-wide text-muted-foreground/85">{WORKSPACE_PRODUCT_VERSION}</p>
       </div>
     </aside>
   );
