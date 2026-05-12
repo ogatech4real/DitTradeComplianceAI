@@ -360,10 +360,6 @@ export function OperatorReviewWorkspace() {
               <CardTitle className="font-[family-name:var(--font-heading)] text-lg font-semibold">
                 Review queue
               </CardTitle>
-              <p className="mt-2 max-w-2xl text-[13px] leading-relaxed text-muted-foreground">
-                Sort declarations, scan severity ribbons, then open evidence for each row. Suited for desk review ahead of
-                disposition.
-              </p>
             </div>
             <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
               <div className="relative flex-1 sm:flex-initial">

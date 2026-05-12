@@ -80,10 +80,7 @@ export function AppSidebar() {
         </nav>
 
         {showWorkflowRail ? (
-          <section
-            className="relative shrink-0 border-t border-sidebar-border/75 bg-sidebar-accent/[0.2] px-3 py-4"
-            aria-label="Screening workflow progress"
-          >
+          <section className="relative shrink-0 border-t border-sidebar-border/75 px-3 py-3" aria-label="Screening workflow progress">
             <WorkflowStatusRail placement="sidebar" />
           </section>
         ) : null}
