@@ -23,11 +23,7 @@ function summaryFromPayload(payload: ScreeningSuccessResponse | undefined): {
   tier: "critical" | "high" | "medium" | "low";
 } {
   if (!payload) {
-    return {
-      headline: "No results yet",
-      sub: "Upload a declarations file below. When screening finishes, open Results for charts and summaries, or Review queue to work cases one by one.",
-      tier: "low",
-    };
+    return { headline: "", sub: "", tier: "low" };
   }
   const s = payload.screening_summary;
   const critical = Number(s.critical_records ?? 0);
@@ -35,14 +31,14 @@ function summaryFromPayload(payload: ScreeningSuccessResponse | undefined): {
   if (critical > 0) {
     return {
       headline: "Urgent items need attention",
-      sub: `${fmt(critical)} declaration${critical === 1 ? "" : "s"} from your latest file should be reviewed without delay.`,
+      sub: `${fmt(critical)} declaration${critical === 1 ? "" : "s"} need review soon.`,
       tier: "critical",
     };
   }
   if (high > 0) {
     return {
       headline: "High-priority review suggested",
-      sub: `${fmt(high)} declaration${high === 1 ? "" : "s"} are marked high severity — use the review queue to work through them.`,
+      sub: `${fmt(high)} declaration${high === 1 ? "" : "s"} at high severity.`,
       tier: "high",
     };
   }
@@ -50,13 +46,13 @@ function summaryFromPayload(payload: ScreeningSuccessResponse | undefined): {
   if (med > 0) {
     return {
       headline: "Some items still in review",
-      sub: `${fmt(med)} declaration${med === 1 ? "" : "s"} are medium severity. Nothing critical is waiting, but follow your usual process.`,
+      sub: `${fmt(med)} at medium severity.`,
       tier: "medium",
     };
   }
   return {
-    headline: "Latest file looks calm",
-    sub: "No critical or high-severity flags on your most recent screening. You can still open Results for the full picture.",
+    headline: "Latest run looks calm",
+    sub: "No critical or high-severity flags.",
     tier: "low",
   };
 }
@@ -98,15 +94,6 @@ export function ExecutiveIntelligenceSurface() {
         )
       : null;
 
-  const activityLine =
-    status === "running"
-      ? "Screening is running. Watch the steps in the sidebar on the left."
-      : status === "succeeded"
-        ? "Your last screening finished. Open Results for charts or Review queue for case detail."
-        : status === "failed"
-          ? "The last run did not finish. Try uploading again or check the message in the upload area."
-          : "Upload a file below when you are ready.";
-
   return (
     <motion.section
       className="relative overflow-hidden rounded-2xl border border-border/70 bg-gradient-to-br from-card via-card to-muted/[0.35] p-6 shadow-sm sm:p-8"
@@ -123,37 +110,33 @@ export function ExecutiveIntelligenceSurface() {
         aria-hidden
       />
 
-      <div className="relative max-w-3xl space-y-6">
-        <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-            Overview
-          </p>
-          <h2 className="mt-2 font-[family-name:var(--font-heading)] text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
-            Start with a file upload
-          </h2>
-          <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-            This page is for importing your declarations and running screening. Charts, breakdowns, and file-quality
-            scores live on the{" "}
-            <Link href={WORKSPACE_ROUTES.dashboard} className="font-medium text-primary underline-offset-4 hover:underline">
-              Results dashboard
-            </Link>
-            — open it after a run completes.
-          </p>
-        </div>
-
+      <div className="relative max-w-3xl space-y-5">
         <div
           className={cn(
-            "rounded-xl border border-border/60 border-l-4 bg-muted/[0.25] p-4",
-            tierAccent[summary.tier],
+            "rounded-xl border border-border/60 border-l-4 bg-muted/[0.25] p-5 sm:p-6",
+            tierAccent[payload ? summary.tier : "low"],
           )}
         >
-          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-            Where things stand
-          </p>
-          <p className="mt-2 font-[family-name:var(--font-heading)] text-lg font-semibold text-foreground">
-            {summary.headline}
-          </p>
-          <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{summary.sub}</p>
+          <h2 className="font-[family-name:var(--font-heading)] text-xl font-semibold tracking-tight text-foreground sm:text-2xl">
+            Start with a file upload here
+          </h2>
+          {payload && summary.headline ? (
+            <p className="mt-2 text-sm font-medium text-foreground">{summary.headline}</p>
+          ) : null}
+          {payload && summary.sub ? (
+            <p className="mt-1 text-sm text-muted-foreground">{summary.sub}</p>
+          ) : null}
+          {status === "running" ? (
+            <p className="mt-2 text-sm text-muted-foreground">Screening in progress — see the steps in the sidebar.</p>
+          ) : null}
+          {status === "failed" ? (
+            <p className="mt-2 text-sm text-muted-foreground">Last run did not finish — check below and try again.</p>
+          ) : null}
+          {q.isError ? (
+            <p className="mt-2 text-sm text-[var(--semantic-critical)]">
+              Could not load latest results. Check the connection badge above.
+            </p>
+          ) : null}
         </div>
 
         {payload && totalRows != null && totalRows > 0 ? (
@@ -189,14 +172,6 @@ export function ExecutiveIntelligenceSurface() {
             <ListChecks className="size-4" aria-hidden />
             Review queue
           </Link>
-        </div>
-
-        <div className="border-t border-border/60 pt-4 text-sm text-muted-foreground">
-          {q.isError ? (
-            <p className="text-[var(--semantic-critical)]">We could not load your latest results. Check the connection badge above.</p>
-          ) : (
-            <p>{activityLine}</p>
-          )}
         </div>
       </div>
     </motion.section>

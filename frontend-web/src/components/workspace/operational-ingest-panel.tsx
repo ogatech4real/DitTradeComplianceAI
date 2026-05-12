@@ -5,13 +5,7 @@ import { useCallback, useState } from "react";
 import { AlertCircle, CheckCircle2, Upload } from "lucide-react";
 import { motion } from "framer-motion";
 
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -90,13 +84,8 @@ export function OperationalIngestPanel() {
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
               <CardTitle className="font-[family-name:var(--font-heading)] text-lg font-semibold tracking-tight">
-                Upload your file
+                Upload
               </CardTitle>
-              <CardDescription className="mt-1.5 max-w-2xl text-sm leading-relaxed">
-                CSV or Excel. We check the file, run screening, then save outcomes for this browser session. When it
-                finishes, use <span className="font-medium text-foreground">Results dashboard</span> for charts and{" "}
-                <span className="font-medium text-foreground">Review queue</span> for line-by-line work.
-              </CardDescription>
             </div>
             {shouldUseMockApi() ? (
               <Badge
@@ -134,10 +123,7 @@ export function OperationalIngestPanel() {
             <p className="mt-4 text-sm font-medium text-foreground">
               Drop a file here, or browse below
             </p>
-            <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
-              Clear column headings help the system read your file. File-quality scores appear on the Results dashboard
-              after screening.
-            </p>
+            <p className="mt-2 text-xs text-muted-foreground">CSV or Excel.</p>
           </div>
 
           <Separator />
