@@ -4,7 +4,17 @@ import { Download } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import type { ScreeningSuccessResponse } from "@/lib/contracts/screening";
-import { recordsToCsv, triggerCsvDownload } from "@/lib/export/csv";
+import { recordsToCsvWithColumns, triggerCsvDownload } from "@/lib/export/csv";
+import {
+  buildFullCohortCsvColumnOrder,
+  prepareFullCohortExportRows,
+} from "@/lib/export/operational-full-cohort-csv";
+import {
+  buildPriorityQueueCsvColumnOrder,
+  buildRecordIdMap,
+  mergePriorityItemWithRecord,
+  riskIndicatorFromHybridLabel,
+} from "@/lib/export/priority-queue-csv";
 
 interface DashboardCsvDownloadsProps {
   payload: ScreeningSuccessResponse;
@@ -26,17 +36,29 @@ export function DashboardCsvDownloads({ payload }: DashboardCsvDownloadsProps) {
     return Number(a?.review_priority ?? 0) - Number(b?.review_priority ?? 0);
   });
   const queue20 = sortedQueue.slice(0, 20);
+  const records = payload.records ?? [];
+  const recordById = buildRecordIdMap(records);
 
   const queueRows: Record<string, unknown>[] =
-    queue20.length > 0 ? queue20.map((q) => ({ ...q })) : [...(payload.records ?? [])]
+    queue20.length > 0
+      ? queue20.map((q) => mergePriorityItemWithRecord(q, recordById))
+      : [...records]
           .sort((a, b) => Number(b.hybrid_score ?? 0) - Number(a.hybrid_score ?? 0))
-          .slice(0, 20);
+          .slice(0, 20)
+          .map((r) => {
+            const row = { ...r };
+            row.risk_indicator = riskIndicatorFromHybridLabel(
+              row.hybrid_risk_label ?? row.risk_label,
+            );
+            return row;
+          });
 
   const priorityDisabled = queueRows.length === 0;
 
   function downloadPriorityCsv() {
     if (priorityDisabled) return;
-    const csv = recordsToCsv(queueRows);
+    const columns = buildPriorityQueueCsvColumnOrder(queueRows);
+    const csv = recordsToCsvWithColumns(queueRows, columns);
     triggerCsvDownload(csv, `priority-queue-top-20_${stamp()}.csv`);
   }
 
@@ -45,7 +67,9 @@ export function DashboardCsvDownloads({ payload }: DashboardCsvDownloadsProps) {
 
   function downloadFullCsv() {
     if (fullDisabled) return;
-    const csv = recordsToCsv(fullRecords);
+    const enriched = prepareFullCohortExportRows(fullRecords);
+    const columns = buildFullCohortCsvColumnOrder(enriched);
+    const csv = recordsToCsvWithColumns(enriched, columns);
     triggerCsvDownload(csv, `operational-review-full-cohort_${stamp()}.csv`);
   }
 
@@ -68,10 +92,11 @@ export function DashboardCsvDownloads({ payload }: DashboardCsvDownloadsProps) {
         variant="secondary"
         disabled={fullDisabled}
         className="gap-1.5 font-medium"
+        title="Every screened row: review cohort first (highest hybrid pressure), then cleared rows. Columns include operator_triage_status, operator_rationale (API explanation + risk drivers), recommended_action, and review_status."
         onClick={downloadFullCsv}
       >
         <Download className="size-4" aria-hidden />
-        Download full operational review CSV
+        Full cohort CSV (priority-ranked)
       </Button>
     </div>
   );

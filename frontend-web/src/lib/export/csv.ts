@@ -18,9 +18,18 @@ function csvEscapeCell(raw: string): string {
 export function recordsToCsv(records: Record<string, unknown>[]): string {
   if (records.length === 0) return "";
   const keys = [...new Set(records.flatMap((r) => Object.keys(r)))].sort();
-  const header = keys.map((k) => csvEscapeCell(k)).join(",");
+  return recordsToCsvWithColumns(records, keys);
+}
+
+/** Fixed column order (e.g. Streamlit-aligned priority queue exports). */
+export function recordsToCsvWithColumns(
+  records: Record<string, unknown>[],
+  columns: string[],
+): string {
+  if (records.length === 0 || columns.length === 0) return "";
+  const header = columns.map((k) => csvEscapeCell(k)).join(",");
   const lines = records.map((row) =>
-    keys.map((k) => csvEscapeCell(stringifyCell(row[k]))).join(","),
+    columns.map((k) => csvEscapeCell(stringifyCell(row[k]))).join(","),
   );
   return `\uFEFF${header}\r\n${lines.join("\r\n")}\r\n`;
 }
