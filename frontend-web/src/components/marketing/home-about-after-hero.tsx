@@ -100,14 +100,6 @@ export function HomeAboutAfterHero() {
               alongside model outputs, not hidden behind them.
             </p>
           </div>
-
-          <div className="max-w-3xl border-t border-border/60 pt-10 text-sm text-muted-foreground">
-            <p>
-              <span className="font-medium text-foreground">Further collaborators &amp; industry:</span> additional names are listed
-              when publications, partner programmes, or mutual disclosures permit. Industrial validation follows agreed integration and
-              documentation checkpoints — not speculative branding on this site.
-            </p>
-          </div>
         </div>
       </div>
     </section>
