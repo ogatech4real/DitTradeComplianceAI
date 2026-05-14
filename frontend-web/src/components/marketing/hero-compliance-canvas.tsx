@@ -1,12 +1,70 @@
 "use client";
 
-import { useCallback, useRef } from "react";
-import { motion, useMotionTemplate, useSpring } from "framer-motion";
+import { useCallback, useEffect, useRef } from "react";
+import { animate, motion, useMotionTemplate, useMotionValue, useSpring, useTransform, type MotionValue } from "framer-motion";
 import { GitBranch, Inbox, ListChecks, Scale, ShieldCheck, Sparkles } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
 const ORBIT_R = "min(36vw, 7.25rem)";
+
+const STAGES = [
+  { Icon: Inbox, label: "Intake", deg: 0 },
+  { Icon: GitBranch, label: "Score", deg: 90 },
+  { Icon: ListChecks, label: "Review", deg: 180 },
+  { Icon: Scale, label: "Govern", deg: 270 },
+] as const;
+
+function OrbitStageItem({
+  spin,
+  deg,
+  Icon,
+  label,
+}: {
+  spin: MotionValue<number>;
+  deg: number;
+  Icon: (typeof STAGES)[number]["Icon"];
+  label: string;
+}) {
+  const armTransform = useTransform(spin, (s) => `rotate(${s + deg}deg) translateY(calc(-1 * ${ORBIT_R}))`);
+  const labelTransform = useTransform(spin, (s) => `translate(-50%, -50%) rotate(${-(s + deg)}deg)`);
+
+  return (
+    <div className="absolute left-1/2 top-1/2 h-0 w-0">
+      <motion.div className="absolute left-0 top-0" style={{ transform: armTransform }}>
+        <motion.div className="flex flex-col items-center gap-1.5" style={{ transform: labelTransform }}>
+          <span className="flex size-10 items-center justify-center rounded-xl border border-border/70 bg-[color-mix(in_oklch,var(--card)_78%,var(--background))] shadow-md backdrop-blur-sm sm:size-11">
+            <Icon
+              className="size-[1.2rem] text-[color-mix(in_oklch,var(--home-accent)_92%,var(--foreground)_8%)] sm:size-5"
+              strokeWidth={1.65}
+            />
+          </span>
+          <span
+            className={cn(
+              "whitespace-nowrap text-center font-bold uppercase leading-none tracking-[0.06em]",
+              "text-[10px] text-foreground/95 sm:text-[11px]",
+              "drop-shadow-[0_1px_2px_oklch(0_0_0_/0.35)]",
+            )}
+          >
+            {label}
+          </span>
+        </motion.div>
+      </motion.div>
+    </div>
+  );
+}
+
+function OrbitStageLabels({ spin }: { spin: MotionValue<number> }) {
+  return (
+    <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+      <div className="relative size-[min(78vw,17.5rem)] sm:size-[19rem]">
+        {STAGES.map(({ Icon, label, deg }) => (
+          <OrbitStageItem key={label} spin={spin} deg={deg} Icon={Icon} label={label} />
+        ))}
+      </div>
+    </div>
+  );
+}
 
 /**
  * Rich decorative hero visual — intake → hybrid intelligence → governance → review.
@@ -16,6 +74,13 @@ export function HeroComplianceCanvas({ className }: { className?: string }) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const spotX = useSpring(0.62, { stiffness: 26, damping: 18, mass: 0.4 });
   const spotY = useSpring(0.38, { stiffness: 26, damping: 18, mass: 0.4 });
+
+  const spin = useMotionValue(0);
+
+  useEffect(() => {
+    const controls = animate(spin, 360, { duration: 52, repeat: Infinity, ease: "linear" });
+    return () => controls.stop();
+  }, [spin]);
 
   const spotlight = useMotionTemplate`radial-gradient(120% 90% at ${spotX}% ${spotY}%, color-mix(in oklch, var(--home-accent) 42%, transparent) 0%, transparent 55%)`;
 
@@ -34,13 +99,6 @@ export function HeroComplianceCanvas({ className }: { className?: string }) {
     spotX.set(0.62);
     spotY.set(0.38);
   }, [spotX, spotY]);
-
-  const stages = [
-    { Icon: Inbox, label: "Intake", deg: 0 },
-    { Icon: GitBranch, label: "Score", deg: 90 },
-    { Icon: ListChecks, label: "Review", deg: 180 },
-    { Icon: Scale, label: "Govern", deg: 270 },
-  ] as const;
 
   return (
     <div
@@ -142,27 +200,7 @@ export function HeroComplianceCanvas({ className }: { className?: string }) {
         />
       </svg>
 
-      {/* Orbiting pipeline stages (behind hub) */}
-      <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-        <div className={cn("relative size-[min(78vw,17.5rem)] sm:size-[19rem]", "hero-compliance-orbit")}>
-          {stages.map(({ Icon, label, deg }) => (
-            <div
-              key={label}
-              className="absolute left-1/2 top-1/2"
-              style={{
-                transform: `translate(-50%, -50%) rotate(${deg}deg) translateY(calc(-1 * ${ORBIT_R}))`,
-              }}
-            >
-              <div className="hero-compliance-orbit-counter flex flex-col items-center gap-1">
-                <span className="flex size-10 items-center justify-center rounded-xl border border-border/70 bg-[color-mix(in_oklch,var(--card)_72%,var(--background))] shadow-md backdrop-blur-sm sm:size-11">
-                  <Icon className="size-[1.15rem] text-[color-mix(in_oklch,var(--home-accent)_90%,var(--foreground)_10%)] sm:size-5" strokeWidth={1.5} />
-                </span>
-                <span className="text-[9px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">{label}</span>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
+      <OrbitStageLabels spin={spin} />
 
       {/* Central hub */}
       <div className="pointer-events-none absolute inset-0 flex items-center justify-center pb-[8%]">
@@ -183,11 +221,15 @@ export function HeroComplianceCanvas({ className }: { className?: string }) {
             />
           </div>
           <motion.div
-            className="mt-2.5 flex items-center gap-1 rounded-full border border-border/60 bg-background/70 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground backdrop-blur-sm"
-            animate={{ opacity: [0.75, 1, 0.75] }}
+            className={cn(
+              "mt-2.5 flex items-center gap-1.5 rounded-full border border-border/60 bg-background/80 px-3 py-1.5 backdrop-blur-sm",
+              "text-[10px] font-bold uppercase leading-none tracking-[0.14em] text-foreground sm:text-[11px]",
+              "shadow-[inset_0_1px_0_color-mix(in_oklch,white_12%,transparent)]",
+            )}
+            animate={{ opacity: [0.88, 1, 0.88] }}
             transition={{ duration: 2.8, repeat: Infinity, ease: "easeInOut" }}
           >
-            <Sparkles className="size-3 text-[color-mix(in_oklch,var(--home-accent)_80%,transparent)]" aria-hidden />
+            <Sparkles className="size-3.5 shrink-0 text-[color-mix(in_oklch,var(--home-accent)_88%,transparent)]" aria-hidden />
             Hybrid intelligence
           </motion.div>
         </motion.div>
