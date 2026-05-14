@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 export const metadata: Metadata = {
   title: "Research & innovation",
   description:
-    "Research-led rigour for Digital Trade Compliance Intelligence: explainable AI, ICC-aligned interoperability, hybrid screening, and human-in-the-loop governance for digital trade operations.",
+    "How Digital Trade Compliance Intelligence frames rigour: academic and operational realism with production engineering, explainable AI for trade governance, hybrid risk scoring, interoperable workflows, and evidence-oriented review aligned with international standards.",
 };
 
 const ARCHITECTURE_THEMES = [
@@ -61,15 +61,31 @@ export default function ResearchInnovationPage() {
       kicker="Research"
       title={
         <>
-          How we frame <span className="text-gradient-home">rigour</span>
+          How We Frame <span className="text-gradient-home">Rigour</span>
         </>
       }
-      description="Digital Trade Compliance Intelligence rests on a single premise: research discipline, operational realism, and shipping-grade software must move together. The programme asks how explainable AI can strengthen digital trade governance — through operational compliance intelligence, hybrid risk scoring, and interoperable workflows aligned with international standards and supervisory expectations — without pretending software replaces judgment."
+      description={
+        <>
+          <p>
+            Digital Trade Compliance Intelligence is built on a simple principle: academic rigour, operational realism, and
+            production-grade software engineering must evolve together. The research programme explores how explainable AI can
+            strengthen modern digital trade governance through operational compliance intelligence, hybrid risk scoring,
+            interoperable data workflows, and evidence-oriented review systems aligned with emerging international standards and
+            regulatory expectations.
+          </p>
+          <p className="mt-4">
+            The objective is not to replace human judgement with automated decision-making, but to develop intelligent systems that
+            improve visibility, prioritisation, consistency, and accountability within increasingly complex compliance
+            environments.
+          </p>
+        </>
+      }
       headerAside={
         <div className="space-y-5">
           <p className="text-sm leading-relaxed text-muted-foreground">
-            Published benchmarks and studies are cited where they exist; the commitments below describe how we design, ship, and
-            disclose the product in production.
+            Published studies, benchmark evaluations, and prototype implementations are referenced where available. The platform
+            itself reflects an ongoing applied research effort focused on operational deployment, explainability, governance
+            alignment, and scalable compliance intelligence infrastructure.
           </p>
           <Link
             href="/platform"
@@ -95,11 +111,17 @@ export default function ResearchInnovationPage() {
       <div className="grid gap-12 lg:grid-cols-12 lg:gap-14">
         <div className="space-y-14 lg:col-span-8">
           <section>
-            <h2 className="text-lg font-semibold text-foreground">Research stance</h2>
+            <h2 className="text-lg font-semibold text-foreground">Research Stance</h2>
             <p className="mt-4 text-[15px] leading-relaxed text-muted-foreground">
-              We treat explainable artificial intelligence as infrastructure for modern trade compliance: interoperable data,
-              defensible scores, and review artefacts that supervisors and partners can interrogate. The question is not whether
-              models can run unattended, but how they make evidence visible, workloads legible, and escalation paths accountable.
+              The platform approaches explainable artificial intelligence as operational compliance infrastructure rather than
+              autonomous automation. This means developing systems that produce interpretable risk signals, auditable review
+              pathways, interoperable trade data structures, and evidence-driven escalation workflows that analysts, supervisors,
+              and partner organisations can meaningfully interrogate.
+            </p>
+            <p className="mt-4 text-[15px] leading-relaxed text-muted-foreground">
+              The central question is not whether AI models can operate unattended, but how intelligent systems can make
+              compliance evidence more visible, operational workloads more manageable, and review decisions more transparent and
+              defensible within modern digital trade ecosystems.
             </p>
           </section>
 
@@ -113,15 +135,6 @@ export default function ResearchInnovationPage() {
               page names the operational modules they roll up into.
             </p>
             <BulletList items={ARCHITECTURE_THEMES} />
-          </section>
-
-          <section className="rounded-xl border border-[color-mix(in_oklch,var(--home-accent)_28%,var(--border))] bg-[color-mix(in_oklch,var(--home-accent)_6%,var(--card))] p-6 sm:p-7">
-            <h2 className="text-lg font-semibold text-foreground">Human-in-the-loop by design</h2>
-            <p className="mt-3 text-[15px] leading-relaxed text-muted-foreground">
-              The research rejects fully autonomous compliance adjudication. It foregrounds transparent governance: humans retain
-              disposition authority, model limits stay legible, and review environments privilege evidence visibility and
-              operational explainability over opaque optimisation.
-            </p>
           </section>
 
           <section>

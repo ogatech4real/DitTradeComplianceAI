@@ -37,23 +37,35 @@ export default function PlatformCapabilitiesPage() {
       }
       headerAside={
         <div className="space-y-5">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">Operating model</p>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">Operating Model</p>
           <p className="text-sm leading-relaxed text-muted-foreground">
-            ICC Digital Trade Toolkit–aligned semantics, auditable review surfaces, and versioned API contracts — deployed and
-            operated under your organisation&apos;s controls and data residency choices.
+            ICC-aligned digital trade semantics, auditable operational review workflows, and versioned API-driven integration
+            architecture deployed under organisation-controlled governance and data residency policies.
           </p>
           <ul className="space-y-2 border-t border-border/50 pt-5 text-[13px] text-foreground/90">
             <li className="flex gap-2">
               <span className="text-[color-mix(in_oklch,var(--home-accent)_85%,transparent)]" aria-hidden>
                 ·
               </span>
-              Human oversight by design
+              Built around human oversight
             </li>
             <li className="flex gap-2">
               <span className="text-[color-mix(in_oklch,var(--home-accent)_85%,transparent)]" aria-hidden>
                 ·
               </span>
-              Evidence-forward analytics, not black-box automation
+              Explainable operational intelligence
+            </li>
+            <li className="flex gap-2">
+              <span className="text-[color-mix(in_oklch,var(--home-accent)_85%,transparent)]" aria-hidden>
+                ·
+              </span>
+              Evidence-driven compliance analytics
+            </li>
+            <li className="flex gap-2">
+              <span className="text-[color-mix(in_oklch,var(--home-accent)_85%,transparent)]" aria-hidden>
+                ·
+              </span>
+              Interoperable and standards-aligned
             </li>
           </ul>
         </div>
