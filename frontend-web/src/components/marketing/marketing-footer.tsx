@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ExternalLink } from "lucide-react";
 
+import { PUBLIC_GITHUB_REPOSITORY_URL } from "@/lib/public-site-links";
 import { WORKSPACE_ROUTES } from "@/lib/workspace-routes";
 
 const PLATFORM = [
@@ -13,7 +14,7 @@ const OPERATIONS = [{ href: WORKSPACE_ROUTES.home, label: "Operational workspace
 
 const EXTERNAL = [
   {
-    href: "https://github.com/ogatech4real/DitTradeComplianceAI",
+    href: PUBLIC_GITHUB_REPOSITORY_URL,
     label: "GitHub",
   },
 ];
@@ -28,11 +29,15 @@ export function MarketingFooter() {
         <div className="grid gap-12 lg:grid-cols-12 lg:gap-10">
           <div className="lg:col-span-5">
             <p className="text-lg font-semibold tracking-tight text-foreground">
-              Digital Trade <span className="text-gradient-home">Compliance intelligence</span>
+              Digital Trade <span className="text-gradient-home">Compliance Intelligence</span>
             </p>
             <p className="mt-4 max-w-md text-sm leading-relaxed text-muted-foreground">
-              Public site for Digital Trade Compliance Intelligence — production workspace for explainable trade screening,
-              partner diligence, and documented product claims. Not legal or jurisdictional advice.
+              Public platform for Digital Trade Compliance Intelligence, providing explainable trade screening, operational
+              compliance analytics, partner diligence support, and evidence-based compliance intelligence workflows.
+            </p>
+            <p className="mt-3 max-w-md text-sm leading-relaxed text-muted-foreground">
+              This platform is intended for operational decision support and research demonstration purposes only and does not
+              constitute legal, regulatory, or jurisdiction-specific compliance advice.
             </p>
           </div>
           <div className="grid gap-10 sm:grid-cols-3 lg:col-span-7">

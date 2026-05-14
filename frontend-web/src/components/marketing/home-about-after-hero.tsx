@@ -3,6 +3,7 @@
 import Link from "next/link";
 
 import { ABOUT_PLATFORM_INTRO, RESEARCH_DIRECTION } from "@/lib/about-platform-content";
+import { PUBLIC_GITHUB_REPOSITORY_URL } from "@/lib/public-site-links";
 import { WORKSPACE_ROUTES } from "@/lib/workspace-routes";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -41,7 +42,7 @@ export function HomeAboutAfterHero() {
               Research
             </Link>
             <Link
-              href="https://github.com/ogatech4real/DitTradeComplianceAI"
+              href={PUBLIC_GITHUB_REPOSITORY_URL}
               target="_blank"
               rel="noopener noreferrer"
               className={cn(buttonVariants({ variant: "outline", size: "lg" }), "home-cta-outline rounded-lg px-7")}

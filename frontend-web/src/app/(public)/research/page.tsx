@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { MarketingArticleShell } from "@/components/marketing/marketing-article-shell";
+import { PUBLIC_GITHUB_REPOSITORY_URL } from "@/lib/public-site-links";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -97,7 +98,7 @@ export default function ResearchInnovationPage() {
             Capability modules
           </Link>
           <Link
-            href="https://github.com/ogatech4real/DitTradeComplianceAI"
+            href={PUBLIC_GITHUB_REPOSITORY_URL}
             className={cn(buttonVariants({ variant: "outline" }), "home-cta-outline w-full justify-center rounded-lg")}
             target="_blank"
             rel="noopener noreferrer"

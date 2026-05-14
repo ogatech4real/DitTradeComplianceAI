@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 
+import { PUBLIC_GITHUB_REPOSITORY_URL } from "@/lib/public-site-links";
 import { WORKSPACE_ROUTES } from "@/lib/workspace-routes";
 import { PUBLIC_PLATFORM_MODULES } from "@/lib/public-platform-modules";
 import { HeroExecutiveSurface } from "@/components/marketing/hero-executive-surface";
@@ -158,7 +159,7 @@ export function PublicHomePage() {
                 Research
               </Link>
               <Link
-                href="https://github.com/ogatech4real/DitTradeComplianceAI"
+                href={PUBLIC_GITHUB_REPOSITORY_URL}
                 target="_blank"
                 rel="noopener noreferrer"
                 className={cn(buttonVariants({ variant: "outline", size: "lg" }), "home-cta-outline rounded-lg px-6")}
