@@ -10,4 +10,4 @@ export const RESEARCH_DIRECTION = [
 ] as const;
 
 export const ABOUT_PLATFORM_INTRO =
-  "AI-assisted operational intelligence for digital trade governance — explainable screening, fraud and batch signals, and jurisdiction-aware triage. Operations run in the workspace; the overview below summarises the programme and design principles.";
+  "AI-assisted operational intelligence for digital trade governance, providing explainable compliance screening, fraud and batch-risk intelligence, and jurisdiction-aware triage. The platform performs real-time diagnostic analysis of uploaded trade data to identify elevated-risk records, compliance inconsistencies, and operational review priorities at first scan. No uploaded data is permanently stored within the platform environment.";

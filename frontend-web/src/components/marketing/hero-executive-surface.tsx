@@ -30,11 +30,11 @@ export function HeroExecutiveSurface() {
 
           <div className="mt-7 rounded-xl border border-border/70 bg-card/45 px-4 py-4 backdrop-blur-sm sm:px-5">
             <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[color-mix(in_oklch,var(--home-accent)_82%,var(--foreground)_18%)]">
-              What we evaluate
+              What we built
             </p>
             <p className="mt-2 text-[15px] leading-snug text-foreground/95">
-              Declarations, attestations, and traceability evidence — scored with hybrid rules and models, then handed to
-              reviewers with explainability and a clear disposition path.
+              A hybrid AI framework for pre-screening of carbon, origin, and traceability records within digital trade
+              compliance workflows.
             </p>
           </div>
 
