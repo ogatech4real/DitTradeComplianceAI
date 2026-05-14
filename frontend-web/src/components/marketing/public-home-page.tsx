@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { WORKSPACE_ROUTES } from "@/lib/workspace-routes";
 import { PUBLIC_PLATFORM_MODULES } from "@/lib/public-platform-modules";
 import { HeroExecutiveSurface } from "@/components/marketing/hero-executive-surface";
+import { HomeAboutAfterHero } from "@/components/marketing/home-about-after-hero";
 import { WorkspaceIntelligencePreview } from "@/components/marketing/workspace-intelligence-preview";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -25,6 +26,8 @@ export function PublicHomePage() {
   return (
     <>
       <HeroExecutiveSurface />
+
+      <HomeAboutAfterHero />
 
       <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
         <div className="max-w-3xl">
@@ -168,29 +171,6 @@ export function PublicHomePage() {
       </section>
 
       <WorkspaceIntelligencePreview home />
-
-      <section className="border-t border-border/70">
-        <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6 lg:px-8 lg:py-16">
-          <div className="flex flex-col gap-6 rounded-xl border border-border/70 bg-card/25 px-6 py-6 sm:flex-row sm:items-center sm:justify-between sm:px-8">
-            <div className="max-w-2xl">
-              <p className="public-kicker">People &amp; context</p>
-              <p className="mt-2 text-foreground">
-                Lead, collaborators, and philosophy — on{" "}
-                <Link href="/about" className="font-medium underline-offset-4 hover:underline">
-                  About
-                </Link>
-                .
-              </p>
-            </div>
-            <Link
-              href="/about"
-              className={cn(buttonVariants({ variant: "outline", size: "lg" }), "home-cta-outline shrink-0 rounded-lg px-6")}
-            >
-              About
-            </Link>
-          </div>
-        </div>
-      </section>
     </>
   );
 }

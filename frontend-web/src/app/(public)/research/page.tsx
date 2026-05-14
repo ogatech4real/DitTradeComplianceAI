@@ -2,11 +2,7 @@ import type { Metadata } from "next";
 
 import Link from "next/link";
 
-import {
-  MarketingArticleCtaBand,
-  MarketingArticleShell,
-} from "@/components/marketing/marketing-article-shell";
-import { WORKSPACE_ROUTES } from "@/lib/workspace-routes";
+import { MarketingArticleShell } from "@/components/marketing/marketing-article-shell";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -178,20 +174,6 @@ export default function ResearchInnovationPage() {
             </ul>
           </div>
         </aside>
-      </div>
-
-      <div className="mt-16">
-        <MarketingArticleCtaBand
-          body="Exercise intake, scoring, explainability, and review queues in the live workspace under your organisation's policies and data controls."
-          actions={
-            <Link
-              href={WORKSPACE_ROUTES.home}
-              className={cn(buttonVariants({ size: "lg" }), "home-cta-primary rounded-lg px-8")}
-            >
-              Workspace
-            </Link>
-          }
-        />
       </div>
     </MarketingArticleShell>
   );

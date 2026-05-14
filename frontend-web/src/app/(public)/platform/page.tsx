@@ -17,11 +17,7 @@ export default function PlatformCapabilitiesPage() {
   return (
     <MarketingArticleShell
       kicker="Platform"
-      title={
-        <>
-          Six integrated modules — <span className="text-gradient-home">production</span> capability surface
-        </>
-      }
+      title="Six integrated modules"
       description="Each module ships in the live workspace: hybrid rules and models, fraud and cohort intelligence, explainable outputs, and human-led disposition. The platform assists compliance operations; it does not issue certificates or replace legal or regulatory judgment."
       actions={
         <>
@@ -64,11 +60,6 @@ export default function PlatformCapabilitiesPage() {
       }
       contentClassName="space-y-0"
     >
-      <p className="mb-8 max-w-3xl text-[15px] leading-relaxed text-muted-foreground">
-        The six modules below are the same capability set summarised on the home page — here with full labels for procurement,
-        risk, and engineering stakeholders reviewing what is already running in the product.
-      </p>
-
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {PUBLIC_PLATFORM_MODULES.map((c) => {
           const Icon = c.icon;

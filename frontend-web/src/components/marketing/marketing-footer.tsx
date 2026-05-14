@@ -7,7 +7,6 @@ const PLATFORM = [
   { href: "/", label: "Home" },
   { href: "/platform", label: "Platform capabilities" },
   { href: "/research", label: "Research & innovation" },
-  { href: "/about", label: "Authors & collaborators" },
 ];
 
 const OPERATIONS = [{ href: WORKSPACE_ROUTES.home, label: "Operational workspace" }];
@@ -34,13 +33,6 @@ export function MarketingFooter() {
             <p className="mt-4 max-w-md text-sm leading-relaxed text-muted-foreground">
               Public site for Digital Trade Compliance Intelligence — production workspace for explainable trade screening,
               partner diligence, and documented product claims. Not legal or jurisdictional advice.
-            </p>
-            <p className="mt-6 text-xs leading-relaxed text-muted-foreground">
-              Contact and collaboration paths are described on{" "}
-              <Link href="/about" className="font-medium text-foreground underline-offset-4 hover:underline">
-                About
-              </Link>
-              . Operational filings remain governed by your organisation&apos;s workspace policies.
             </p>
           </div>
           <div className="grid gap-10 sm:grid-cols-3 lg:col-span-7">
@@ -88,10 +80,9 @@ export function MarketingFooter() {
             </div>
           </div>
         </div>
-        <div className="mt-14 border-t border-border/70 pt-8 text-center text-[11px] leading-relaxed text-muted-foreground lg:text-left">
-          ICC Digital Trade Toolkit alignment describes interoperable data discipline — not certification, clearance guarantees,
-          or autonomous regulatory outcomes. The operational workspace remains the venue for live screening and disposition.
-        </div>
+        <p className="mt-14 border-t border-border/70 pt-8 text-center text-[11px] leading-relaxed text-muted-foreground lg:text-left">
+          © 2026 ICC Digital Trade Toolkit alignment
+        </p>
       </div>
     </footer>
   );

@@ -63,9 +63,9 @@ export function ConnectionBadge() {
       <Badge
         variant="outline"
         className="border-[var(--semantic-emerald)]/35 bg-[var(--semantic-emerald-soft)]/80 font-normal text-foreground"
-        title={q.data?.status ? `Service status: ${q.data.status}` : undefined}
+        title={q.data?.status ? `API status: ${q.data.status}` : "API reachable"}
       >
-        Connected
+        API Connected
       </Badge>
     </div>
   );

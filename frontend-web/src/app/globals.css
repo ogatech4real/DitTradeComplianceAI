@@ -390,6 +390,51 @@
   }
 }
 
+@keyframes hero-compliance-terrain-drift {
+  0% {
+    background-position: 0 0, 0 0;
+  }
+  100% {
+    background-position: 44px 44px, -22px 22px;
+  }
+}
+
+@keyframes hero-compliance-orbit-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.hero-compliance-terrain {
+  transform: perspective(780px) rotateX(63deg) scale3d(1.2, 1.2, 1);
+  transform-origin: 50% 100%;
+  background-image:
+    linear-gradient(
+      to right,
+      color-mix(in oklch, var(--home-accent) 24%, transparent) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      to bottom,
+      color-mix(in oklch, var(--home-accent) 14%, transparent) 1px,
+      transparent 1px
+    );
+  background-size: 44px 44px;
+  animation: hero-compliance-terrain-drift 26s linear infinite;
+}
+
+.hero-compliance-orbit {
+  animation: hero-compliance-orbit-spin 52s linear infinite;
+  transform-origin: 50% 50%;
+}
+
+.hero-compliance-orbit-counter {
+  animation: hero-compliance-orbit-spin 52s linear infinite reverse;
+}
+
 @layer utilities {
   .text-gradient-brand {
     background-image: var(--gradient-brand);

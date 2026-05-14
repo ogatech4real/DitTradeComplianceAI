@@ -20,7 +20,6 @@ import {
 const NAV = [
   { href: "/platform", label: "Platform" },
   { href: "/research", label: "Research" },
-  { href: "/about", label: "About" },
 ] as const;
 
 export function MarketingHeader() {

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 
 import { WORKSPACE_ROUTES } from "@/lib/workspace-routes";
-import { HeroIntelligenceTopology } from "@/components/marketing/hero-intelligence-topology";
+import { HeroComplianceCanvas } from "@/components/marketing/hero-compliance-canvas";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -73,21 +73,7 @@ export function HeroExecutiveSurface() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1], delay: 0.04 }}
         >
-          <div className="relative flex w-full flex-col justify-center overflow-hidden rounded-2xl border border-border/70 bg-[color-mix(in_oklch,var(--card)_38%,transparent)] p-6 sm:p-8">
-            <div className="public-site-hero-grid pointer-events-none absolute inset-0 opacity-[0.22]" />
-            <div className="relative">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">Flow sketch</p>
-              <p className="mt-2 max-w-sm text-sm text-muted-foreground">
-                Abstract routes and nodes — not live data or proprietary graphs.
-              </p>
-              <div className="mt-5">
-                <HeroIntelligenceTopology
-                  accent="home"
-                  className="mx-auto h-[min(200px,38vw)] w-full max-w-md sm:h-[240px]"
-                />
-              </div>
-            </div>
-          </div>
+          <HeroComplianceCanvas className="min-h-[min(320px,52vw)] w-full lg:min-h-[340px]" />
         </motion.div>
       </div>
     </section>
